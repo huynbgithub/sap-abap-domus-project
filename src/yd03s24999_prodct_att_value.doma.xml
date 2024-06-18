@@ -3,13 +3,12 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD01V>
-    <DOMNAME>YD03S24999_BRAND</DOMNAME>
+    <DOMNAME>YD03S24999_PRODCT_ATT_VALUE</DOMNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DATATYPE>CHAR</DATATYPE>
-    <LENG>000032</LENG>
-    <OUTPUTLEN>000032</OUTPUTLEN>
-    <LOWERCASE>X</LOWERCASE>
-    <DDTEXT>Brand</DDTEXT>
+    <LENG>000064</LENG>
+    <OUTPUTLEN>000064</OUTPUTLEN>
+    <DDTEXT>Product Attribute Value</DDTEXT>
    </DD01V>
   </asx:values>
  </asx:abap>

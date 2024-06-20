@@ -1,7 +1,7 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'Product Variant Image Header'
 define root view entity ZI_03_S24_999_PRV_IMAGE
-  as select from y03s24999_prvimg
+  as select from y03s24999_prvimg 
 {
   key id                 as Id,
   key product_variant_id as ProductVariantId,

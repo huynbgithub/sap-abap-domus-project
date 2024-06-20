@@ -66,8 +66,6 @@ IS_DELETED = '' )
                               ( ID = 'D73F1E03-449A-4A71-0A20-08DC31F603D0' PRODUCT_VARIANT_ID = 'D72B2A49-4DC1-4087-BDE1-08DC3240B5EA' IMAGE_URL =
 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/89972819_2667852566829181_4018520278588981248_npH5ZuTFCOe%23.jpg' IS_DELETED = '' )
                               ( ID = '015E3B52-88BD-4DA7-0A21-08DC31F603D0' PRODUCT_VARIANT_ID = 'AE56714D-1696-4818-B9D1-6E5073E11669' IMAGE_URL = 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/logogTaS6Nuoil%23.png' IS_DELETED = '' )
-                              ( ID = '00F49694-DA91-4B1A-2D5F-08DC32B83AEF' PRODUCT_VARIANT_ID = 'A3136B17-9CA8-44FA-6B00-08DC2631263D' IMAGE_URL = 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/19uaSjPWZO1%23.png' IS_DELETED = '' )
-                              ( ID = '4651313C-81D6-4032-2D60-08DC32B83AEF' PRODUCT_VARIANT_ID = 'A3136B17-9CA8-44FA-6B00-08DC2631263D' IMAGE_URL = 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/25pOMI4nKXG%29.png' IS_DELETED = '' )
                               ( ID = '474ECE41-AD53-4FF5-AF22-08DC32D730BC' PRODUCT_VARIANT_ID = '9D6919CB-B7FF-4AE7-4E3A-08DC32D67287' IMAGE_URL = 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/Product1BhPgVHzX9k%24.png' IS_DELETED =
 '' )
                               ( ID = 'D1C948A4-7BE1-45AF-D4F5-08DC32DE0ACF' PRODUCT_VARIANT_ID = '414F3B1B-88F6-4219-4268-08DC32D83389' IMAGE_URL =
@@ -131,10 +129,6 @@ IS_DELETED = '' )
 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/malm-bed-frame-high-w-2-storage-boxes-white__1101597_pe866769_s5o8dtoMqFwB%23.avif' IS_DELETED = '' )
                               ( ID = 'D59119E3-AFD9-4014-DFA7-08DC38F2D493' PRODUCT_VARIANT_ID = 'A836A1E9-3402-4F28-5B4F-08DC38F2BA0A' IMAGE_URL = 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/Product1etublNjYxT%25.png' IS_DELETED =
 '' )
-                              ( ID = 'AA637845-6307-4053-CE45-08DC47E08E8B' PRODUCT_VARIANT_ID = 'A3136B17-9CA8-44FA-6B00-08DC2631263D' IMAGE_URL =
-'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/Screenshot2024-03-19122254moa2gsKauE%28.png' IS_DELETED = '' )
-                              ( ID = '390748CF-C9B9-44B0-C8B7-08DC48D045D2' PRODUCT_VARIANT_ID = 'A3136B17-9CA8-44FA-6B00-08DC2631263D' IMAGE_URL = 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/Screenshot2024-03-17at23WkTUxMMsVi^.25'
-IS_DELETED = '' )
                               ( ID = '97C57459-5EC3-49B0-B8AB-08DC4910A6F9' PRODUCT_VARIANT_ID = 'AF73932E-66B0-4D8A-DDA6-08DC49109013' IMAGE_URL = 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/bPOIKw1Ref8_.png' IS_DELETED = '' )
                               ( ID = 'F3B79A59-5C1F-41C1-8533-107F7370854D' PRODUCT_VARIANT_ID = '6B388CA1-B69E-40D2-6B01-08DC2631263D' IMAGE_URL =
 'https://www.fortytwo.sg/media/catalog/product/cache/1/image/1305x/9df78eab33525d08d6e5fb8d27136e95/6/1/6131blk1.jpg' IS_DELETED = '' )

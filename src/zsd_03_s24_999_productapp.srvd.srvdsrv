@@ -1,0 +1,4 @@
+@EndUserText.label: 'Product App Service Definition'
+define service ZSD_03_S24_999_PRODUCTAPP {
+  expose ZC_03_S24_999_ProductApp as ProductApp;
+}

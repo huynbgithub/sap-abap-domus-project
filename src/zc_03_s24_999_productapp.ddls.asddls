@@ -27,9 +27,14 @@ define view entity ZC_03_S24_999_ProductApp
       ]
       
       @EndUserText.label: 'ID'
-      @UI.lineItem: [{ position: 1, label: 'ID' }]
-      @UI.selectionField: [{ position: 1 }]
+//      @UI.lineItem: [{ position: 1, label: 'ID' }]
+      @UI.selectionField: [{ position: 10 }]
       key Id,
+      
+      @EndUserText.label: 'Short ID'
+      @UI.lineItem: [{ position: 1, label: 'ID' }]
+//      @UI.selectionField: [{ position: 1 }]
+      ShortId,
       
       @EndUserText.label: 'Short Description'
       @UI.lineItem: [{ position: 50, label: 'Description' }]
@@ -39,7 +44,7 @@ define view entity ZC_03_S24_999_ProductApp
 
       @EndUserText.label: 'Name'
       @UI.lineItem: [{ position: 30, label: 'Name', importance: #HIGH }]
-      @UI.selectionField: [{ position: 10 }]
+      @UI.selectionField: [{ position: 30 }]
       @UI.identification: [{ position: 20 }]
       Name,
 
@@ -49,8 +54,8 @@ define view entity ZC_03_S24_999_ProductApp
       ImageUrl,
 
       @EndUserText.label: 'Category'
-      @UI.lineItem: [{ position: 20, label: 'Category' }]
-      @UI.selectionField: [{ position: 30 }]
+      @UI.lineItem: [{ position: 20, label: 'Category', importance: #HIGH }]
+      @UI.selectionField: [{ position: 20 }]
       @UI.identification: [{ position: 50 }]
       Category,
 

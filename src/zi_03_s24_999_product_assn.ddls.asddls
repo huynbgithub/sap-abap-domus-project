@@ -6,11 +6,12 @@ association[0..1] to ZI_03_S24_999_PRO_1ST_VRT_IMG as _variant on $projection.Id
 association to parent ZI_03_S24_999_PROCAT as _procat on $projection.ProcatId = _procat.Id
 {
     key P.Id as Id,
+    concat(left(Id, 18),'...') as ShortId,
     P.ProcatId as ProcatId,
     P.ProductName as Name,
     P.Brand as Brand,
     P.Description as Description,
-    ltrim(Description, '.') as ShortDescription,
+    concat(left(Description, 180),'...') as ShortDescription,
     _variant.ImageUrl as ImageUrl,
     _procat.Name as Category,
     _procat

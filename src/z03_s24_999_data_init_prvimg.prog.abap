@@ -74,8 +74,6 @@ IS_DELETED = '' )
 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/malm-bed-frame-high-white__1101527_pe866706_s5sAZlWQcef7%23.avif' IS_DELETED = '' )
                               ( ID = '71F31E34-E7F6-4556-0F5F-08DC32E0D424' PRODUCT_VARIANT_ID = '6368E5DF-C2D9-4D7F-9263-045A8AFC26F9' IMAGE_URL = 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/Hinh-anh-chan-dung-nudQEuCZ3PLs%29.jpg'
 IS_DELETED = '' )
-                              ( ID = '2CCE9370-7D6A-44FA-0F60-08DC32E0D424' PRODUCT_VARIANT_ID = '6368E5DF-C2D9-4D7F-9263-045A8AFC26F9' IMAGE_URL = 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/digital-business-cardQ43Oces7wE^.png'
-IS_DELETED = '' )
                               ( ID = '291670FA-33DA-4B02-0F61-08DC32E0D424' PRODUCT_VARIANT_ID = 'E02FDA14-0FFD-4360-06CE-08DC32DFF8DF' IMAGE_URL =
 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/malm-bed-frame-high-w-2-storage-boxes-white__1101597_pe866769_s5i71PTHEj3B%2B.avif' IS_DELETED = '' )
                               ( ID = '66132B69-A47C-4DB9-0F62-08DC32E0D424' PRODUCT_VARIANT_ID = 'AE56714D-1696-4818-B9D1-6E5073E11669' IMAGE_URL =

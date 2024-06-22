@@ -2,7 +2,7 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @UI.headerInfo: {
     title: {
-        value: 'Category'
+        value: 'CategoryName'
     },
     description: {
         value: 'Name'
@@ -27,14 +27,13 @@ define view entity ZC_03_S24_999_ProductApp
       ]
       
       @EndUserText.label: 'ID'
-//      @UI.lineItem: [{ position: 1, label: 'ID' }]
-      @UI.selectionField: [{ position: 10 }]
       key Id,
       
-      @EndUserText.label: 'Short ID'
-      @UI.lineItem: [{ position: 1, label: 'ID' }]
-//      @UI.selectionField: [{ position: 1 }]
-      ShortId,
+      @EndUserText.label: 'Product Code'
+      @UI.lineItem: [{ position: 1, label: 'Product Code' }]
+      @UI.selectionField: [{ position: 1 }]
+      @UI.identification: [{ position: 15 }]
+      ProductCode,
       
       @EndUserText.label: 'Short Description'
       @UI.lineItem: [{ position: 50, label: 'Description' }]
@@ -57,7 +56,7 @@ define view entity ZC_03_S24_999_ProductApp
       @UI.lineItem: [{ position: 20, label: 'Category', importance: #HIGH }]
       @UI.selectionField: [{ position: 20 }]
       @UI.identification: [{ position: 50 }]
-      Category,
+      _procat.Name as CategoryName,
 
       @EndUserText.label: 'Brand'
       @UI.lineItem: [{ position: 40, label: 'Brand'}]

@@ -5,6 +5,7 @@ define root view entity ZI_03_S24_999_PRODUCT
 {
   key id               as Id,
   key procat_id        as ProcatId,
+      product_code     as ProductCode,
       product_name     as ProductName,
       brand            as Brand,
       created_by       as CreatedBy,

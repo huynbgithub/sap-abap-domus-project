@@ -418,30 +418,34 @@
       <DESCRIPT>Quotation</DESCRIPT>
       <TYPE>I</TYPE>
       <NEXTSCREEN>0000</NEXTSCREEN>
-      <LINES>024</LINES>
-      <COLUMNS>118</COLUMNS>
+      <LINES>033</LINES>
+      <COLUMNS>183</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
        <TYPE>SCREEN</TYPE>
        <NAME>SCREEN</NAME>
       </RPY_DYCATT>
-     </CONTAINERS>
-     <FIELDS>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEXT</TYPE>
-       <NAME>%#AUTOTEXT001</NAME>
-       <TEXT>SUBSCREEN_0130</TEXT>
+      <RPY_DYCATT>
+       <TYPE>SUBSCREEN</TYPE>
+       <NAME>SUBSCREEN_0131</NAME>
+       <ELEMENT_OF>SCREEN</ELEMENT_OF>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
-       <LENGTH>014</LENGTH>
-       <VISLENGTH>014</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
-       <FORMAT>CHAR</FORMAT>
-       <REQU_ENTRY>N</REQU_ENTRY>
-      </RPY_DYFATC>
+       <LENGTH>090</LENGTH>
+       <HEIGHT>002</HEIGHT>
+      </RPY_DYCATT>
+      <RPY_DYCATT>
+       <TYPE>CUST_CTRL</TYPE>
+       <NAME>CUSTOM_CONTROL_ALV_0130</NAME>
+       <ELEMENT_OF>SCREEN</ELEMENT_OF>
+       <LINE>004</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>090</LENGTH>
+       <HEIGHT>025</HEIGHT>
+      </RPY_DYCATT>
+     </CONTAINERS>
+     <FIELDS>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
@@ -459,16 +463,18 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>* MODULE STATUS_0110.</LINE>
+       <LINE>  CALL SUBSCREEN SUBSCREEN_0131 INCLUDING SY-REPID &apos;0131&apos;.</LINE>
       </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>*</LINE>
-      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>* MODULE USER_COMMAND_0110.</LINE>
+       <LINE>  CALL SUBSCREEN SUBSCREEN_0131.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>  MODULE USER_COMMAND_0130.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
     </item>
@@ -735,6 +741,14 @@
       <TEXT_NAME>ICON_CANCEL</TEXT_NAME>
       <ICON_ID>@0W@</ICON_ID>
       <FUN_TEXT>Cancel</FUN_TEXT>
+     </RSMPE_FUNT>
+     <RSMPE_FUNT>
+      <CODE>EXECUTE</CODE>
+      <TEXTNO>001</TEXTNO>
+      <TEXT_TYPE>S</TEXT_TYPE>
+      <TEXT_NAME>ICON_EXECUTE_OBJECT</TEXT_NAME>
+      <ICON_ID>@15@</ICON_ID>
+      <FUN_TEXT>Execute</FUN_TEXT>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
       <CODE>EXIT</CODE>
@@ -1206,11 +1220,25 @@
       <MENUCODE>000010</MENUCODE>
      </RSMPE_ACT>
     </ACT>
+    <BUT>
+     <RSMPE_BUT>
+      <PFK_CODE>000001</PFK_CODE>
+      <CODE>0001</CODE>
+      <NO>01</NO>
+      <PFNO>08</PFNO>
+     </RSMPE_BUT>
+    </BUT>
     <PFK>
      <RSMPE_PFK>
       <CODE>000001</CODE>
       <PFNO>03</PFNO>
       <FUNCODE>BACK</FUNCODE>
+      <FUNNO>001</FUNNO>
+     </RSMPE_PFK>
+     <RSMPE_PFK>
+      <CODE>000001</CODE>
+      <PFNO>08</PFNO>
+      <FUNCODE>EXECUTE</FUNCODE>
       <FUNNO>001</FUNNO>
      </RSMPE_PFK>
      <RSMPE_PFK>
@@ -1252,6 +1280,10 @@
      <RSMPE_STAF>
       <STATUS>ZSTATUS_001</STATUS>
       <FUNCTION>CANC</FUNCTION>
+     </RSMPE_STAF>
+     <RSMPE_STAF>
+      <STATUS>ZSTATUS_001</STATUS>
+      <FUNCTION>EXECUTE</FUNCTION>
      </RSMPE_STAF>
      <RSMPE_STAF>
       <STATUS>ZSTATUS_001</STATUS>
@@ -1327,6 +1359,12 @@
     <item>
      <ID>R</ID>
      <ENTRY>Program for Domus Staff</ENTRY>
+     <LENGTH>23</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_QCODE</KEY>
+     <ENTRY>Quotation Code:</ENTRY>
      <LENGTH>23</LENGTH>
     </item>
    </TPOOL>

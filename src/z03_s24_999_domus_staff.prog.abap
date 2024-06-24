@@ -9,7 +9,7 @@ PROGRAM Z03_S24_999_DOMUS_STAFF.
 *& DOMUS_STAFF Top Include
 *&---------------------------------------------------------------------*
 INCLUDE Z03_S24_999_DOMUS_STAFF_TOP.
-
+INCLUDE Z03_S24_999_QUOTATION_TOP.
 *---------------------------------------------------------------------*
 * MODULES (Call by Screens)
 *---------------------------------------------------------------------*
@@ -19,6 +19,12 @@ INCLUDE Z03_S24_999_DOMUS_AUTH_PAI1000.
 * Screen 100
 INCLUDE Z03_S24_999_DOMUS_STAFF_PBO100.
 INCLUDE Z03_S24_999_DOMUS_STAFF_PAI100.
+* Screen 130
+INCLUDE Z03_S24_999_DOMUS_STAFF_PBO130.
+INCLUDE Z03_S24_999_DOMUS_STAFF_PAI130.
+* Screen 140
+INCLUDE Z03_S24_999_DOMUS_STAFF_PBO140.
+INCLUDE Z03_S24_999_DOMUS_STAFF_PAI140.
 
 *---------------------------------------------------------------------*
 * Subroutine (FORM ... PERFORM)

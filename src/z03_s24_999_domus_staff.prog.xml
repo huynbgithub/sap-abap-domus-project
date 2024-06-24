@@ -20,7 +20,7 @@
       <TYPE>N</TYPE>
       <NEXTSCREEN>0100</NEXTSCREEN>
       <LINES>027</LINES>
-      <COLUMNS>121</COLUMNS>
+      <COLUMNS>123</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -52,6 +52,21 @@
        <C_RESIZE_H>X</C_RESIZE_H>
        <C_LINE_MIN>003</C_LINE_MIN>
        <C_COLN_MIN>012</C_COLN_MIN>
+       <C_SCROLL_V>X</C_SCROLL_V>
+       <C_SCROLL_H>X</C_SCROLL_H>
+      </RPY_DYCATT>
+      <RPY_DYCATT>
+       <TYPE>SUBSCREEN</TYPE>
+       <NAME>0150_SCA</NAME>
+       <ELEMENT_OF>ZTAB_001</ELEMENT_OF>
+       <LINE>003</LINE>
+       <COLUMN>002</COLUMN>
+       <LENGTH>119</LENGTH>
+       <HEIGHT>024</HEIGHT>
+       <C_RESIZE_V>X</C_RESIZE_V>
+       <C_RESIZE_H>X</C_RESIZE_H>
+       <C_LINE_MIN>003</C_LINE_MIN>
+       <C_COLN_MIN>003</C_COLN_MIN>
        <C_SCROLL_V>X</C_SCROLL_V>
        <C_SCROLL_H>X</C_SCROLL_H>
       </RPY_DYCATT>
@@ -135,10 +150,27 @@
        <CONT_TYPE>STRIP_CTRL</CONT_TYPE>
        <CONT_NAME>ZTAB_001</CONT_NAME>
        <TYPE>PUSH</TYPE>
+       <NAME>ZTAB_001_TAB5</NAME>
+       <TEXT>Service</TEXT>
+       <LINE>001</LINE>
+       <COLUMN>002</COLUMN>
+       <LENGTH>007</LENGTH>
+       <VISLENGTH>007</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <PUSH_FCODE>ZTAB_001_FC5</PUSH_FCODE>
+       <PUSH_FTYPE>P</PUSH_FTYPE>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <REF_FIELD>0150_SCA</REF_FIELD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>STRIP_CTRL</CONT_TYPE>
+       <CONT_NAME>ZTAB_001</CONT_NAME>
+       <TYPE>PUSH</TYPE>
        <NAME>ZTAB_001_TAB2</NAME>
        <TEXT>Package</TEXT>
        <LINE>001</LINE>
-       <COLUMN>002</COLUMN>
+       <COLUMN>003</COLUMN>
        <LENGTH>007</LENGTH>
        <VISLENGTH>007</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -155,7 +187,7 @@
        <NAME>ZTAB_001_TAB3</NAME>
        <TEXT>Quotation</TEXT>
        <LINE>001</LINE>
-       <COLUMN>003</COLUMN>
+       <COLUMN>004</COLUMN>
        <LENGTH>009</LENGTH>
        <VISLENGTH>009</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -172,7 +204,7 @@
        <NAME>ZTAB_001_TAB4</NAME>
        <TEXT>Contract</TEXT>
        <LINE>001</LINE>
-       <COLUMN>004</COLUMN>
+       <COLUMN>005</COLUMN>
        <LENGTH>008</LENGTH>
        <VISLENGTH>008</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -206,7 +238,10 @@
        <LINE>       0130_SCA INCLUDING G_ZTAB_001-PROG &apos;0130&apos;,</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>       0140_SCA INCLUDING G_ZTAB_001-PROG &apos;0140&apos;.</LINE>
+       <LINE>       0140_SCA INCLUDING G_ZTAB_001-PROG &apos;0140&apos;,</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>       0150_SCA INCLUDING G_ZTAB_001-PROG &apos;0150&apos;.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE> MODULE STATUS_0100.</LINE>
@@ -233,7 +268,10 @@
        <LINE>       0130_SCA,</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>       0140_SCA.</LINE>
+       <LINE>       0140_SCA,</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>       0150_SCA.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>  MODULE ZTAB_001_ACTIVE_TAB_GET.</LINE>
@@ -458,6 +496,68 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT001</NAME>
        <TEXT>SUBSCREEN_0140</TEXT>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>014</LENGTH>
+       <VISLENGTH>014</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>OKCODE</TYPE>
+       <TEXT>____________________</TEXT>
+       <LENGTH>020</LENGTH>
+       <VISLENGTH>020</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+      </RPY_DYFATC>
+     </FIELDS>
+     <FLOW_LOGIC>
+      <RPY_DYFLOW>
+       <LINE>PROCESS BEFORE OUTPUT.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>* MODULE STATUS_0110.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>*</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>PROCESS AFTER INPUT.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>* MODULE USER_COMMAND_0110.</LINE>
+      </RPY_DYFLOW>
+     </FLOW_LOGIC>
+    </item>
+    <item>
+     <HEADER>
+      <PROGRAM>Z03_S24_999_DOMUS_STAFF</PROGRAM>
+      <SCREEN>0150</SCREEN>
+      <LANGUAGE>E</LANGUAGE>
+      <DESCRIPT>Service</DESCRIPT>
+      <TYPE>I</TYPE>
+      <NEXTSCREEN>0000</NEXTSCREEN>
+      <LINES>024</LINES>
+      <COLUMNS>118</COLUMNS>
+     </HEADER>
+     <CONTAINERS>
+      <RPY_DYCATT>
+       <TYPE>SCREEN</TYPE>
+       <NAME>SCREEN</NAME>
+      </RPY_DYCATT>
+     </CONTAINERS>
+     <FIELDS>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT001</NAME>
+       <TEXT>SUBSCREEN_0150</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>014</LENGTH>

@@ -16,6 +16,15 @@ FORM HANDLE_EXIT_COMMAND USING IN_UCOMM.
     WHEN 'BACK'.
       IF O_CONTAINER IS NOT INITIAL.
         CALL METHOD O_CONTAINER->FREE.
+        CLEAR O_CONTAINER.
+      ENDIF.
+      IF O_ALV_TABLE IS NOT INITIAL.
+        FREE O_ALV_TABLE.
+        CLEAR O_ALV_TABLE.
+      ENDIF.
+      IF P_QCODE IS NOT INITIAL.
+        FREE P_QCODE.
+        CLEAR P_QCODE.
       ENDIF.
       LEAVE TO SCREEN 0.
 
@@ -120,8 +129,8 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 FORM SHOW_QUOTATION_ALV .
   DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
-        LS_LAYOUT    TYPE LVC_S_LAYO,
-        LS_VARIANT   TYPE DISVARIANT.
+        LS_LAYOUT    TYPE LVC_S_LAYO.
+*        LS_VARIANT   TYPE DISVARIANT.
 
 * Define Table Structure / Define fields catalog
   PERFORM PREPARE_FIELD_CATALOG
@@ -130,31 +139,32 @@ FORM SHOW_QUOTATION_ALV .
 * Prepare Layout
   PERFORM PREPARE_LAYOUT
     CHANGING LS_LAYOUT.
-* Prepare Variant
-  PERFORM PREPARE_VARIANT
-    CHANGING LS_VARIANT.
+** Prepare Variant
+*  PERFORM PREPARE_VARIANT
+*    CHANGING LS_VARIANT.
 
 * Show ALV
   PERFORM DISPLAY_ALV_TABLE
-    USING LS_LAYOUT LS_VARIANT
+    USING LS_LAYOUT
+*          LS_VARIANT
     CHANGING LT_FIELD_CAT.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form ADD_FCAT
 *&---------------------------------------------------------------------*
-FORM ADD_FCAT USING FIELDNAME
-                    SCRTEXT_M
-                    OUTPUTLEN
-                    KEY
-                    HOTSPOT
+FORM ADD_FCAT USING U_FIELDNAME
+                    U_SCRTEXT_M
+                    U_OUTPUTLEN
+                    U_KEY
+                    U_HOTSPOT
               CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
-  DATA: WA_FIELD_CAT TYPE LVC_S_FCAT.
-  WA_FIELD_CAT-FIELDNAME = FIELDNAME.
-  WA_FIELD_CAT-SCRTEXT_M = SCRTEXT_M.
-  WA_FIELD_CAT-OUTPUTLEN = OUTPUTLEN.
-  WA_FIELD_CAT-KEY = KEY.
-  WA_FIELD_CAT-HOTSPOT = HOTSPOT.
-  APPEND WA_FIELD_CAT TO CH_T_FIELD_CAT.
+  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
+  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
+  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
+  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
+  LS_FIELD_CAT-KEY = U_KEY.
+  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form PREPARE_FIELD_CATALOG
@@ -181,40 +191,25 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_ALV_TABLE
 *&---------------------------------------------------------------------*
-*---------------------------------------------------------------------*
-* lcl_alv_handler
-*---------------------------------------------------------------------*
-CLASS LCL_ALV_HANDLER IMPLEMENTATION.
-
-  METHOD HOTSPOT_CLICK.
-
-    READ TABLE IT_QUOTATION INTO DATA(LS_QUOTATION01)
-      INDEX E_ROW_ID-INDEX.
-
-    MESSAGE I007(Z03S24999_DOMUS_MSGS) WITH LS_QUOTATION01-QUOTATION_CODE.
-
-  ENDMETHOD.
-
-ENDCLASS.
 FORM DISPLAY_ALV_TABLE
   USING IM_S_LAYOUT    TYPE LVC_S_LAYO
-        IM_S_VARIANT   TYPE DISVARIANT
+*        IM_S_VARIANT   TYPE DISVARIANT
   CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
 
   IF O_CONTAINER IS INITIAL.
-    O_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0132' ).
 
+    O_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0132' ).
     O_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_CONTAINER ).
   ENDIF.
 
   O_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
     EXPORTING
       IS_LAYOUT                     = IM_S_LAYOUT      " Layout
-      I_SAVE                        = 'A'
-      IS_VARIANT                    = IM_S_VARIANT
+*      I_SAVE                        = 'A'
+*      IS_VARIANT                    = IM_S_VARIANT
     CHANGING
-      IT_OUTTAB                     = IT_QUOTATION          " Output Table
-      IT_FIELDCATALOG               = CH_T_FIELD_CAT                 " Field Catalog
+      IT_OUTTAB                     = IT_QUOTATION     " Output Table
+      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
     EXCEPTIONS
       INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
       PROGRAM_ERROR                 = 2                " Program Errors
@@ -244,13 +239,13 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form PREPARE_VARIANT
 *&---------------------------------------------------------------------*
-FORM PREPARE_VARIANT CHANGING CH_S_VARIANT TYPE DISVARIANT.
-
-  CH_S_VARIANT-REPORT = SY-REPID.
-  CH_S_VARIANT-HANDLE = 001.
-  CH_S_VARIANT-VARIANT = '/CUSTOM_CONTROL_ALV_0132'.
-
-ENDFORM.
+*FORM PREPARE_VARIANT CHANGING CH_S_VARIANT TYPE DISVARIANT.
+*
+*  CH_S_VARIANT-REPORT = SY-REPID.
+*  CH_S_VARIANT-HANDLE = 001.
+*  CH_S_VARIANT-VARIANT = '/CUSTOM_CONTROL_ALV_0132'.
+*
+*ENDFORM.
 *---------------------------------------------------------------------*
 * SET_QCODE_INITIAL_VALUES
 *---------------------------------------------------------------------*

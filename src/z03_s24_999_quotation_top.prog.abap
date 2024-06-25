@@ -22,7 +22,7 @@ TYPES: BEGIN OF TY_QUOTATION,
          UPDATED_ON     TYPE Y03S24999_QUOTA-UPDATED_ON,
        END OF TY_QUOTATION.
 *---------------------------------------------------------------------*
-* CLASS Declaration
+* CLASS Definition
 *---------------------------------------------------------------------*
 CLASS LCL_ALV_HANDLER DEFINITION.
   PUBLIC SECTION.

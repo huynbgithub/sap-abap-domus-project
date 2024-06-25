@@ -84,6 +84,8 @@ FORM HANDLE_UCOMM_0130  USING    IN_OKCODE
   CASE IN_OKCODE.
 
     WHEN 'EXECUTE'.
+* Set color for each quotation status
+      PERFORM SET_INIT_STATUS_COLOR.
 * Get data from QUOTATION table
       PERFORM GET_QUOTATION_DATA.
 * Show QUOTATION ALV
@@ -118,6 +120,11 @@ FORM GET_QUOTATION_DATA .
   IF SY-SUBRC <> 0.
     MESSAGE E004(Z03S24999_DOMUS_MSGS).
   ENDIF.
+
+    LOOP AT IT_QUOTATION ASSIGNING FIELD-SYMBOL(<LS_DATA>).
+
+      PERFORM CHANGE_COLOR USING <LS_DATA>-STATUS CHANGING <LS_DATA>-COLOR.
+    ENDLOOP.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form SHOW_QUOTATION_ALV
@@ -145,9 +152,9 @@ FORM SHOW_QUOTATION_ALV .
 
 * Show ALV
   PERFORM DISPLAY_ALV_TABLE
-    USING LS_LAYOUT
-*          LS_VARIANT
-    CHANGING LT_FIELD_CAT.
+    CHANGING LS_LAYOUT
+*            LS_VARIANT
+             LT_FIELD_CAT.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form ADD_FCAT
@@ -157,6 +164,7 @@ FORM ADD_FCAT USING U_FIELDNAME
                     U_OUTPUTLEN
                     U_KEY
                     U_HOTSPOT
+                    U_EMPHASIZE
               CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
   DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
   LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
@@ -164,6 +172,7 @@ FORM ADD_FCAT USING U_FIELDNAME
   LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
   LS_FIELD_CAT-KEY = U_KEY.
   LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
   APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
 ENDFORM.
 *&---------------------------------------------------------------------*
@@ -173,29 +182,30 @@ FORM PREPARE_FIELD_CATALOG
   CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
 
 ***** Full form:
-  PERFORM: ADD_FCAT USING 'QUOTATION_CODE' 'Quotation Code'    10 'X' 'X' CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'CUSTOMER'       'Customer'          10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'STAFF'          'Staff'             10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'STATUS'         'Status'            10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'PACKAGE_NAME'   'Reference Package' 10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'EXPIRED_ON'     'Expired On'        10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'EXPIRED_AT'     'Expired At'        10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'CREATED_BY'     'Created By'        10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'CREATED_AT'     'Created At'        10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'CREATED_ON'     'Created On'        10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'UPDATED_BY'     'Updated By'        10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'UPDATED_AT'     'Updated At'        10 ''  ''  CHANGING CH_T_FIELD_CAT,
-           ADD_FCAT USING 'UPDATED_ON'     'Updated On'        10 ''  ''  CHANGING CH_T_FIELD_CAT.
+  PERFORM: ADD_FCAT USING 'QUOTATION_CODE' 'Quotation'         10 'X' 'X' ''      CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'CUSTOMER'       'Customer'          10 ''  ''  'C500'  CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'STAFF'          'Staff'             10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'STATUS'         'Status'            10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'PACKAGE_NAME'   'Reference Package' 10 ''  ''  'C700'  CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'EXPIRED_ON'     'Expired On'        10 ''  ''  'C601'  CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'EXPIRED_AT'     'Expired At'        10 ''  ''  'C701'  CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'CREATED_BY'     'Created By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'CREATED_AT'     'Created At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'CREATED_ON'     'Created On'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'UPDATED_BY'     'Updated By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'UPDATED_AT'     'Updated At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_FCAT USING 'UPDATED_ON'     'Updated On'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
 ENDFORM.
 
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_ALV_TABLE
 *&---------------------------------------------------------------------*
 FORM DISPLAY_ALV_TABLE
-  USING IM_S_LAYOUT    TYPE LVC_S_LAYO
-*        IM_S_VARIANT   TYPE DISVARIANT
-  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+  CHANGING CH_S_LAYOUT    TYPE LVC_S_LAYO
+*          IM_S_VARIANT   TYPE DISVARIANT
+           CH_T_FIELD_CAT TYPE LVC_T_FCAT.
 
+  CH_S_LAYOUT-CTAB_FNAME = 'COLOR'.
   IF O_CONTAINER IS INITIAL.
 
     O_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0132' ).
@@ -204,7 +214,7 @@ FORM DISPLAY_ALV_TABLE
 
   O_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
     EXPORTING
-      IS_LAYOUT                     = IM_S_LAYOUT      " Layout
+      IS_LAYOUT                     = CH_S_LAYOUT      " Layout
 *      I_SAVE                        = 'A'
 *      IS_VARIANT                    = IM_S_VARIANT
     CHANGING
@@ -262,5 +272,33 @@ FORM SET_QCODE_INITIAL_VALUES.
 *  P_QCODE-SIGN   = 'I'.  " Include
 *  P_QCODE-OPTION = 'CP'. " CP Contain Pattern
 *  P_QCODE-LOW    = 'Q*'. " Begin with 'Q'
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SET_INIT_STATUS_COLOR
+*&---------------------------------------------------------------------*
+FORM SET_INIT_STATUS_COLOR.
+  GT_COLOR = VALUE #( ( STATUS = 'Negotiating' COL = 7 INT = 1 INV = 1 )
+                      ( STATUS = 'Accepted'    COL = 3 INT = 1 INV = 1 )
+                      ( STATUS = 'Cancelled'   COL = 6 INT = 1 INV = 1 )
+                      ( STATUS = 'Requested'   COL = 5 INT = 1 INV = 1 ) ).
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_COLOR
+*&---------------------------------------------------------------------*
+FORM CHANGE_COLOR  USING    U_QSTATUS TYPE Y03S24999_QUOTA-STATUS
+                   CHANGING CH_COLOR TYPE LVC_T_SCOL.
+
+  DATA LS_COLOR TYPE LVC_S_SCOL.
+  CLEAR: CH_COLOR.
+
+  LS_COLOR-FNAME = 'STATUS'.
+
+  TRY.
+      MOVE-CORRESPONDING GT_COLOR[ STATUS =  U_QSTATUS ] TO LS_COLOR-COLOR.
+      APPEND LS_COLOR TO CH_COLOR.
+  CATCH CX_SY_ITAB_LINE_NOT_FOUND.
+
+  ENDTRY.
 
 ENDFORM.

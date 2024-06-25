@@ -20,7 +20,13 @@ TYPES: BEGIN OF TY_QUOTATION,
          UPDATED_BY     TYPE Y03S24999_QUOTA-UPDATED_BY,
          UPDATED_AT     TYPE Y03S24999_QUOTA-UPDATED_AT,
          UPDATED_ON     TYPE Y03S24999_QUOTA-UPDATED_ON,
+         COLOR          TYPE LVC_T_SCOL,
        END OF TY_QUOTATION.
+* TYPE Declaration for Quotation Status Color
+TYPES: BEGIN OF TY_COLOR,
+            STATUS TYPE Y03S24999_QUOTA-STATUS.
+            INCLUDE TYPE LVC_S_COLO.
+       TYPES END OF TY_COLOR.
 *---------------------------------------------------------------------*
 * CLASS Definition
 *---------------------------------------------------------------------*
@@ -44,6 +50,9 @@ DATA: IT_QUOTATION TYPE STANDARD TABLE OF TY_QUOTATION.
 
 * Work Area Declaration for QUOTATION Table
 DATA: WA_QUOTATION TYPE TY_QUOTATION.
+
+* Status Color Table
+DATA: GT_COLOR TYPE STANDARD TABLE OF TY_COLOR.
 
 * ALV Table Object
 DATA: O_CONTAINER TYPE REF TO CL_GUI_CUSTOM_CONTAINER,

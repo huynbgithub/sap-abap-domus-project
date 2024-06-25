@@ -24,7 +24,16 @@ TYPES: BEGIN OF TY_QUOTATION,
 *---------------------------------------------------------------------*
 * CLASS Declaration
 *---------------------------------------------------------------------*
+CLASS LCL_ALV_HANDLER DEFINITION.
+  PUBLIC SECTION.
 
+    METHODS HOTSPOT_CLICK FOR EVENT HOTSPOT_CLICK OF CL_GUI_ALV_GRID
+      IMPORTING
+        E_ROW_ID
+        E_COLUMN_ID
+        ES_ROW_NO.
+
+ENDCLASS.
 *---------------------------------------------------------------------*
 * DATA Declaration
 *---------------------------------------------------------------------*
@@ -47,3 +56,8 @@ SELECTION-SCREEN BEGIN OF SCREEN 0131 AS SUBSCREEN.
   SELECT-OPTIONS : P_QCODE FOR Y03S24999_QUOTA-QUOTATION_CODE.
 
 SELECTION-SCREEN END OF SCREEN 0131.
+*---------------------------------------------------------------------*
+* Init
+*---------------------------------------------------------------------*
+*INITIALIZATION.
+*  PERFORM SET_QCODE_INITIAL_VALUES.

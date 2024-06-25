@@ -38,6 +38,24 @@
      <MSGNR>004</MSGNR>
      <TEXT>No data found for the given selection of table.</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>Error during ALV displaying.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>Display ALV successfully.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>You are clicking the record: &amp;1</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

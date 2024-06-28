@@ -1,11 +1,12 @@
 *&---------------------------------------------------------------------*
-*& Include          Z03_S24_999_DOMUS_STAFF_PBO130
+*& Include          Z03_S24_999_DOMUS_STAFF_PBO132
 *&---------------------------------------------------------------------*
 *&---------------------------------------------------------------------*
-*& Module SET_INITIAL_VALUES_0131 OUTPUT
+*& Module STATUS_0132 OUTPUT
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-MODULE SET_INITIAL_VALUES_0131 OUTPUT.
-  PERFORM SET_QCODE_INITIAL_VALUES.
+MODULE STATUS_0132 OUTPUT.
+* Set color for each quotation status
+      PERFORM SET_INIT_STATUS_COLOR.
 ENDMODULE.

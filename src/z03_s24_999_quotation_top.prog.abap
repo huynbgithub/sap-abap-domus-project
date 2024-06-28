@@ -43,7 +43,7 @@ ENDCLASS.
 *---------------------------------------------------------------------*
 * DATA Declaration
 *---------------------------------------------------------------------*
-TABLES: Y03S24999_QUOTA.
+DATA: QCODE_DUMMY TYPE Y03S24999_QUOTA-QUOTATION_CODE.
 
 * Internal Table Declaration for QUOTATION Table
 DATA: IT_QUOTATION TYPE STANDARD TABLE OF TY_QUOTATION.
@@ -55,18 +55,12 @@ DATA: WA_QUOTATION TYPE TY_QUOTATION.
 DATA: GT_COLOR TYPE STANDARD TABLE OF TY_COLOR.
 
 * ALV Table Object
-DATA: O_CONTAINER TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
-      O_ALV_TABLE TYPE REF TO CL_GUI_ALV_GRID.
+DATA: O_QUOTATION_CONTAINER TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+      O_QUOTATION_ALV_TABLE TYPE REF TO CL_GUI_ALV_GRID.
 
 *&---------------------------------------------------------------------*
 *& Selection Screen
 *&---------------------------------------------------------------------*
 SELECTION-SCREEN BEGIN OF SCREEN 0131 AS SUBSCREEN.
-  SELECT-OPTIONS : P_QCODE FOR Y03S24999_QUOTA-QUOTATION_CODE.
-
+  SELECT-OPTIONS : P_QCODE FOR QCODE_DUMMY.
 SELECTION-SCREEN END OF SCREEN 0131.
-*---------------------------------------------------------------------*
-* Init
-*---------------------------------------------------------------------*
-*INITIALIZATION.
-*  PERFORM SET_QCODE_INITIAL_VALUES.

@@ -7,7 +7,9 @@
 *       text
 *----------------------------------------------------------------------*
 MODULE USER_COMMAND_0120 INPUT.
-  PERFORM HANDLE_UCOMM_0120
-  USING GV_OKCODE
-        P_PKNAME.
+  IF ZTAB_001-ACTIVETAB = 'ZTAB_001_FC2'.
+    PERFORM HANDLE_UCOMM_0120
+    USING GV_OKCODE
+          P_PKNAME.
+  ENDIF.
 ENDMODULE.

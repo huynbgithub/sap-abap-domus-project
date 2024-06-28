@@ -56,11 +56,9 @@ FORM GET_QUOTATION_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
     CLEAR IT_QUOTATION[].
 
     IF O_QUOTATION_CONTAINER IS NOT INITIAL.
-      CALL METHOD O_QUOTATION_CONTAINER->FREE.
       CLEAR O_QUOTATION_CONTAINER.
     ENDIF.
     IF O_QUOTATION_ALV_TABLE IS NOT INITIAL.
-      FREE O_QUOTATION_ALV_TABLE.
       CLEAR O_QUOTATION_ALV_TABLE.
     ENDIF.
 
@@ -136,7 +134,7 @@ FORM PREPARE_QUOTA_FIELD_CATALOG
            ADD_QUOTATION_FCAT USING 'CUSTOMER'       'Customer'          10 ''  ''  'C500'  CHANGING CH_T_FIELD_CAT,
            ADD_QUOTATION_FCAT USING 'STAFF'          'Staff'             10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
            ADD_QUOTATION_FCAT USING 'STATUS'         'Status'            10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
-           ADD_QUOTATION_FCAT USING 'PACKAGE_NAME'   'Reference Package' 10 ''  ''  'C700'  CHANGING CH_T_FIELD_CAT,
+           ADD_QUOTATION_FCAT USING 'PACKAGE_NAME'   'Reference Package' 32 ''  ''  'C700'  CHANGING CH_T_FIELD_CAT,
            ADD_QUOTATION_FCAT USING 'EXPIRED_ON'     'Expired On'        10 ''  ''  'C601'  CHANGING CH_T_FIELD_CAT,
            ADD_QUOTATION_FCAT USING 'EXPIRED_AT'     'Expired At'        10 ''  ''  'C701'  CHANGING CH_T_FIELD_CAT,
            ADD_QUOTATION_FCAT USING 'CREATED_BY'     'Created By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
@@ -156,8 +154,10 @@ FORM DISPLAY_QUOTATION_ALV_TABLE
 *          IM_S_VARIANT   TYPE DISVARIANT
 
   IF O_QUOTATION_CONTAINER IS INITIAL.
-
     O_QUOTATION_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0132' ).
+  ENDIF.
+
+  IF O_QUOTATION_ALV_TABLE IS INITIAL.
     O_QUOTATION_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_QUOTATION_CONTAINER ).
   ENDIF.
 
@@ -180,7 +180,7 @@ FORM DISPLAY_QUOTATION_ALV_TABLE
   SET HANDLER LO_HANDLER->HOTSPOT_CLICK FOR O_QUOTATION_ALV_TABLE.
 
   IF SY-SUBRC = 0.
-    MESSAGE S006(Z03S24999_DOMUS_MSGS).
+    MESSAGE S006(Z03S24999_DOMUS_MSGS) WITH 'Quotation'.
   ELSE.
     MESSAGE E005(Z03S24999_DOMUS_MSGS).
   ENDIF.
@@ -191,7 +191,7 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 FORM PREPARE_QUOTATION_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
 
-  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
+*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
   CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
   CH_S_LAYOUT-CTAB_FNAME = 'COLOR'.
 
@@ -231,9 +231,9 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 FORM SET_INIT_STATUS_COLOR.
   GT_QUOTATION_COLOR = VALUE #( ( STATUS = 'Negotiating' COL = 7 INT = 1 INV = 1 )
-                      ( STATUS = 'Accepted'    COL = 3 INT = 1 INV = 1 )
-                      ( STATUS = 'Cancelled'   COL = 6 INT = 1 INV = 1 )
-                      ( STATUS = 'Requested'   COL = 5 INT = 1 INV = 1 ) ).
+                                ( STATUS = 'Accepted'    COL = 3 INT = 1 INV = 1 )
+                                ( STATUS = 'Cancelled'   COL = 6 INT = 1 INV = 1 )
+                                ( STATUS = 'Requested'   COL = 5 INT = 1 INV = 1 ) ).
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form CHANGE_QUOTATION_COLOR

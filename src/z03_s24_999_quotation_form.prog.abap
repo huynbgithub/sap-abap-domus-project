@@ -10,7 +10,7 @@
 *&      --> IN_QCODE
 *&---------------------------------------------------------------------*
 FORM HANDLE_UCOMM_0130 USING IN_OKCODE
-                                IN_QCODE.
+                             IN_QCODE.
   DATA: LV_SUCCESS TYPE ABAP_BOOL.
 
   CASE IN_OKCODE.
@@ -49,6 +49,7 @@ FORM GET_QUOTATION_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
       AND Q~IS_DELETED <> @ABAP_TRUE
       AND P~IS_DELETED <> @ABAP_TRUE
       AND Q~STAFF = @GV_USERNAME
+    ORDER BY Q~QUOTATION_CODE DESCENDING
     INTO CORRESPONDING FIELDS OF TABLE @IT_QUOTATION.
 
   IF SY-SUBRC <> 0.
@@ -175,7 +176,7 @@ FORM DISPLAY_QUOTATION_ALV_TABLE
       OTHERS                        = 4
   ).
 
-  DATA(LO_HANDLER) = NEW LCL_ALV_HANDLER( ).
+  DATA(LO_HANDLER) = NEW LCL_QUOTATION_ALV_HANDLER( ).
   SET HANDLER LO_HANDLER->HOTSPOT_CLICK FOR O_QUOTATION_ALV_TABLE.
 
   IF SY-SUBRC = 0.
@@ -229,7 +230,7 @@ ENDFORM.
 *& Form SET_INIT_STATUS_COLOR
 *&---------------------------------------------------------------------*
 FORM SET_INIT_STATUS_COLOR.
-  GT_COLOR = VALUE #( ( STATUS = 'Negotiating' COL = 7 INT = 1 INV = 1 )
+  GT_QUOTATION_COLOR = VALUE #( ( STATUS = 'Negotiating' COL = 7 INT = 1 INV = 1 )
                       ( STATUS = 'Accepted'    COL = 3 INT = 1 INV = 1 )
                       ( STATUS = 'Cancelled'   COL = 6 INT = 1 INV = 1 )
                       ( STATUS = 'Requested'   COL = 5 INT = 1 INV = 1 ) ).
@@ -238,7 +239,7 @@ ENDFORM.
 *& Form CHANGE_QUOTATION_COLOR
 *&---------------------------------------------------------------------*
 FORM CHANGE_QUOTATION_COLOR  USING    U_QSTATUS TYPE Y03S24999_QUOTA-STATUS
-                   CHANGING CH_COLOR TYPE LVC_T_SCOL.
+                             CHANGING CH_COLOR  TYPE LVC_T_SCOL.
 
   DATA LS_COLOR TYPE LVC_S_SCOL.
   CLEAR: CH_COLOR.
@@ -246,7 +247,7 @@ FORM CHANGE_QUOTATION_COLOR  USING    U_QSTATUS TYPE Y03S24999_QUOTA-STATUS
   LS_COLOR-FNAME = 'STATUS'.
 
   TRY.
-      MOVE-CORRESPONDING GT_COLOR[ STATUS =  U_QSTATUS ] TO LS_COLOR-COLOR.
+      MOVE-CORRESPONDING GT_QUOTATION_COLOR[ STATUS =  U_QSTATUS ] TO LS_COLOR-COLOR.
       APPEND LS_COLOR TO CH_COLOR.
     CATCH CX_SY_ITAB_LINE_NOT_FOUND.
 

@@ -356,30 +356,34 @@
       <DESCRIPT>Package</DESCRIPT>
       <TYPE>I</TYPE>
       <NEXTSCREEN>0000</NEXTSCREEN>
-      <LINES>024</LINES>
-      <COLUMNS>119</COLUMNS>
+      <LINES>031</LINES>
+      <COLUMNS>167</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
        <TYPE>SCREEN</TYPE>
        <NAME>SCREEN</NAME>
       </RPY_DYCATT>
-     </CONTAINERS>
-     <FIELDS>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEXT</TYPE>
-       <NAME>%#AUTOTEXT001</NAME>
-       <TEXT>Package_Management___________________</TEXT>
+      <RPY_DYCATT>
+       <TYPE>SUBSCREEN</TYPE>
+       <NAME>SUBSCREEN_0121</NAME>
+       <ELEMENT_OF>SCREEN</ELEMENT_OF>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
-       <LENGTH>037</LENGTH>
-       <VISLENGTH>030</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
-       <FORMAT>CHAR</FORMAT>
-       <REQU_ENTRY>N</REQU_ENTRY>
-      </RPY_DYFATC>
+       <LENGTH>060</LENGTH>
+       <HEIGHT>002</HEIGHT>
+      </RPY_DYCATT>
+      <RPY_DYCATT>
+       <TYPE>SUBSCREEN</TYPE>
+       <NAME>SUBSCREEN_0122</NAME>
+       <ELEMENT_OF>SCREEN</ELEMENT_OF>
+       <LINE>004</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>100</LENGTH>
+       <HEIGHT>025</HEIGHT>
+      </RPY_DYCATT>
+     </CONTAINERS>
+     <FIELDS>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
@@ -397,7 +401,74 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>* MODULE STATUS_0110.</LINE>
+       <LINE>*  MODULE SET_INITIAL_VALUES_0121.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  CALL SUBSCREEN SUBSCREEN_0121 INCLUDING SY-REPID &apos;0121&apos;.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  CALL SUBSCREEN SUBSCREEN_0122 INCLUDING SY-REPID &apos;0122&apos;.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>PROCESS AFTER INPUT.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  CALL SUBSCREEN SUBSCREEN_0121.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  CALL SUBSCREEN SUBSCREEN_0122.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  MODULE USER_COMMAND_0120.</LINE>
+      </RPY_DYFLOW>
+     </FLOW_LOGIC>
+    </item>
+    <item>
+     <HEADER>
+      <PROGRAM>Z03_S24_999_DOMUS_STAFF</PROGRAM>
+      <SCREEN>0122</SCREEN>
+      <LANGUAGE>E</LANGUAGE>
+      <DESCRIPT>Package List Screen</DESCRIPT>
+      <TYPE>I</TYPE>
+      <NEXTSCREEN>0122</NEXTSCREEN>
+      <LINES>032</LINES>
+      <COLUMNS>137</COLUMNS>
+     </HEADER>
+     <CONTAINERS>
+      <RPY_DYCATT>
+       <TYPE>SCREEN</TYPE>
+       <NAME>SCREEN</NAME>
+      </RPY_DYCATT>
+      <RPY_DYCATT>
+       <TYPE>CUST_CTRL</TYPE>
+       <NAME>CUSTOM_CONTROL_ALV_0122</NAME>
+       <ELEMENT_OF>SCREEN</ELEMENT_OF>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>090</LENGTH>
+       <HEIGHT>020</HEIGHT>
+      </RPY_DYCATT>
+     </CONTAINERS>
+     <FIELDS>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>OKCODE</TYPE>
+       <TEXT>____________________</TEXT>
+       <LENGTH>020</LENGTH>
+       <VISLENGTH>020</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+      </RPY_DYFATC>
+     </FIELDS>
+     <FLOW_LOGIC>
+      <RPY_DYFLOW>
+       <LINE>PROCESS BEFORE OUTPUT.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>* MODULE STATUS_0122.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>*</LINE>
@@ -406,7 +477,7 @@
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>* MODULE USER_COMMAND_0110.</LINE>
+       <LINE>* MODULE USER_COMMAND_0122.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
     </item>
@@ -1428,6 +1499,12 @@
      <ID>R</ID>
      <ENTRY>Program for Domus Staff</ENTRY>
      <LENGTH>23</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_PKNAME</KEY>
+     <ENTRY>Package Name:</ENTRY>
+     <LENGTH>21</LENGTH>
     </item>
     <item>
      <ID>S</ID>

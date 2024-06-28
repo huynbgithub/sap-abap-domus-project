@@ -3,9 +3,9 @@
 *&---------------------------------------------------------------------*
 
 *---------------------------------------------------------------------*
-* LCL_QUOTATION_ALV_HANDLER IMPLEMENTATION
+* CL_QUOTATION_ALV_HANDLER IMPLEMENTATION
 *---------------------------------------------------------------------*
-CLASS LCL_QUOTATION_ALV_HANDLER IMPLEMENTATION.
+CLASS CL_QUOTATION_ALV_HANDLER IMPLEMENTATION.
 
   METHOD HOTSPOT_CLICK.
 
@@ -19,9 +19,9 @@ CLASS LCL_QUOTATION_ALV_HANDLER IMPLEMENTATION.
 ENDCLASS.
 
 *---------------------------------------------------------------------*
-* LCL_PACKAGE_ALV_HANDLER IMPLEMENTATION
+* CL_PACKAGE_ALV_HANDLER IMPLEMENTATION
 *---------------------------------------------------------------------*
-CLASS LCL_PACKAGE_ALV_HANDLER IMPLEMENTATION.
+CLASS CL_PACKAGE_ALV_HANDLER IMPLEMENTATION.
 
   METHOD HOTSPOT_CLICK.
 

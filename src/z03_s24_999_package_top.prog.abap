@@ -24,7 +24,7 @@ TYPES: BEGIN OF TY_PACKAGE,
 *---------------------------------------------------------------------*
 * CLASS Definition
 *---------------------------------------------------------------------*
-CLASS LCL_PACKAGE_ALV_HANDLER DEFINITION.
+CLASS CL_PACKAGE_ALV_HANDLER DEFINITION.
   PUBLIC SECTION.
 
     METHODS HOTSPOT_CLICK FOR EVENT HOTSPOT_CLICK OF CL_GUI_ALV_GRID
@@ -47,7 +47,8 @@ DATA: WA_PACKAGE TYPE TY_PACKAGE.
 
 * ALV Table Object
 DATA: O_PACKAGE_CONTAINER TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
-      O_PACKAGE_ALV_TABLE TYPE REF TO CL_GUI_ALV_GRID.
+      O_PACKAGE_ALV_TABLE TYPE REF TO CL_GUI_ALV_GRID,
+      O_PACKAGE_HANDLER TYPE REF TO CL_PACKAGE_ALV_HANDLER.
 
 *&---------------------------------------------------------------------*
 *& Selection Screen

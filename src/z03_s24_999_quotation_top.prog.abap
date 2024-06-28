@@ -30,7 +30,7 @@ TYPES: BEGIN OF TY_QUOTATION_COLOR,
 *---------------------------------------------------------------------*
 * CLASS Definition
 *---------------------------------------------------------------------*
-CLASS LCL_QUOTATION_ALV_HANDLER DEFINITION.
+CLASS CL_QUOTATION_ALV_HANDLER DEFINITION.
   PUBLIC SECTION.
 
     METHODS HOTSPOT_CLICK FOR EVENT HOTSPOT_CLICK OF CL_GUI_ALV_GRID
@@ -56,7 +56,8 @@ DATA: GT_QUOTATION_COLOR TYPE STANDARD TABLE OF TY_QUOTATION_COLOR.
 
 * ALV Table Object
 DATA: O_QUOTATION_CONTAINER TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
-      O_QUOTATION_ALV_TABLE TYPE REF TO CL_GUI_ALV_GRID.
+      O_QUOTATION_ALV_TABLE TYPE REF TO CL_GUI_ALV_GRID,
+      O_QUOTATION_HANDLER TYPE REF TO CL_QUOTATION_ALV_HANDLER.
 
 *&---------------------------------------------------------------------*
 *& Selection Screen

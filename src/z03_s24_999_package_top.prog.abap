@@ -50,6 +50,9 @@ DATA: O_PACKAGE_CONTAINER TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
       O_PACKAGE_ALV_TABLE TYPE REF TO CL_GUI_ALV_GRID,
       O_PACKAGE_HANDLER TYPE REF TO CL_PACKAGE_ALV_HANDLER.
 
+DATA: PACKAGE_SCREEN_MODE TYPE C LENGTH 4 VALUE '0120'.
+
+DATA: GV_PACKAGE_ID TYPE Y03S24999_PACKGE-ID.
 *&---------------------------------------------------------------------*
 *& Selection Screen
 *&---------------------------------------------------------------------*

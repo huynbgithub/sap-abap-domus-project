@@ -33,3 +33,19 @@ CLASS CL_PACKAGE_ALV_HANDLER IMPLEMENTATION.
   ENDMETHOD.
 
 ENDCLASS.
+
+*---------------------------------------------------------------------*
+* CL_PCKSER_ALV_HANDLER IMPLEMENTATION
+*---------------------------------------------------------------------*
+CLASS CL_PCKSER_ALV_HANDLER IMPLEMENTATION.
+
+  METHOD HOTSPOT_CLICK.
+
+    READ TABLE IT_PCKSER INTO DATA(LS_PCKSER)
+      INDEX E_ROW_ID-INDEX.
+
+    MESSAGE I007(Z03S24999_DOMUS_MSGS) WITH LS_PCKSER-ID.
+
+  ENDMETHOD.
+
+ENDCLASS.

@@ -12,9 +12,7 @@
 FORM HANDLE_UCOMM_0120 USING IN_OKCODE
                              IN_QCODE.
   DATA: LV_SUCCESS TYPE ABAP_BOOL.
-
   CASE IN_OKCODE.
-
     WHEN 'EXECUTE'.
 * Get data from PACKAGE table
       PERFORM GET_PACKAGE_DATA CHANGING LV_SUCCESS.
@@ -23,13 +21,9 @@ FORM HANDLE_UCOMM_0120 USING IN_OKCODE
       ENDIF.
 * Show PACKAGE ALV
       PERFORM SHOW_PACKAGE_ALV.
-
     WHEN OTHERS.
-
   ENDCASE.
-
 ENDFORM.
-
 *&---------------------------------------------------------------------*
 *& Form GET_PACKAGE_DATA
 *&---------------------------------------------------------------------*
@@ -69,7 +63,6 @@ FORM GET_PACKAGE_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
     CH_V_SUCCESS = ABAP_TRUE.
   ENDIF.
 ENDFORM.
-
 *&---------------------------------------------------------------------*
 *& Form SHOW_PACKAGE_ALV
 *&---------------------------------------------------------------------*
@@ -135,7 +128,6 @@ FORM PREPARE_PACKAGE_FIELD_CATALOG
            ADD_PACKAGE_FCAT USING 'UPDATED_AT'     'Updated At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
            ADD_PACKAGE_FCAT USING 'UPDATED_ON'     'Updated On'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
 ENDFORM.
-
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_PACKAGE_ALV_TABLE
 *&---------------------------------------------------------------------*
@@ -223,24 +215,38 @@ FORM HANDLE_UCOMM_0122 USING U_OKCODE.
 
       PACKAGE_SCREEN_MODE = '0129'.
 
-      ZTAB_001-ACTIVETAB = '0120_SCA'.
-      G_ZTAB_001-PRESSED_TAB = '0120_SCA'.
-      GV_OKCODE = C_ZTAB_001-TAB2.
-
     WHEN OTHERS.
-
   ENDCASE.
 ENDFORM.
-
 *&---------------------------------------------------------------------*
-*& Form GET_PCKSER_DATA
+*& Form PREPARE_PACKAGE_DETAIL
 *&---------------------------------------------------------------------*
 *& text
 *&---------------------------------------------------------------------*
 *& -->  p1        text
 *& <--  p2        text
 *&---------------------------------------------------------------------*
-FORM GET_PCKSER_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
+FORM PREPARE_PACKAGE_DETAIL USING U_PACKAGE_ID.
+  DATA: LV_SUCCESS TYPE ABAP_BOOL.
+  PERFORM GET_PCKSER_DATA USING U_PACKAGE_ID
+                          CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+*   Show PCKSER ALV
+  PERFORM SHOW_PCKSER_ALV.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_PCKSER_DATA
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  USING U_PACKAGE_ID
+*& <--  CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
+*&---------------------------------------------------------------------*
+FORM GET_PCKSER_DATA USING U_PACKAGE_ID
+                     CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
   CLEAR: IT_PCKSER[], CH_V_SUCCESS.
 
   SELECT PS~*, S~NAME AS SERVICE_NAME
@@ -249,7 +255,7 @@ FORM GET_PCKSER_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
     ON PS~SERVICE_ID = S~ID
     WHERE S~IS_DELETED <> @ABAP_TRUE
       AND PS~IS_DELETED <> @ABAP_TRUE
-      AND PS~PACKAGE_ID = @GV_PACKAGE_ID
+      AND PS~PACKAGE_ID = @U_PACKAGE_ID
     ORDER BY PS~CREATED_ON DESCENDING, PS~CREATED_AT DESCENDING
     INTO CORRESPONDING FIELDS OF TABLE @IT_PCKSER.
 
@@ -275,7 +281,6 @@ FORM GET_PCKSER_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
   ENDIF.
 
 ENDFORM.
-
 *&---------------------------------------------------------------------*
 *& Form SHOW_PCKSER_ALV
 *&---------------------------------------------------------------------*

@@ -7,7 +7,7 @@
 *       text
 *----------------------------------------------------------------------*
 MODULE USER_COMMAND_0122 INPUT.
-  IF ZTAB_001-ACTIVETAB = 'ZTAB_001_FC2'.
+  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB2.
     PERFORM HANDLE_UCOMM_0122
     USING GV_OKCODE.
   ENDIF.

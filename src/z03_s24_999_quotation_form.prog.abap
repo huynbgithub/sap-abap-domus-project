@@ -25,9 +25,7 @@ FORM HANDLE_UCOMM_0130 USING IN_OKCODE
       PERFORM SHOW_QUOTATION_ALV.
 
     WHEN OTHERS.
-
   ENDCASE.
-
 ENDFORM.
 
 *&---------------------------------------------------------------------*

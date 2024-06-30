@@ -29,19 +29,19 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 *& text
 *&---------------------------------------------------------------------*
-*&      --> IN_OKCODE
-*&      --> IN_USERNAME
+*&      --> U_OKCODE
+*&      --> U_USERNAME
 *&---------------------------------------------------------------------*
-FORM HANDLE_UCOMM_1000  USING    IN_OKCODE
-                                 IN_USERNAME.
-  IF IN_OKCODE = 'CFM'.
+FORM HANDLE_UCOMM_1000  USING    U_OKCODE
+                                 U_USERNAME.
+  IF U_OKCODE = 'CFM'.
 
     DATA: LV_IS_STAFF TYPE YS03S24999_ROLES-IS_STAFF.
 
-    IF IN_USERNAME = SY-UNAME.
+    IF U_USERNAME = SY-UNAME.
 
       SELECT SINGLE IS_STAFF FROM Y03S24999_USER
-        WHERE USERNAME = @IN_USERNAME
+        WHERE USERNAME = @U_USERNAME
         INTO @LV_IS_STAFF.
 
       IF SY-SUBRC = 0.
@@ -49,13 +49,15 @@ FORM HANDLE_UCOMM_1000  USING    IN_OKCODE
           MESSAGE S001(Z03S24999_DOMUS_MSGS).
           CALL SCREEN 100.
         ELSE.
-          MESSAGE S002(Z03S24999_DOMUS_MSGS) WITH IN_USERNAME DISPLAY LIKE 'E'.
+          MESSAGE S002(Z03S24999_DOMUS_MSGS) WITH U_USERNAME DISPLAY LIKE 'E'.
         ENDIF.
       ELSE.
-        MESSAGE S002(Z03S24999_DOMUS_MSGS) WITH IN_USERNAME DISPLAY LIKE 'E'.
+        MESSAGE S002(Z03S24999_DOMUS_MSGS) WITH U_USERNAME DISPLAY LIKE 'E'.
       ENDIF.
     ELSE.
       MESSAGE S003(Z03S24999_DOMUS_MSGS) DISPLAY LIKE 'E'.
     ENDIF.
+
+    CLEAR: U_OKCODE.
   ENDIF.
 ENDFORM.

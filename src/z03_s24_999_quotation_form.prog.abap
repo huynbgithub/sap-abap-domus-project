@@ -6,14 +6,14 @@
 *&---------------------------------------------------------------------*
 *& text
 *&---------------------------------------------------------------------*
-*&      --> IN_OKCODE
-*&      --> IN_QCODE
+*&      --> U_OKCODE
+*&      --> U_QCODE
 *&---------------------------------------------------------------------*
-FORM HANDLE_UCOMM_0130 USING IN_OKCODE
-                             IN_QCODE.
+FORM HANDLE_UCOMM_0130 USING U_OKCODE
+                             U_QCODE.
   DATA: LV_SUCCESS TYPE ABAP_BOOL.
 
-  CASE IN_OKCODE.
+  CASE U_OKCODE.
 
     WHEN 'EXECUTE'.
 * Get data from QUOTATION table
@@ -24,6 +24,7 @@ FORM HANDLE_UCOMM_0130 USING IN_OKCODE
 * Show QUOTATION ALV
       PERFORM SHOW_QUOTATION_ALV.
 
+      CLEAR: U_OKCODE.
     WHEN OTHERS.
   ENDCASE.
 ENDFORM.

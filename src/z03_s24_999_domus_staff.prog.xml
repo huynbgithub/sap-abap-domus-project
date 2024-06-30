@@ -254,6 +254,9 @@
        <LINE>  MODULE ZTAB_001_ACTIVE_TAB_GET.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
+       <LINE>  MODULE ZTAB_001_ACTIVE_TAB_SET.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
        <LINE>  CALL SUBSCREEN:</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
@@ -424,7 +427,7 @@
       <TYPE>I</TYPE>
       <NEXTSCREEN>0122</NEXTSCREEN>
       <LINES>032</LINES>
-      <COLUMNS>183</COLUMNS>
+      <COLUMNS>184</COLUMNS>
      </HEADER>
      <CONTAINERS>
       <RPY_DYCATT>
@@ -435,13 +438,63 @@
        <TYPE>CUST_CTRL</TYPE>
        <NAME>CUSTOM_CONTROL_ALV_0122</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>001</LINE>
+       <LINE>002</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>179</LENGTH>
        <HEIGHT>024</HEIGHT>
       </RPY_DYCATT>
      </CONTAINERS>
      <FIELDS>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>PUSH</TYPE>
+       <NAME>%#AUTOTEXT001</NAME>
+       <TEXT>___</TEXT>
+       <ICON_NAME>ICON_DOC_ITEM_DETAIL</ICON_NAME>
+       <WITH_ICON>X</WITH_ICON>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>008</LENGTH>
+       <VISLENGTH>002</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <PUSH_FCODE>VIEW_PACKAGE</PUSH_FCODE>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>PUSH</TYPE>
+       <NAME>%#AUTOTEXT002</NAME>
+       <ICON_NAME>ICON_CREATE</ICON_NAME>
+       <WITH_ICON>X</WITH_ICON>
+       <LINE>001</LINE>
+       <COLUMN>004</COLUMN>
+       <LENGTH>004</LENGTH>
+       <VISLENGTH>002</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <PUSH_FCODE>CREATE_PACKAGE</PUSH_FCODE>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>PUSH</TYPE>
+       <NAME>%#AUTOTEXT003</NAME>
+       <TEXT>_</TEXT>
+       <ICON_NAME>ICON_DELETE</ICON_NAME>
+       <WITH_ICON>X</WITH_ICON>
+       <LINE>001</LINE>
+       <COLUMN>007</COLUMN>
+       <LENGTH>006</LENGTH>
+       <VISLENGTH>002</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <PUSH_FCODE>DELETE_PACKAGE</PUSH_FCODE>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
@@ -475,13 +528,13 @@
     <item>
      <HEADER>
       <PROGRAM>Z03_S24_999_DOMUS_STAFF</PROGRAM>
-      <SCREEN>0128</SCREEN>
+      <SCREEN>0129</SCREEN>
       <LANGUAGE>E</LANGUAGE>
-      <DESCRIPT>Package Service Detail</DESCRIPT>
+      <DESCRIPT>Package Detail</DESCRIPT>
       <TYPE>I</TYPE>
-      <NEXTSCREEN>0128</NEXTSCREEN>
+      <NEXTSCREEN>0129</NEXTSCREEN>
       <LINES>027</LINES>
-      <COLUMNS>121</COLUMNS>
+      <COLUMNS>124</COLUMNS>
       <KEEP_SCPOS>X</KEEP_SCPOS>
      </HEADER>
      <CONTAINERS>
@@ -490,16 +543,178 @@
        <NAME>SCREEN</NAME>
       </RPY_DYCATT>
       <RPY_DYCATT>
-       <TYPE>CUST_CTRL</TYPE>
-       <NAME>CUSTOM_CONTROL_ALV_0128</NAME>
+       <TYPE>TABLE_CTRL</TYPE>
+       <NAME>PCKPRV_TABLE_CONTROL</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>001</LINE>
+       <LINE>007</LINE>
        <COLUMN>001</COLUMN>
-       <LENGTH>090</LENGTH>
-       <HEIGHT>009</HEIGHT>
+       <LENGTH>056</LENGTH>
+       <HEIGHT>008</HEIGHT>
+       <C_SCROLL_V>X</C_SCROLL_V>
+       <C_SCROLL_H>X</C_SCROLL_H>
+       <TC_TABTYPE>ENTRY</TC_TABTYPE>
+       <TC_HEADER>X</TC_HEADER>
+       <TC_CONFIG>X</TC_CONFIG>
+       <TC_SEL_LNS>SINGLE</TC_SEL_LNS>
+       <TC_SEL_CLS>SINGLE</TC_SEL_CLS>
+       <TC_LSEL_CL>X</TC_LSEL_CL>
+      </RPY_DYCATT>
+      <RPY_DYCATT>
+       <TYPE>TABLE_CTRL</TYPE>
+       <NAME>PCKSER_TABLE_CONTROL</NAME>
+       <ELEMENT_OF>SCREEN</ELEMENT_OF>
+       <LINE>016</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>056</LENGTH>
+       <HEIGHT>008</HEIGHT>
+       <C_SCROLL_V>X</C_SCROLL_V>
+       <C_SCROLL_H>X</C_SCROLL_H>
+       <TC_TABTYPE>ENTRY</TC_TABTYPE>
+       <TC_HEADER>X</TC_HEADER>
+       <TC_CONFIG>X</TC_CONFIG>
+       <TC_SEL_LNS>SINGLE</TC_SEL_LNS>
+       <TC_SEL_CLS>SINGLE</TC_SEL_CLS>
+       <TC_LSEL_CL>X</TC_LSEL_CL>
       </RPY_DYCATT>
      </CONTAINERS>
      <FIELDS>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>PUSH</TYPE>
+       <NAME>BACK_TO_PACKAGE_LIST</NAME>
+       <TEXT>__</TEXT>
+       <ICON_NAME>ICON_ARROW_LEFT</ICON_NAME>
+       <ICON_QINFO>Back</ICON_QINFO>
+       <ICON_QSPEC>X</ICON_QSPEC>
+       <WITH_ICON>X</WITH_ICON>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>013</LENGTH>
+       <VISLENGTH>002</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <PUSH_FCODE>BACK_TO_PACKAGE_LIST</PUSH_FCODE>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT001</NAME>
+       <TEXT>Package_ID:</TEXT>
+       <LINE>003</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>011</LENGTH>
+       <VISLENGTH>011</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <LABELLEFT>X</LABELLEFT>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>GS_PACKAGE_DETAIL-ID</NAME>
+       <TEXT>____________________________________</TEXT>
+       <LINE>003</LINE>
+       <COLUMN>014</COLUMN>
+       <LENGTH>036</LENGTH>
+       <VISLENGTH>036</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT002</NAME>
+       <TEXT>Name:</TEXT>
+       <LINE>004</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>005</LENGTH>
+       <VISLENGTH>005</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <LABELLEFT>X</LABELLEFT>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>GS_PACKAGE_DETAIL-NAME</NAME>
+       <TEXT>________________________________________________________________</TEXT>
+       <LINE>004</LINE>
+       <COLUMN>014</COLUMN>
+       <LENGTH>064</LENGTH>
+       <VISLENGTH>064</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT003</NAME>
+       <TEXT>Description:</TEXT>
+       <LINE>005</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>012</LENGTH>
+       <VISLENGTH>012</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <LABELLEFT>X</LABELLEFT>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>GS_PACKAGE_DETAIL-DESCRIPTION</NAME>
+       <TEXT>________________________________________________________________</TEXT>
+       <LINE>005</LINE>
+       <COLUMN>014</COLUMN>
+       <LENGTH>064</LENGTH>
+       <VISLENGTH>064</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT004</NAME>
+       <TEXT>Products:</TEXT>
+       <LINE>006</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>009</LENGTH>
+       <VISLENGTH>009</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT005</NAME>
+       <TEXT>Services:</TEXT>
+       <LINE>015</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>009</LENGTH>
+       <VISLENGTH>009</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
@@ -511,13 +726,160 @@
        <FORMAT>CHAR</FORMAT>
        <INPUT_FLD>X</INPUT_FLD>
       </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKPRV_TABLE_CONTROL</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT008</NAME>
+       <TEXT>Product_Name</TEXT>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>012</LENGTH>
+       <VISLENGTH>040</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <TC_HEADING>X</TC_HEADING>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKPRV_TABLE_CONTROL</CONT_NAME>
+       <TYPE>CHECK</TYPE>
+       <NAME>GS_PCKPRV-SEL</NAME>
+       <LINE>001</LINE>
+       <LENGTH>001</LENGTH>
+       <VISLENGTH>001</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <TC_SELCOL>X</TC_SELCOL>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKPRV_TABLE_CONTROL</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>GS_PCKPRV-PRODUCT_NAME</NAME>
+       <TEXT>________________________________________________________________</TEXT>
+       <ROLLING>X</ROLLING>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>064</LENGTH>
+       <VISLENGTH>040</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKSER_TABLE_CONTROL</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT006</NAME>
+       <TEXT>Name</TEXT>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>004</LENGTH>
+       <VISLENGTH>030</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <TC_HEADING>X</TC_HEADING>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKSER_TABLE_CONTROL</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT007</NAME>
+       <TEXT>Price</TEXT>
+       <LINE>001</LINE>
+       <COLUMN>002</COLUMN>
+       <LENGTH>005</LENGTH>
+       <VISLENGTH>020</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <TC_HEADING>X</TC_HEADING>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKSER_TABLE_CONTROL</CONT_NAME>
+       <TYPE>CHECK</TYPE>
+       <NAME>GS_PCKSER-SEL</NAME>
+       <LINE>001</LINE>
+       <LENGTH>001</LENGTH>
+       <VISLENGTH>001</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <TC_SELCOL>X</TC_SELCOL>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKSER_TABLE_CONTROL</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>GS_PCKSER-SERVICE_NAME</NAME>
+       <TEXT>________________________________________________________________</TEXT>
+       <ROLLING>X</ROLLING>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>064</LENGTH>
+       <VISLENGTH>030</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKSER_TABLE_CONTROL</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>GS_PCKSER-DISPLAY_PRICE</NAME>
+       <TEXT>______________________________</TEXT>
+       <LINE>001</LINE>
+       <COLUMN>002</COLUMN>
+       <LENGTH>030</LENGTH>
+       <VISLENGTH>020</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>DEC</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
      </FIELDS>
      <FLOW_LOGIC>
       <RPY_DYFLOW>
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE> MODULE PREPARE_DATA_0128.</LINE>
+       <LINE>  MODULE PREPARE_DATA_0129.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  MODULE MODIFY_PACKAGE_SCREEN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>* Populate Data into Table Control</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  LOOP AT GT_PCKPRV INTO GS_PCKPRV WITH CONTROL PCKPRV_TABLE_CONTROL.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>    MODULE MODIFY_PCKPRV_SCREEN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  ENDLOOP.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>* Populate Data into Table Control</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  LOOP AT GT_PCKSER INTO GS_PCKSER WITH CONTROL PCKSER_TABLE_CONTROL.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>    MODULE MODIFY_PCKSER_SCREEN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  ENDLOOP.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>*</LINE>
@@ -526,66 +888,88 @@
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>* MODULE USER_COMMAND_0128.</LINE>
-      </RPY_DYFLOW>
-     </FLOW_LOGIC>
-    </item>
-    <item>
-     <HEADER>
-      <PROGRAM>Z03_S24_999_DOMUS_STAFF</PROGRAM>
-      <SCREEN>0129</SCREEN>
-      <LANGUAGE>E</LANGUAGE>
-      <DESCRIPT>Package Detail</DESCRIPT>
-      <TYPE>I</TYPE>
-      <NEXTSCREEN>0129</NEXTSCREEN>
-      <LINES>027</LINES>
-      <COLUMNS>121</COLUMNS>
-      <KEEP_SCPOS>X</KEEP_SCPOS>
-     </HEADER>
-     <CONTAINERS>
-      <RPY_DYCATT>
-       <TYPE>SCREEN</TYPE>
-       <NAME>SCREEN</NAME>
-      </RPY_DYCATT>
-      <RPY_DYCATT>
-       <TYPE>SUBSCREEN</TYPE>
-       <NAME>SUBSCREEN_0128</NAME>
-       <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>003</LINE>
-       <COLUMN>001</COLUMN>
-       <LENGTH>099</LENGTH>
-       <HEIGHT>010</HEIGHT>
-      </RPY_DYCATT>
-     </CONTAINERS>
-     <FIELDS>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>OKCODE</TYPE>
-       <TEXT>____________________</TEXT>
-       <LENGTH>020</LENGTH>
-       <VISLENGTH>020</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
-       <FORMAT>CHAR</FORMAT>
-       <INPUT_FLD>X</INPUT_FLD>
-      </RPY_DYFATC>
-     </FIELDS>
-     <FLOW_LOGIC>
-      <RPY_DYFLOW>
-       <LINE>PROCESS BEFORE OUTPUT.</LINE>
+       <LINE>  CHAIN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>  CALL SUBSCREEN SUBSCREEN_0128 INCLUDING G_ZTAB_001-PROG &apos;0128&apos;.</LINE>
+       <LINE>     FIELD GS_PACKAGE_DETAIL-ID.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>     FIELD GS_PACKAGE_DETAIL-NAME.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>     FIELD GS_PACKAGE_DETAIL-DESCRIPTION.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>PROCESS AFTER INPUT.</LINE>
+       <LINE>*     MODULE VALIDATE_PO_INPUTS_0200.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>  CALL SUBSCREEN SUBSCREEN_0128.</LINE>
+       <LINE>  ENDCHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>  LOOP AT GT_PCKPRV.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>*  MODULE USER_COMMAND_0129.</LINE>
+       <LINE>     CHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>       FIELD:</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>              GS_PCKSER-SEL,</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>              GS_PCKPRV-PRODUCT_NAME.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>*       MODULE VALIDATE_PITEM_INPUTS_0200.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>       MODULE MODIFY_PCKPRV_TABLE ON CHAIN-REQUEST.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>     ENDCHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>   ENDLOOP.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>  LOOP AT GT_PCKSER.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>     CHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>       FIELD:</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>              GS_PCKSER-SEL,</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>              GS_PCKSER-SERVICE_NAME,</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>              GS_PCKSER-DISPLAY_PRICE.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>*       MODULE VALIDATE_PITEM_INPUTS_0200.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>       MODULE MODIFY_PCKSER_TABLE ON CHAIN-REQUEST.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>     ENDCHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>   ENDLOOP.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>   MODULE USER_COMMAND_0129.</LINE>
       </RPY_DYFLOW>
      </FLOW_LOGIC>
     </item>
@@ -1013,708 +1397,12 @@
       <FUN_TEXT>Exit</FUN_TEXT>
      </RSMPE_FUNT>
     </FUN>
-    <MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>01</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;01&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>02</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;02&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>03</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;03&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>04</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;04&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>05</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;05&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>06</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>07</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;06&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>08</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>09</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;09&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>10</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>11</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;10&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000001</CODE>
-      <NO>12</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;11&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>01</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;12&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>02</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;13&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>03</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;24&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>04</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;14&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>05</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>06</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;16&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>07</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;17&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>08</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;18&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>09</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>10</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;26&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>11</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;27&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>12</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;20&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>13</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000002</CODE>
-      <NO>14</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;22&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000003</CODE>
-      <NO>01</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000003</CODE>
-      <NO>02</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;23&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>01</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;01&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>02</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;02&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>03</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;03&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>04</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;04&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>05</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;05&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>06</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>07</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;06&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>08</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>09</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;09&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>10</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>11</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;10&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000006</CODE>
-      <NO>12</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;11&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>01</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;12&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>02</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;13&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>03</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;24&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>04</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;14&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>05</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>06</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;16&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>07</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;17&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>08</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;18&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>09</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>10</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;26&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>11</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;27&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>12</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;20&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>13</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000007</CODE>
-      <NO>14</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;22&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000008</CODE>
-      <NO>01</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000008</CODE>
-      <NO>02</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;23&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>01</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;01&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>02</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;02&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>03</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;03&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>04</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;04&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>05</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;05&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>06</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>07</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;06&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>08</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>09</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;09&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>10</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>11</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;10&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000011</CODE>
-      <NO>12</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;11&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>01</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;12&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>02</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;13&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>03</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;24&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>04</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;14&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>05</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>06</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;16&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>07</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;17&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>08</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;18&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>09</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>10</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;26&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>11</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;27&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>12</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;20&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>13</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000012</CODE>
-      <NO>14</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;22&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000013</CODE>
-      <NO>01</NO>
-      <REF_TYPE>S</REF_TYPE>
-      <REF_CODE>&lt;S1&gt;</REF_CODE>
-     </RSMPE_MEN>
-     <RSMPE_MEN>
-      <CODE>000013</CODE>
-      <NO>02</NO>
-      <REF_TYPE>F</REF_TYPE>
-      <REF_CODE>&lt;23&gt;</REF_CODE>
-     </RSMPE_MEN>
-    </MEN>
-    <MTX>
-     <RSMPE_MNLT>
-      <CODE>000001</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>&lt;Object&gt;</TEXT>
-      <PATH>O</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000002</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Edit</TEXT>
-      <PATH>E</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000003</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Goto</TEXT>
-      <PATH>G</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000004</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Extras</TEXT>
-      <PATH>A</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000005</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Environment</TEXT>
-      <PATH>V</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000006</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>&lt;Object&gt;</TEXT>
-      <PATH>O</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000007</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Edit</TEXT>
-      <PATH>E</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000008</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Goto</TEXT>
-      <PATH>G</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000009</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Extras</TEXT>
-      <PATH>A</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000010</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Environment</TEXT>
-      <PATH>V</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000011</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>&lt;Object&gt;</TEXT>
-      <PATH>O</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000012</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Edit</TEXT>
-      <PATH>E</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000013</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Goto</TEXT>
-      <PATH>G</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000014</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Extras</TEXT>
-      <PATH>A</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-     <RSMPE_MNLT>
-      <CODE>000015</CODE>
-      <TEXT_TYPE>S</TEXT_TYPE>
-      <TEXT>Environment</TEXT>
-      <PATH>V</PATH>
-      <INT_NOTE>Standard Supplement</INT_NOTE>
-     </RSMPE_MNLT>
-    </MTX>
-    <ACT>
-     <RSMPE_ACT>
-      <CODE>000001</CODE>
-      <NO>01</NO>
-      <MENUCODE>000001</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000001</CODE>
-      <NO>02</NO>
-      <MENUCODE>000002</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000001</CODE>
-      <NO>03</NO>
-      <MENUCODE>000003</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000001</CODE>
-      <NO>04</NO>
-      <MENUCODE>000004</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000001</CODE>
-      <NO>05</NO>
-      <MENUCODE>000005</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000002</CODE>
-      <NO>01</NO>
-      <MENUCODE>000006</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000002</CODE>
-      <NO>02</NO>
-      <MENUCODE>000007</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000002</CODE>
-      <NO>03</NO>
-      <MENUCODE>000008</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000002</CODE>
-      <NO>04</NO>
-      <MENUCODE>000009</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000002</CODE>
-      <NO>05</NO>
-      <MENUCODE>000010</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000003</CODE>
-      <NO>01</NO>
-      <MENUCODE>000011</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000003</CODE>
-      <NO>02</NO>
-      <MENUCODE>000012</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000003</CODE>
-      <NO>03</NO>
-      <MENUCODE>000013</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000003</CODE>
-      <NO>04</NO>
-      <MENUCODE>000014</MENUCODE>
-     </RSMPE_ACT>
-     <RSMPE_ACT>
-      <CODE>000003</CODE>
-      <NO>05</NO>
-      <MENUCODE>000015</MENUCODE>
-     </RSMPE_ACT>
-    </ACT>
     <BUT>
      <RSMPE_BUT>
       <PFK_CODE>000001</PFK_CODE>
       <CODE>0001</CODE>
       <NO>01</NO>
       <PFNO>08</PFNO>
-     </RSMPE_BUT>
-     <RSMPE_BUT>
-      <PFK_CODE>000001</PFK_CODE>
-      <CODE>0001</CODE>
-      <NO>08</NO>
-      <PFNO>02</PFNO>
      </RSMPE_BUT>
     </BUT>
     <PFK>
@@ -1824,7 +1512,6 @@
       <OBJ_TYPE>A</OBJ_TYPE>
       <OBJ_CODE>000001</OBJ_CODE>
       <MODAL>D</MODAL>
-      <NORM>X</NORM>
       <INT_NOTE>Screen 0100 GUI Status</INT_NOTE>
      </RSMPE_ATRT>
      <RSMPE_ATRT>
@@ -1844,7 +1531,6 @@
       <OBJ_TYPE>A</OBJ_TYPE>
       <OBJ_CODE>000002</OBJ_CODE>
       <MODAL>D</MODAL>
-      <NORM>X</NORM>
       <INT_NOTE>Screen 1000 GUI Status</INT_NOTE>
      </RSMPE_ATRT>
      <RSMPE_ATRT>
@@ -1864,7 +1550,6 @@
       <OBJ_TYPE>A</OBJ_TYPE>
       <OBJ_CODE>000003</OBJ_CODE>
       <MODAL>D</MODAL>
-      <NORM>X</NORM>
       <INT_NOTE>Screen 0120 GUI Status</INT_NOTE>
      </RSMPE_ATRT>
      <RSMPE_ATRT>

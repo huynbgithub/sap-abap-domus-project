@@ -7,7 +7,7 @@
 *       text
 *----------------------------------------------------------------------*
 MODULE USER_COMMAND_0120 INPUT.
-  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB2.
+  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB2 AND G_ZTAB_001-SUBSCREEN = '0120'.
     PERFORM HANDLE_UCOMM_0120
     USING GV_OKCODE
           P_PKNAME.

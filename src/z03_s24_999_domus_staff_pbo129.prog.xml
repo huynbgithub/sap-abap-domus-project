@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>Z03_S24_999_PCKSER_TOP</NAME>
+    <NAME>Z03_S24_999_DOMUS_STAFF_PBO129</NAME>
     <SUBC>I</SUBC>
     <RSTAT>T</RSTAT>
     <RLOAD>E</RLOAD>
@@ -12,8 +12,8 @@
    <TPOOL>
     <item>
      <ID>R</ID>
-     <ENTRY>Include Z03_S24_999_PACKAGE_TOP</ENTRY>
-     <LENGTH>31</LENGTH>
+     <ENTRY>Include Z03_S24_999_DOMUS_STAFF_PBO129</ENTRY>
+     <LENGTH>38</LENGTH>
     </item>
    </TPOOL>
   </asx:values>

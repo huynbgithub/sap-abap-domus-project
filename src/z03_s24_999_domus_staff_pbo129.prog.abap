@@ -7,6 +7,7 @@
 *&
 *&---------------------------------------------------------------------*
 MODULE PREPARE_DATA_0129 OUTPUT.
+  PCKPRV_TABLE_CONTROL-LINES = LINES( GT_PCKPRV ).
   PCKSER_TABLE_CONTROL-LINES = LINES( GT_PCKSER ).
 ENDMODULE.
 *&---------------------------------------------------------------------*

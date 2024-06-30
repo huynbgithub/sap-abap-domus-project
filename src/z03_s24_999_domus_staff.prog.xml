@@ -533,8 +533,8 @@
       <DESCRIPT>Package Detail</DESCRIPT>
       <TYPE>I</TYPE>
       <NEXTSCREEN>0129</NEXTSCREEN>
-      <LINES>031</LINES>
-      <COLUMNS>126</COLUMNS>
+      <LINES>026</LINES>
+      <COLUMNS>139</COLUMNS>
       <KEEP_SCPOS>X</KEEP_SCPOS>
      </HEADER>
      <CONTAINERS>
@@ -548,7 +548,7 @@
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
        <LINE>007</LINE>
        <COLUMN>001</COLUMN>
-       <LENGTH>090</LENGTH>
+       <LENGTH>080</LENGTH>
        <HEIGHT>008</HEIGHT>
        <C_SCROLL_V>X</C_SCROLL_V>
        <C_SCROLL_H>X</C_SCROLL_H>
@@ -563,10 +563,27 @@
        <TYPE>TABLE_CTRL</TYPE>
        <NAME>PCKSER_TABLE_CONTROL</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>017</LINE>
-       <COLUMN>001</COLUMN>
-       <LENGTH>077</LENGTH>
+       <LINE>007</LINE>
+       <COLUMN>086</COLUMN>
+       <LENGTH>046</LENGTH>
        <HEIGHT>008</HEIGHT>
+       <C_SCROLL_V>X</C_SCROLL_V>
+       <C_SCROLL_H>X</C_SCROLL_H>
+       <TC_TABTYPE>ENTRY</TC_TABTYPE>
+       <TC_HEADER>X</TC_HEADER>
+       <TC_CONFIG>X</TC_CONFIG>
+       <TC_SEL_LNS>SINGLE</TC_SEL_LNS>
+       <TC_SEL_CLS>SINGLE</TC_SEL_CLS>
+       <TC_LSEL_CL>X</TC_LSEL_CL>
+      </RPY_DYCATT>
+      <RPY_DYCATT>
+       <TYPE>TABLE_CTRL</TYPE>
+       <NAME>PCKIMG_TABLE_CONTROL</NAME>
+       <ELEMENT_OF>SCREEN</ELEMENT_OF>
+       <LINE>018</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>080</LENGTH>
+       <HEIGHT>007</HEIGHT>
        <C_SCROLL_V>X</C_SCROLL_V>
        <C_SCROLL_H>X</C_SCROLL_H>
        <TC_TABTYPE>ENTRY</TC_TABTYPE>
@@ -670,6 +687,7 @@
        <VISLENGTH>042</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
+       <UP_LOWER>X</UP_LOWER>
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
        <BRIGHT>X</BRIGHT>
@@ -699,9 +717,10 @@
        <LINE>005</LINE>
        <COLUMN>014</COLUMN>
        <LENGTH>255</LENGTH>
-       <VISLENGTH>072</VISLENGTH>
+       <VISLENGTH>067</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
+       <UP_LOWER>X</UP_LOWER>
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
       </RPY_DYFATC>
@@ -713,6 +732,20 @@
        <TEXT>Products:</TEXT>
        <LINE>006</LINE>
        <COLUMN>001</COLUMN>
+       <LENGTH>009</LENGTH>
+       <VISLENGTH>009</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT005</NAME>
+       <TEXT>Services:</TEXT>
+       <LINE>006</LINE>
+       <COLUMN>086</COLUMN>
        <LENGTH>009</LENGTH>
        <VISLENGTH>009</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -738,11 +771,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>GV_PCKPRV_TOTAL_PRICE</NAME>
-       <TEXT>____________________</TEXT>
+       <TEXT>______________________________________________________</TEXT>
        <LINE>015</LINE>
        <COLUMN>024</COLUMN>
-       <LENGTH>020</LENGTH>
-       <VISLENGTH>020</VISLENGTH>
+       <LENGTH>054</LENGTH>
+       <VISLENGTH>054</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>DEC</FORMAT>
        <OUTPUT_FLD>X</OUTPUT_FLD>
@@ -754,24 +787,10 @@
        <CONT_TYPE>SCREEN</CONT_TYPE>
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
-       <NAME>%#AUTOTEXT005</NAME>
-       <TEXT>Services:</TEXT>
-       <LINE>016</LINE>
-       <COLUMN>001</COLUMN>
-       <LENGTH>009</LENGTH>
-       <VISLENGTH>009</VISLENGTH>
-       <HEIGHT>001</HEIGHT>
-       <FORMAT>CHAR</FORMAT>
-       <REQU_ENTRY>N</REQU_ENTRY>
-      </RPY_DYFATC>
-      <RPY_DYFATC>
-       <CONT_TYPE>SCREEN</CONT_TYPE>
-       <CONT_NAME>SCREEN</CONT_NAME>
-       <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT010</NAME>
        <TEXT>Total_Price_(Service):</TEXT>
-       <LINE>025</LINE>
-       <COLUMN>001</COLUMN>
+       <LINE>015</LINE>
+       <COLUMN>086</COLUMN>
        <LENGTH>022</LENGTH>
        <VISLENGTH>022</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -784,8 +803,8 @@
        <TYPE>TEMPLATE</TYPE>
        <NAME>GV_PCKSER_TOTAL_PRICE</NAME>
        <TEXT>____________________</TEXT>
-       <LINE>025</LINE>
-       <COLUMN>024</COLUMN>
+       <LINE>015</LINE>
+       <COLUMN>109</COLUMN>
        <LENGTH>020</LENGTH>
        <VISLENGTH>020</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -801,7 +820,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT011</NAME>
        <TEXT>TOTAL_PRICE_(PACKAGE):</TEXT>
-       <LINE>026</LINE>
+       <LINE>016</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>022</LENGTH>
        <VISLENGTH>022</VISLENGTH>
@@ -814,17 +833,32 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>GV_PACKAGE_TOTAL_PRICE</NAME>
-       <TEXT>____________________</TEXT>
-       <LINE>026</LINE>
+       <TEXT>_________________________________________________________________________________________________________</TEXT>
+       <LINE>016</LINE>
        <COLUMN>024</COLUMN>
-       <LENGTH>020</LENGTH>
-       <VISLENGTH>020</VISLENGTH>
+       <LENGTH>105</LENGTH>
+       <VISLENGTH>105</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>DEC</FORMAT>
        <OUTPUT_FLD>X</OUTPUT_FLD>
        <OUTPUTONLY>X</OUTPUTONLY>
        <REQU_ENTRY>N</REQU_ENTRY>
        <RIGHT_JUST>X</RIGHT_JUST>
+       <BRIGHT>X</BRIGHT>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT017</NAME>
+       <TEXT>Package_Images:</TEXT>
+       <LINE>017</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>015</LENGTH>
+       <VISLENGTH>015</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
       </RPY_DYFATC>
       <RPY_DYFATC>
        <CONT_TYPE>SCREEN</CONT_TYPE>
@@ -927,6 +961,7 @@
        <VISLENGTH>032</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
+       <UP_LOWER>X</UP_LOWER>
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
        <BRIGHT>X</BRIGHT>
@@ -1036,6 +1071,7 @@
        <VISLENGTH>024</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
+       <UP_LOWER>X</UP_LOWER>
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
        <BRIGHT>X</BRIGHT>
@@ -1055,6 +1091,53 @@
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
        <RIGHT_JUST>X</RIGHT_JUST>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKIMG_TABLE_CONTROL</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>%#AUTOTEXT018</NAME>
+       <TEXT>URL</TEXT>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>003</LENGTH>
+       <VISLENGTH>074</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+       <TC_HEADING>X</TC_HEADING>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKIMG_TABLE_CONTROL</CONT_NAME>
+       <TYPE>CHECK</TYPE>
+       <NAME>GS_PCKIMG-SEL</NAME>
+       <LINE>001</LINE>
+       <LENGTH>001</LENGTH>
+       <VISLENGTH>001</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <TC_SELCOL>X</TC_SELCOL>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>TABLE_CTRL</CONT_TYPE>
+       <CONT_NAME>PCKIMG_TABLE_CONTROL</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>GS_PCKIMG-IMAGE_URL</NAME>
+       <TEXT>____________________________________________________________________________________________________________________________________</TEXT>
+       <ROLLING>X</ROLLING>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>255</LENGTH>
+       <VISLENGTH>074</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <UP_LOWER>X</UP_LOWER>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+       <DBLCLICK>X</DBLCLICK>
       </RPY_DYFATC>
      </FIELDS>
      <FLOW_LOGIC>
@@ -1087,6 +1170,18 @@
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>    MODULE MODIFY_PCKSER_SCREEN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  ENDLOOP.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>* Populate Data into Table Control</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  LOOP AT GT_PCKIMG INTO GS_PCKIMG WITH CONTROL PCKIMG_TABLE_CONTROL.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>    MODULE MODIFY_PCKIMG_SCREEN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>  ENDLOOP.</LINE>
@@ -1179,6 +1274,35 @@
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>       MODULE MODIFY_PCKSER_TABLE ON CHAIN-REQUEST.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>     ENDCHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>   ENDLOOP.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>  LOOP AT GT_PCKIMG.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>     CHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>       FIELD:</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>              GS_PCKIMG-SEL,</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>              GS_PCKIMG-IMAGE_URL.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>*       MODULE VALIDATE_PITEM_INPUTS_0200.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>       MODULE MODIFY_PCKIMG_TABLE ON CHAIN-REQUEST.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>     ENDCHAIN.</LINE>
@@ -1615,6 +1739,14 @@
       <TEXT_TYPE>S</TEXT_TYPE>
       <FUN_TEXT>Exit</FUN_TEXT>
      </RSMPE_FUNT>
+     <RSMPE_FUNT>
+      <CODE>PICK</CODE>
+      <TEXTNO>001</TEXTNO>
+      <TEXT_TYPE>S</TEXT_TYPE>
+      <TEXT_NAME>ICON_WD_NAVIGATION_LINK</TEXT_NAME>
+      <ICON_ID>@TM@</ICON_ID>
+      <FUN_TEXT>Choose</FUN_TEXT>
+     </RSMPE_FUNT>
     </FUN>
     <BUT>
      <RSMPE_BUT>
@@ -1628,7 +1760,7 @@
      <RSMPE_PFK>
       <CODE>000001</CODE>
       <PFNO>02</PFNO>
-      <FUNCODE>DISPLAY</FUNCODE>
+      <FUNCODE>PICK</FUNCODE>
       <FUNNO>001</FUNNO>
      </RSMPE_PFK>
      <RSMPE_PFK>
@@ -1712,6 +1844,10 @@
      <RSMPE_STAF>
       <STATUS>ZSTATUS_001</STATUS>
       <FUNCTION>EXIT</FUNCTION>
+     </RSMPE_STAF>
+     <RSMPE_STAF>
+      <STATUS>ZSTATUS_001</STATUS>
+      <FUNCTION>PICK</FUNCTION>
      </RSMPE_STAF>
      <RSMPE_STAF>
       <STATUS>ZSTATUS_AUTH</STATUS>

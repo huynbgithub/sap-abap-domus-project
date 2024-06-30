@@ -9,6 +9,7 @@
 MODULE PREPARE_DATA_0129 OUTPUT.
   PCKPRV_TABLE_CONTROL-LINES = LINES( GT_PCKPRV ).
   PCKSER_TABLE_CONTROL-LINES = LINES( GT_PCKSER ).
+  PCKIMG_TABLE_CONTROL-LINES = LINES( GT_PCKIMG ).
 ENDMODULE.
 *&---------------------------------------------------------------------*
 *& Module MODIFY_PACKAGE_SCREEN OUTPUT
@@ -73,6 +74,25 @@ ENDMODULE.
 *&
 *&---------------------------------------------------------------------*
 MODULE MODIFY_PCKSER_SCREEN OUTPUT.
+  LOOP AT SCREEN.
+    CASE GV_PACKAGE_SCREEN_MODE.
+      WHEN GC_PACKAGE_MODE_DISPLAY.
+        SCREEN-INPUT = '0'.
+      WHEN GC_PACKAGE_MODE_CHANGE.
+
+      WHEN GC_PACKAGE_MODE_CREATE.
+
+      WHEN OTHERS.
+    ENDCASE.
+    MODIFY SCREEN.
+  ENDLOOP.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Module MODIFY_PACKAGE_IMAGE_SCREEN_FOR_TABLE OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE MODIFY_PCKIMG_SCREEN OUTPUT.
   LOOP AT SCREEN.
     CASE GV_PACKAGE_SCREEN_MODE.
       WHEN GC_PACKAGE_MODE_DISPLAY.

@@ -205,6 +205,29 @@ FORM HANDLE_UCOMM_0129  USING    U_OKCODE.
     WHEN 'BACK_TO_PACKAGE_LIST'.
       PACKAGE_SCREEN_MODE = '0120'.
       CLEAR: U_OKCODE.
+    WHEN 'PICK'.
+      GET CURSOR FIELD GV_CURSOR.
+
+      IF GV_CURSOR = 'GS_PCKIMG-IMAGE_URL'.
+        CALL FUNCTION 'CALL_BROWSER'
+          EXPORTING
+            URL                    = GS_PCKIMG-IMAGE_URL
+*           WINDOW_NAME            = ' '
+*           NEW_WINDOW             = ' '
+*           BROWSER_TYPE           =
+*           CONTEXTSTRING          =
+          EXCEPTIONS
+            FRONTEND_NOT_SUPPORTED = 1
+            FRONTEND_ERROR         = 2
+            PROG_NOT_FOUND         = 3
+            NO_BATCH               = 4
+            UNSPECIFIED_ERROR      = 5
+            OTHERS                 = 6.
+        IF SY-SUBRC <> 0.
+          MESSAGE 'CALL BROWSER ERROR.' TYPE 'E'.
+        ENDIF.
+      ENDIF.
+      CLEAR: U_OKCODE.
     WHEN OTHERS.
   ENDCASE.
 ENDFORM.
@@ -257,14 +280,17 @@ FORM PREPARE_PACKAGE_DETAIL USING U_PACKAGE_ID.
 
   PERFORM GET_PACKAGE_PRODUCT_ITEMS USING U_PACKAGE_ID.
   PERFORM GET_PACKAGE_SERVICE_ITEMS USING U_PACKAGE_ID.
+  PERFORM GET_PACKAGE_IMAGE_ITEMS   USING U_PACKAGE_ID.
 
   GV_PACKAGE_TOTAL_PRICE = GV_PCKPRV_TOTAL_PRICE + GV_PCKSER_TOTAL_PRICE.
 
   GS_PACKAGE_DETAIL_BEFORE_MOD = GS_PACKAGE_DETAIL.
   GT_PCKPRV_BEFORE_MOD = GT_PCKPRV.
   GT_PCKSER_BEFORE_MOD = GT_PCKSER.
+  GT_PCKIMG_BEFORE_MOD = GT_PCKIMG.
   CLEAR: GT_PCKPRV_DELETED.
   CLEAR: GT_PCKSER_DELETED.
+  CLEAR: GT_PCKIMG_DELETED.
 
   GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
 ENDFORM.
@@ -337,4 +363,23 @@ FORM GET_PACKAGE_SERVICE_ITEMS USING U_PACKAGE_ID.
   LOOP AT GT_PCKSER INTO DATA(LS_ROW).
     GV_PCKSER_TOTAL_PRICE += LS_ROW-DISPLAY_PRICE.
   ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_PACKAGE_IMAGE_ITEMS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_PACKAGE_ID
+*&---------------------------------------------------------------------*
+FORM GET_PACKAGE_IMAGE_ITEMS USING U_PACKAGE_ID.
+  SELECT ' ' AS SEL,
+         PI~*
+  FROM Y03S24999_PCKIMG AS PI
+  WHERE IS_DELETED <> @ABAP_TRUE
+    AND PACKAGE_ID = @U_PACKAGE_ID
+  INTO CORRESPONDING FIELDS OF TABLE @GT_PCKIMG.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE 'No IMAGE item found.' TYPE 'E'.
+  ENDIF.
 ENDFORM.

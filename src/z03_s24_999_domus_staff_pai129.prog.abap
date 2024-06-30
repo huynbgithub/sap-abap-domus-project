@@ -28,3 +28,11 @@ ENDMODULE.
 MODULE MODIFY_PCKSER_TABLE INPUT.
   MODIFY GT_PCKSER FROM GS_PCKSER INDEX PCKSER_TABLE_CONTROL-CURRENT_LINE.
 ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  MODIFY_PCKIMG_TABLE  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE MODIFY_PCKIMG_TABLE INPUT.
+  MODIFY GT_PCKIMG FROM GS_PCKIMG INDEX PCKIMG_TABLE_CONTROL-CURRENT_LINE.
+ENDMODULE.

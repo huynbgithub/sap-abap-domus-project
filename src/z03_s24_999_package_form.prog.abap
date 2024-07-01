@@ -2,7 +2,7 @@
 *& Include          Z03_S24_999_PACKAGE_FORM
 *&---------------------------------------------------------------------*
 *&---------------------------------------------------------------------*
-*& Form HANDLE_UCOMM_0130
+*& Form HANDLE_UCOMM_0120
 *&---------------------------------------------------------------------*
 *& text
 *&---------------------------------------------------------------------*
@@ -243,21 +243,40 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
               OTHERS                 = 6.
 
           IF SY-SUBRC = 0.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Display Image on Browser Successfully!'.
+            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Display Images on Browser successfully!'.
           ELSEIF SY-SUBRC = 1.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'FRONTEND_NOT_SUPPORTED' DISPLAY LIKE 'E'.
+            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Frontend Not Supported' DISPLAY LIKE 'E'.
           ELSEIF SY-SUBRC = 2.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'FRONTEND_ERROR' DISPLAY LIKE 'E'.
+            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Frontend Error' DISPLAY LIKE 'E'.
           ELSEIF SY-SUBRC = 3.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'PROG_NOT_FOUND' DISPLAY LIKE 'E'.
+            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Program Not Found' DISPLAY LIKE 'E'.
           ELSEIF SY-SUBRC = 4.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'NO_BATCH' DISPLAY LIKE 'E'.
+            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'No Batch' DISPLAY LIKE 'E'.
           ELSE.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'UNSPECIFIED_ERROR' DISPLAY LIKE 'E'.
+            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Unspecified Error While Displaying Images' DISPLAY LIKE 'E'.
           ENDIF.
 
         ENDLOOP.
       ENDIF.
+
+      CLEAR: U_OKCODE.
+    WHEN 'INSERT_PCKSER'.
+      CALL SCREEN 0128 STARTING AT 10 08 ENDING AT 70 15.
+*      READ TABLE GT_PCKSER INDEX 1 INTO GS_PCKSER.
+*      CLEAR: GS_PCKSER.
+*      IF GS_PCKSER-PACKAGE_ID <> ''.
+*        GS_PCKSER-PACKAGE_ID = GS_PACKAGE_DETAIL-ID.
+*      ENDIF.
+*      APPEND GS_PCKSER TO GT_PCKSER.
+
+      CLEAR: U_OKCODE.
+    WHEN 'INSERT_PCKPRV'.
+*      READ TABLE GT_PCKPRV INDEX 1 INTO GS_PCKPRV.
+*      CLEAR: GS_PCKPRV.
+*      IF GS_PCKPRV- <> ''.
+*        GS_PCKPRV- = GS_PCKPRV-.
+*      ENDIF.
+*      APPEND GS_PCKPRV TO GT_PCKPRV.
 
       CLEAR: U_OKCODE.
     WHEN OTHERS.
@@ -360,6 +379,7 @@ FORM GET_PACKAGE_PRODUCT_ITEMS USING U_PACKAGE_ID.
 
   SELECT ' ' AS SEL,
          PCKPRV~*,
+         PROVRT~VARIANT_CODE AS VARIANT_CODE,
          PROVRT~DISPLAY_PRICE AS DISPLAY_PRICE,
          ( DISPLAY_PRICE * PCKPRV~QUANTITY ) AS TOTAL_PRICE,
          PROVRT~PRODUCT_ID
@@ -439,4 +459,178 @@ FORM GET_PACKAGE_IMAGE_ITEMS USING U_PACKAGE_ID.
   IF SY-SUBRC <> 0.
     MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Package Image' DISPLAY LIKE 'E'.
   ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Include          Z03_S24_999_PACKAGE_FORM
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0128
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0128 USING U_OKCODE.
+
+  CASE U_OKCODE.
+    WHEN 'ENTER_128'.
+
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+    WHEN 'CANCLE_128'.
+
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_SERVICE_0128_DATA
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM GET_SERVICE_0128_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
+  CLEAR: IT_SERVICE_0128[], CH_V_SUCCESS.
+
+  SELECT *
+    FROM Y03S24999_SERVCE
+    WHERE IS_DELETED <> @ABAP_TRUE
+    ORDER BY CREATED_ON DESCENDING, CREATED_AT DESCENDING
+    INTO CORRESPONDING FIELDS OF TABLE @IT_SERVICE_0128.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_SERVICE_0128[].
+
+    IF O_SERVICE_0128_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_SERVICE_0128_CONTAINER->FREE.
+      CLEAR O_SERVICE_0128_CONTAINER.
+    ENDIF.
+    IF O_SERVICE_0128_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_SERVICE_0128_ALV_TABLE.
+    ENDIF.
+
+    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Service' DISPLAY LIKE 'E'.
+    CH_V_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ELSE.
+    CH_V_SUCCESS = ABAP_TRUE.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_SERVICE_0128_ALV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_SERVICE_0128_ALV.
+  DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
+        LS_LAYOUT    TYPE LVC_S_LAYO.
+*        LS_VARIANT   TYPE DISVARIANT.
+
+* Define Table Structure / Define fields catalog
+  PERFORM PREPARESERVICE0128FIELDCATALOG
+    CHANGING LT_FIELD_CAT.
+
+* Prepare Layout
+  PERFORM PREPARE_SERVICE_0128_LAYOUT
+    CHANGING LS_LAYOUT.
+** Prepare Variant
+*  PERFORM PREPARE_VARIANT
+*    CHANGING LS_VARIANT.
+
+* Show ALV
+  PERFORM DISPLAY_SERVICE_0128_ALV_TABLE
+    CHANGING LS_LAYOUT
+*            LS_VARIANT
+             LT_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form ADD_SERVICE_0128_FCAT
+*&---------------------------------------------------------------------*
+FORM ADD_SERVICE_0128_FCAT USING U_FIELDNAME
+                    U_SCRTEXT_M
+                    U_OUTPUTLEN
+                    U_KEY
+                    U_HOTSPOT
+                    U_EMPHASIZE
+              CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
+  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
+  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
+  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
+  LS_FIELD_CAT-KEY = U_KEY.
+  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
+  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_SERVICE_0128_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+FORM PREPARESERVICE0128FIELDCATALOG
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+
+***** Full form:
+  PERFORM: ADD_SERVICE_0128_FCAT USING 'NAME'           'Name'              20 '' 'X'  'C500'  CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0128_FCAT USING 'DISPLAY_PRICE'  'Price'             14 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0128_FCAT USING 'DESCRIPTION'    'Description'       10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0128_FCAT USING 'CREATED_BY'     'Created By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0128_FCAT USING 'CREATED_AT'     'Created At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0128_FCAT USING 'CREATED_ON'     'Created On'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0128_FCAT USING 'UPDATED_BY'     'Updated By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0128_FCAT USING 'UPDATED_AT'     'Updated At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0128_FCAT USING 'UPDATED_ON'     'Updated On'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DISPLAY_SERVICE_0128_ALV_TABLE
+*&---------------------------------------------------------------------*
+FORM DISPLAY_SERVICE_0128_ALV_TABLE
+  USING    U_S_LAYOUT    TYPE LVC_S_LAYO
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+*          IM_S_VARIANT   TYPE DISVARIANT
+
+  IF O_SERVICE_0128_CONTAINER IS INITIAL.
+    O_SERVICE_0128_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0128' ).
+  ENDIF.
+
+  IF O_SERVICE_0128_ALV_TABLE IS INITIAL.
+    O_SERVICE_0128_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_SERVICE_0128_CONTAINER ).
+  ENDIF.
+
+  O_SERVICE_0128_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
+    EXPORTING
+      IS_LAYOUT                     = U_S_LAYOUT      " Layout
+*      I_SAVE                        = 'A'
+*      IS_VARIANT                    = IM_S_VARIANT
+    CHANGING
+      IT_OUTTAB                     = IT_SERVICE_0128     " Output Table
+      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
+    EXCEPTIONS
+      INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
+      PROGRAM_ERROR                 = 2                " Program Errors
+      TOO_MANY_LINES                = 3                " Too many Rows in Ready for Input Grid
+      OTHERS                        = 4
+  ).
+
+  IF SY-SUBRC = 0.
+    MESSAGE S006(Z03S24999_DOMUS_MSGS) WITH 'Service'.
+  ELSE.
+    MESSAGE E005(Z03S24999_DOMUS_MSGS).
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_SERVICE_0128_LAYOUT
+*&---------------------------------------------------------------------*
+FORM PREPARE_SERVICE_0128_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
+
+*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
+  CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
+  CH_S_LAYOUT-SEL_MODE = 'A'.
+
 ENDFORM.

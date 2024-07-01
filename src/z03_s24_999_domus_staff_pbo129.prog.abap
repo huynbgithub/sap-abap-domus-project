@@ -70,7 +70,7 @@ MODULE MODIFY_PACKAGE_SCREEN OUTPUT.
            SCREEN-INPUT     = '1'.
         ENDIF.
 
-        SCREEN-REQUIRED = '1'.
+*        SCREEN-REQUIRED = '1'.
 
         IF SCREEN-NAME = 'GS_PACKAGE_DETAIL-ID'.
           SCREEN-INPUT = '0'.
@@ -105,7 +105,7 @@ MODULE MODIFY_PACKAGE_SCREEN OUTPUT.
            SCREEN-INPUT     = '1'.
         ENDIF.
 
-        SCREEN-REQUIRED = '1'.
+*        SCREEN-REQUIRED = '1'.
 
         IF SCREEN-NAME = 'GS_PACKAGE_DETAIL-ID'.
           SCREEN-INPUT = '0'.

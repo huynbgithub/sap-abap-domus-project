@@ -11,20 +11,31 @@
 *&---------------------------------------------------------------------*
 FORM HANDLE_UCOMM_0120 USING U_OKCODE
                              U_QCODE.
-  DATA: LV_SUCCESS TYPE ABAP_BOOL.
   CASE U_OKCODE.
     WHEN 'EXECUTE'.
-* Get data from PACKAGE table
-      PERFORM GET_PACKAGE_DATA CHANGING LV_SUCCESS.
-      IF LV_SUCCESS = ABAP_FALSE.
-        RETURN.
-      ENDIF.
-* Show PACKAGE ALV
-      PERFORM SHOW_PACKAGE_ALV.
-
+      PERFORM PROCESS_0122_PACKAGE_LIST.
       CLEAR: U_OKCODE.
+
     WHEN OTHERS.
   ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_0122_PACKAGE_LIST
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_0122_PACKAGE_LIST.
+  DATA: LV_SUCCESS TYPE ABAP_BOOL.
+* Get data from PACKAGE table
+  PERFORM GET_PACKAGE_DATA CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+* Show PACKAGE ALV
+  PERFORM SHOW_PACKAGE_ALV.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form GET_PACKAGE_DATA
@@ -204,62 +215,26 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
   CASE U_OKCODE.
     WHEN 'BACK_TO_PACKAGE_LIST'.
       PACKAGE_SCREEN_MODE = '0120'.
+      PERFORM PROCESS_0122_PACKAGE_LIST.
       CLEAR: U_OKCODE.
 
     WHEN 'DISPLAY<->CHANGE'.
       CASE GV_PACKAGE_SCREEN_MODE.
         WHEN GC_PACKAGE_MODE_DISPLAY.
           GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_CHANGE.
+
         WHEN GC_PACKAGE_MODE_CHANGE.
+          PERFORM WARNING_PACKAGE_CHANGES_EXIST.
           GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
+
         WHEN OTHERS.
       ENDCASE.
       CLEAR: U_OKCODE.
 
     WHEN 'OPEN_PCKIMG_URL'.
-
-      DATA: LV_SEL_PCKIMGS TYPE STANDARD TABLE OF TY_PCKIMG.
-
-      LOOP AT GT_PCKIMG INTO DATA(LS_ROW).
-        IF LS_ROW-SEL = 'X'.
-          APPEND LS_ROW TO LV_SEL_PCKIMGS.
-        ENDIF.
-      ENDLOOP.
-
-      IF LINES( LV_SEL_PCKIMGS ) = 0.
-        MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least' ' one' ' Image' DISPLAY LIKE 'E'.
-      ELSE.
-        LOOP AT LV_SEL_PCKIMGS INTO DATA(LS_IMAGE).
-
-          CALL FUNCTION 'CALL_BROWSER'
-            EXPORTING
-              URL                    = LS_IMAGE-IMAGE_URL
-            EXCEPTIONS
-              FRONTEND_NOT_SUPPORTED = 1
-              FRONTEND_ERROR         = 2
-              PROG_NOT_FOUND         = 3
-              NO_BATCH               = 4
-              UNSPECIFIED_ERROR      = 5
-              OTHERS                 = 6.
-
-          IF SY-SUBRC = 0.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Display Images on Browser successfully!'.
-          ELSEIF SY-SUBRC = 1.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Frontend Not Supported' DISPLAY LIKE 'E'.
-          ELSEIF SY-SUBRC = 2.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Frontend Error' DISPLAY LIKE 'E'.
-          ELSEIF SY-SUBRC = 3.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Program Not Found' DISPLAY LIKE 'E'.
-          ELSEIF SY-SUBRC = 4.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'No Batch' DISPLAY LIKE 'E'.
-          ELSE.
-            MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Unspecified Error While Displaying Images' DISPLAY LIKE 'E'.
-          ENDIF.
-
-        ENDLOOP.
-      ENDIF.
-
+      PERFORM OPEN_PCKIMG_URL.
       CLEAR: U_OKCODE.
+
     WHEN 'INSERT_PCKSER'.
       DATA: LV_SUCCESS TYPE ABAP_BOOL.
 * Get data from SERVICE_0128 table
@@ -274,8 +249,40 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
       PERFORM DELETE_SELECTED_PCKSERS.
       CLEAR: U_OKCODE.
 
-    WHEN 'INSERT_PCKPRV'.
+    WHEN 'INSERT_PCKIMG'.
+      READ TABLE GT_PCKIMG INDEX 1 INTO GS_PCKIMG.
+      CLEAR: GS_PCKIMG.
+      IF GS_PACKAGE_DETAIL-ID <> ''.
+        GS_PCKIMG-PACKAGE_ID = GS_PACKAGE_DETAIL-ID.
+      ENDIF.
 
+      PERFORM CREATE_UUID_C36_STATIC CHANGING GS_PCKIMG-ID.
+
+      APPEND GS_PCKIMG TO GT_PCKIMG.
+
+      CLEAR: U_OKCODE.
+
+    WHEN 'DELETE_PCKIMG'.
+      PERFORM DELETE_SELECTED_PCKIMGS.
+      CLEAR: U_OKCODE.
+
+    WHEN 'INSERT_PCKPRV'.
+      CLEAR: U_OKCODE.
+
+    WHEN 'SAVE'.
+      CASE GV_PACKAGE_SCREEN_MODE.
+        WHEN GC_PACKAGE_MODE_DISPLAY.
+
+        WHEN GC_PACKAGE_MODE_CHANGE.
+          PERFORM CHANGE_PACKAGE_DETAIL.
+          PERFORM PREPARE_PACKAGE_DETAIL USING GV_PACKAGE_ID.
+
+          MESSAGE S010(Z03S24999_DOMUS_MSGS) WITH 'Package'.
+
+          GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
+
+        WHEN OTHERS.
+      ENDCASE.
       CLEAR: U_OKCODE.
     WHEN OTHERS.
   ENDCASE.
@@ -312,13 +319,13 @@ FORM HANDLE_UCOMM_0122 USING U_OKCODE.
           PACKAGE_SCREEN_MODE = '0129'.
 
         ELSEIF LINES( LT_INDEX_ROWS ) = 0.
-          MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH '' 'one' ' Package' DISPLAY LIKE 'E'.
+          MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Package' DISPLAY LIKE 'E'.
         ELSEIF LINES( LT_INDEX_ROWS ) > 1.
-          MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'only' ' one' ' Package' DISPLAY LIKE 'E'.
+          MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'only one Package' DISPLAY LIKE 'E'.
         ENDIF.
 
       ELSE.
-        MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH '' 'one' ' Package' DISPLAY LIKE 'E'.
+        MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Package' DISPLAY LIKE 'E'.
       ENDIF.
 
       CLEAR: U_OKCODE.
@@ -344,22 +351,12 @@ FORM PREPARE_PACKAGE_DETAIL USING U_PACKAGE_ID.
     WHERE ID = U_PACKAGE_ID AND IS_DELETED <> ABAP_TRUE.
 
   IF SY-SUBRC <> 0.
-    MESSAGE 'Package is not found.' TYPE 'E'.
+    MESSAGE E004(Z03S24999_DOMUS_MSGS) WITH 'Package'.
   ENDIF.
 
   PERFORM GET_PACKAGE_PRODUCT_ITEMS USING U_PACKAGE_ID.
   PERFORM GET_PACKAGE_SERVICE_ITEMS USING U_PACKAGE_ID.
   PERFORM GET_PACKAGE_IMAGE_ITEMS   USING U_PACKAGE_ID.
-
-*  GV_PCKPRV_TOTAL_PRICE = 0.
-*  LOOP AT GT_PCKPRV INTO DATA(LS_ROW).
-*    GV_PCKPRV_TOTAL_PRICE += LS_ROW-TOTAL_PRICE.
-*  ENDLOOP.
-*  GV_PCKSER_TOTAL_PRICE = 0.
-*  LOOP AT GT_PCKSER INTO DATA(LS_ROW).
-*    GV_PCKSER_TOTAL_PRICE += LS_ROW-DISPLAY_PRICE.
-*  ENDLOOP.
-*  GV_PACKAGE_TOTAL_PRICE = GV_PCKPRV_TOTAL_PRICE + GV_PCKSER_TOTAL_PRICE.
 
   GS_PACKAGE_DETAIL_BEFORE_MOD = GS_PACKAGE_DETAIL.
   GT_PCKPRV_BEFORE_MOD = GT_PCKPRV.
@@ -442,10 +439,6 @@ FORM GET_PACKAGE_SERVICE_ITEMS USING U_PACKAGE_ID.
     MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Package Service' DISPLAY LIKE 'E'.
   ENDIF.
 
-*  GV_PCKSER_TOTAL_PRICE = 0.
-*  LOOP AT GT_PCKSER INTO DATA(LS_ROW).
-*    GV_PCKSER_TOTAL_PRICE += LS_ROW-DISPLAY_PRICE.
-*  ENDLOOP.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form GET_PACKAGE_IMAGE_ITEMS
@@ -482,46 +475,7 @@ FORM HANDLE_UCOMM_0128 USING U_OKCODE.
   CASE U_OKCODE.
 
     WHEN 'ENTER_128'.
-
-      IF O_SERVICE_0128_ALV_TABLE IS NOT INITIAL.
-
-        DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
-        DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
-
-        CALL METHOD O_SERVICE_0128_ALV_TABLE->GET_SELECTED_ROWS
-          IMPORTING
-            ET_INDEX_ROWS = LT_INDEX_ROWS.
-
-        IF LINES( LT_INDEX_ROWS ) > 0.
-
-          LOOP AT LT_INDEX_ROWS INTO LS_INDEX_ROW.
-
-            READ TABLE GT_PCKSER INDEX 1 INTO GS_PCKSER.
-            CLEAR: GS_PCKSER.
-
-            IF GS_PCKSER-PACKAGE_ID <> ''.
-              GS_PCKSER-PACKAGE_ID = GS_PACKAGE_DETAIL-ID.
-            ENDIF.
-
-            READ TABLE IT_SERVICE_0128 INDEX LS_INDEX_ROW INTO DATA(LS_SERVICE_0128).
-            GS_PCKSER-SERVICE_ID = LS_SERVICE_0128-ID.
-            GS_PCKSER-SERVICE_NAME = LS_SERVICE_0128-NAME.
-            GS_PCKSER-DISPLAY_PRICE = LS_SERVICE_0128-DISPLAY_PRICE.
-
-            APPEND GS_PCKSER TO GT_PCKSER.
-          ENDLOOP.
-
-        ELSE.
-          MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least' ' one' ' Service' DISPLAY LIKE 'E'.
-        ENDIF.
-
-        CLEAR: U_OKCODE.
-        LEAVE TO SCREEN 0.
-      ELSE.
-
-        MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least' ' one' ' Service' DISPLAY LIKE 'E'.
-      ENDIF.
-
+      PERFORM HANDLE_ENTER_ON_SCREEN_0128.
       CLEAR: U_OKCODE.
     WHEN 'CANCLE_128'.
 
@@ -529,6 +483,55 @@ FORM HANDLE_UCOMM_0128 USING U_OKCODE.
       LEAVE TO SCREEN 0.
     WHEN OTHERS.
   ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_ENTER_ON_SCREEN_0128
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_ENTER_ON_SCREEN_0128.
+  IF O_SERVICE_0128_ALV_TABLE IS NOT INITIAL.
+
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+
+    CALL METHOD O_SERVICE_0128_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+
+    IF LINES( LT_INDEX_ROWS ) > 0.
+* Loop to append each selected Services into Package Service List
+      LOOP AT LT_INDEX_ROWS INTO LS_INDEX_ROW.
+
+        READ TABLE GT_PCKSER INDEX 1 INTO GS_PCKSER.
+        CLEAR: GS_PCKSER.
+
+        IF GS_PACKAGE_DETAIL-ID <> ''.
+          GS_PCKSER-PACKAGE_ID = GS_PACKAGE_DETAIL-ID.
+        ENDIF.
+
+        READ TABLE IT_SERVICE_0128 INDEX LS_INDEX_ROW INTO DATA(LS_SERVICE_0128).
+        GS_PCKSER-SERVICE_ID = LS_SERVICE_0128-ID.
+        GS_PCKSER-SERVICE_NAME = LS_SERVICE_0128-NAME.
+        GS_PCKSER-DISPLAY_PRICE = LS_SERVICE_0128-DISPLAY_PRICE.
+
+        PERFORM CREATE_UUID_C36_STATIC CHANGING GS_PCKSER-ID.
+
+        APPEND GS_PCKSER TO GT_PCKSER.
+      ENDLOOP.
+
+    ELSE.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Service' DISPLAY LIKE 'E'.
+    ENDIF.
+
+    LEAVE TO SCREEN 0.
+  ELSE.
+
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Service' DISPLAY LIKE 'E'.
+  ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form GET_SERVICE_0128_DATA
@@ -698,7 +701,7 @@ FORM DELETE_SELECTED_PCKSERS.
   ENDLOOP.
 
   IF LINES( LD_SEL_PCKSERS ) = 0.
-    MESSAGE 'Please select a row for deletion.' TYPE 'S' DISPLAY LIKE 'E'.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'a Service for deletion' DISPLAY LIKE 'E'.
     LEAVE LIST-PROCESSING.
   ELSEIF LINES( LD_SEL_PCKSERS ) > 1.
     PERFORM WARNING_MULTI_SELECTED_PCKSER TABLES LD_SEL_PCKSERS.
@@ -721,7 +724,7 @@ FORM WARNING_MULTI_SELECTED_PCKSER TABLES U_ITAB LIKE GT_PCKSER.
 
   CALL FUNCTION 'POPUP_TO_CONFIRM'
     EXPORTING
-      TEXT_QUESTION         = 'Do you want to delete MULTIPLE rows?'
+      TEXT_QUESTION         = 'Do you want to delete MULTIPLE services?'
       TEXT_BUTTON_1         = 'Yes'(001)
       TEXT_BUTTON_2         = 'No'(002)
       DISPLAY_CANCEL_BUTTON = ''
@@ -743,13 +746,326 @@ ENDFORM.
 *& <--  p2        text
 *&---------------------------------------------------------------------*
 FORM HANDLE_PCKSER_FINAL_DELETION TABLES U_ITAB LIKE GT_PCKSER.
-    LOOP AT U_ITAB INTO DATA(S_ROW).
-      APPEND S_ROW TO GT_PCKSER_DELETED.
+  LOOP AT U_ITAB INTO DATA(S_ROW).
+    APPEND S_ROW TO GT_PCKSER_DELETED.
 
-      DELETE TABLE GT_PCKSER FROM S_ROW.
+    DELETE TABLE GT_PCKSER FROM S_ROW.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'One deleting Service in Package has caused an error!'.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_PACKAGE_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHANGE_PACKAGE_DETAIL .
+  PERFORM CHANGE_PACKAGE_BASIC_DETAIL.
+  PERFORM CHANGE_PACKAGE_SERVICES_DETAIL.
+  PERFORM CHANGE_PACKAGE_IMAGES_DETAIL.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_PACKAGE_BASIC_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHANGE_PACKAGE_BASIC_DETAIL .
+  DATA: LS_PACKGE TYPE Y03S24999_PACKGE.
+  MOVE-CORRESPONDING GS_PACKAGE_DETAIL TO LS_PACKGE.
+  UPDATE Y03S24999_PACKGE FROM LS_PACKGE.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Package basic information'.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_PACKAGE_SERVICES_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHANGE_PACKAGE_SERVICES_DETAIL .
+  PERFORM MODIFY_PCKSER_TABLE.
+  PERFORM SOFT_DELETE_PCKSER_TABLE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_PACKAGE_IMAGES_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHANGE_PACKAGE_IMAGES_DETAIL .
+  PERFORM MODIFY_PCKIMG_TABLE.
+  PERFORM SOFT_DELETE_PCKIMG_TABLE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form MODIFY_PCKSER_TABLE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM MODIFY_PCKSER_TABLE .
+  DATA: LT_PI TYPE STANDARD TABLE OF Y03S24999_PCKSER.
+  MOVE-CORRESPONDING GT_PCKSER TO LT_PI.
+
+  LOOP AT LT_PI INTO DATA(LS_PI).
+    LS_PI-UPDATED_BY = SY-UNAME.
+    LS_PI-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+    LS_PI-UPDATED_ON = SY-DATUM.
+
+    MODIFY Y03S24999_PCKSER FROM LS_PI.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Package Service details'.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form MODIFY_PCKIMG_TABLE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM MODIFY_PCKIMG_TABLE .
+  DATA: LT_PI TYPE STANDARD TABLE OF Y03S24999_PCKIMG.
+  MOVE-CORRESPONDING GT_PCKIMG TO LT_PI.
+
+  LOOP AT LT_PI INTO DATA(LS_PI).
+    LS_PI-UPDATED_BY = SY-UNAME.
+    LS_PI-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+    LS_PI-UPDATED_ON = SY-DATUM.
+
+    MODIFY Y03S24999_PCKIMG FROM LS_PI.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Package Image details'.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SOFT_DELETE_PCKSER_TABLE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SOFT_DELETE_PCKSER_TABLE .
+  DATA: LT_PID TYPE STANDARD TABLE OF Y03S24999_PCKSER.
+
+  SELECT 'X' AS IS_DELETED, GPD~*
+    FROM @GT_PCKSER_DELETED AS GPD
+    INTO CORRESPONDING FIELDS OF TABLE @LT_PID.
+
+  IF SY-SUBRC = 0.
+    LOOP AT LT_PID INTO DATA(LS_PID).
+      LS_PID-UPDATED_BY = SY-UNAME.
+      LS_PID-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+      LS_PID-UPDATED_ON = SY-DATUM.
+
+      UPDATE Y03S24999_PCKSER FROM LS_PID.
 
       IF SY-SUBRC <> 0.
-        MESSAGE 'One deleting row has caused an error!' TYPE 'E'.
+        MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Soft delete Package Service failed!'.
       ENDIF.
     ENDLOOP.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SOFT_DELETE_PCKIMG_TABLE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SOFT_DELETE_PCKIMG_TABLE .
+  DATA: LT_PID TYPE STANDARD TABLE OF Y03S24999_PCKIMG.
+
+  SELECT 'X' AS IS_DELETED, GPD~*
+    FROM @GT_PCKIMG_DELETED AS GPD
+    INTO CORRESPONDING FIELDS OF TABLE @LT_PID.
+
+  IF SY-SUBRC = 0.
+    LOOP AT LT_PID INTO DATA(LS_PID).
+      LS_PID-UPDATED_BY = SY-UNAME.
+      LS_PID-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+      LS_PID-UPDATED_ON = SY-DATUM.
+
+      UPDATE Y03S24999_PCKIMG FROM LS_PID.
+
+      IF SY-SUBRC <> 0.
+        MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Soft delete Package Image failed!'.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form OPEN_PCKIMG_URL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM OPEN_PCKIMG_URL .
+  DATA: LV_SEL_PCKIMGS TYPE STANDARD TABLE OF TY_PCKIMG.
+
+  LOOP AT GT_PCKIMG INTO DATA(LS_ROW).
+    IF LS_ROW-SEL = 'X'.
+      APPEND LS_ROW TO LV_SEL_PCKIMGS.
+    ENDIF.
+  ENDLOOP.
+
+  IF LINES( LV_SEL_PCKIMGS ) = 0.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Image' DISPLAY LIKE 'E'.
+  ELSE.
+    LOOP AT LV_SEL_PCKIMGS INTO DATA(LS_IMAGE).
+
+      CALL FUNCTION 'CALL_BROWSER'
+        EXPORTING
+          URL                    = LS_IMAGE-IMAGE_URL
+        EXCEPTIONS
+          FRONTEND_NOT_SUPPORTED = 1
+          FRONTEND_ERROR         = 2
+          PROG_NOT_FOUND         = 3
+          NO_BATCH               = 4
+          UNSPECIFIED_ERROR      = 5
+          OTHERS                 = 6.
+
+      IF SY-SUBRC = 0.
+        MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Display Images on Browser successfully!'.
+      ELSEIF SY-SUBRC = 1.
+        MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Frontend Not Supported' DISPLAY LIKE 'E'.
+      ELSEIF SY-SUBRC = 2.
+        MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Frontend Error' DISPLAY LIKE 'E'.
+      ELSEIF SY-SUBRC = 3.
+        MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Program Not Found' DISPLAY LIKE 'E'.
+      ELSEIF SY-SUBRC = 4.
+        MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'No Batch' DISPLAY LIKE 'E'.
+      ELSE.
+        MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Unspecified Error While Displaying Images' DISPLAY LIKE 'E'.
+      ENDIF.
+
+    ENDLOOP.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DELETE_SELECTED_PCKIMGS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM DELETE_SELECTED_PCKIMGS.
+  DATA: LD_SEL_PCKIMGS LIKE GT_PCKIMG.
+  LOOP AT GT_PCKIMG INTO DATA(LS_PI).
+    IF LS_PI-SEL = 'X'.
+      APPEND LS_PI TO LD_SEL_PCKIMGS.
+    ENDIF.
+  ENDLOOP.
+
+  IF LINES( LD_SEL_PCKIMGS ) = 0.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'an Image for deletion' DISPLAY LIKE 'E'.
+    LEAVE LIST-PROCESSING.
+  ELSEIF LINES( LD_SEL_PCKIMGS ) > 1.
+    PERFORM WARNING_MULTI_SELECTED_PCKIMG TABLES LD_SEL_PCKIMGS.
+
+  ELSEIF LINES( LD_SEL_PCKIMGS ) = 1.
+    PERFORM HANDLE_PCKIMG_FINAL_DELETION TABLES LD_SEL_PCKIMGS.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form WARNING_MULTI_SELECTED_PCKIMG
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM WARNING_MULTI_SELECTED_PCKIMG TABLES U_ITAB LIKE GT_PCKIMG.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Do you want to delete MULTIPLE images?'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    PERFORM HANDLE_PCKIMG_FINAL_DELETION TABLES U_ITAB.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_PCKIMG_FINAL_DELETION
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_PCKIMG_FINAL_DELETION TABLES U_ITAB LIKE GT_PCKIMG.
+  LOOP AT U_ITAB INTO DATA(S_ROW).
+    APPEND S_ROW TO GT_PCKIMG_DELETED.
+
+    DELETE TABLE GT_PCKIMG FROM S_ROW.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'One deleting Service in Package has caused an error!'.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form WARNING_PACKAGE_CHANGES_EXIST
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM WARNING_PACKAGE_CHANGES_EXIST .
+  DATA: LD_CHOICE TYPE C.
+  IF GS_PACKAGE_DETAIL_BEFORE_MOD <> GS_PACKAGE_DETAIL OR
+     GT_PCKPRV_BEFORE_MOD <> GT_PCKPRV OR
+     GT_PCKSER_BEFORE_MOD <> GT_PCKSER OR
+     GT_PCKIMG_BEFORE_MOD <> GT_PCKIMG.
+    CALL FUNCTION 'POPUP_TO_CONFIRM'
+      EXPORTING
+        TEXT_QUESTION         = 'Do you want to save before switching mode?'
+        TEXT_BUTTON_1         = 'Yes'(001)
+        TEXT_BUTTON_2         = 'No'(002)
+        DISPLAY_CANCEL_BUTTON = ''
+      IMPORTING
+        ANSWER                = LD_CHOICE.
+    IF LD_CHOICE = '1'.
+      PERFORM CHANGE_PACKAGE_DETAIL.
+      PERFORM PREPARE_PACKAGE_DETAIL USING GV_PACKAGE_ID.
+    ELSEIF LD_CHOICE = '2'.
+      PERFORM PREPARE_PACKAGE_DETAIL USING GV_PACKAGE_ID.
+    ENDIF.
+
+  ENDIF.
 ENDFORM.

@@ -60,7 +60,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
      <MSGNR>008</MSGNR>
-     <TEXT>Please select &amp;1&amp;2&amp;3!</TEXT>
+     <TEXT>Please select &amp;1!</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -72,6 +72,13 @@
      <SPRSL>E</SPRSL>
      <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
      <MSGNR>010</MSGNR>
+     <TEXT>Save &amp;1 successfully.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>011</MSGNR>
+     <TEXT>Change &amp;1 failed!</TEXT>
     </T100>
    </T100>
   </asx:values>

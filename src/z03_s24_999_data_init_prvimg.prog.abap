@@ -46,7 +46,7 @@ IS_DELETED = '' )
                               ( ID = '8DE6C6BF-3458-4F60-0A16-08DC31F603D0' PRODUCT_VARIANT_ID = 'D72B2A49-4DC1-4087-BDE1-08DC3240B5EA' IMAGE_URL =
 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/malm-bed-frame-high-white__1101527_pe866706_s5oVVt2jsUYu%2B.avif' IS_DELETED = '' )
                               ( ID = '0F13134E-D126-4C2C-0A17-08DC31F603D0' PRODUCT_VARIANT_ID = 'D72B2A49-4DC1-4087-BDE1-08DC3240B5EA' IMAGE_URL =
-'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/tarva-bed-frame-pine__1102036_pe866857_s5oEX15Elb56^.avif' IS_DELETED = '' )
+'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/tarva-bed-frame-pine__1102036_pe866857_s5oEX15Elb56%5E.avif' IS_DELETED = '' )
                               ( ID = '16CEC569-1479-4229-0A18-08DC31F603D0' PRODUCT_VARIANT_ID = 'F60AABE1-7B42-4DCF-2A6C-08DC31E67559' IMAGE_URL =
 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/malm-bed-frame-high-white__1101527_pe866706_s5ViJqzNYqGq%2A.avif' IS_DELETED = '' )
                               ( ID = '61428DC1-49F9-4E78-0A19-08DC31F603D0' PRODUCT_VARIANT_ID = 'C9A5C66F-B976-44E2-51CB-08DC3240E242' IMAGE_URL = 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/placeholderPspiNlqAEK%40.jpg' IS_DELETED
@@ -97,7 +97,7 @@ IS_DELETED = '' )
                               ( ID = 'EE6C1068-5707-48C0-C750-08DC343FEA11' PRODUCT_VARIANT_ID = '006EC9AD-2B43-49C8-ED9C-08DC340A2951' IMAGE_URL =
 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/malm-bed-frame-high-w-2-storage-boxes-white__1154393_pe886042_s5%281%29Ku4keXRDkg%28.avif' IS_DELETED = '' )
                               ( ID = '38E70FFF-494C-4173-C751-08DC343FEA11' PRODUCT_VARIANT_ID = '006EC9AD-2B43-49C8-ED9C-08DC340A2951' IMAGE_URL =
-'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/tarva-bed-frame-pine__1102036_pe866857_s569TZlN8bj0^.avif' IS_DELETED = '' )
+'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/tarva-bed-frame-pine__1102036_pe866857_s569TZlN8bj0%5E.avif' IS_DELETED = '' )
                               ( ID = 'FB1400F4-71D6-433D-C752-08DC343FEA11' PRODUCT_VARIANT_ID = 'A0247763-ACBA-42B5-ED9D-08DC340A2951' IMAGE_URL =
 'https://domusblobstorage.blob.core.windows.net/domus-storage-v1/idanaes-upholstered-ottoman-bed-gunnared-dark-grey__1079002_pe857426_s5xOP0pKh0Pr%28.avif' IS_DELETED = '' )
                               ( ID = '42798270-212C-4563-C753-08DC343FEA11' PRODUCT_VARIANT_ID = 'A0247763-ACBA-42B5-ED9D-08DC340A2951' IMAGE_URL =

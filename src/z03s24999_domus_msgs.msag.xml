@@ -12,7 +12,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
      <MSGNR>000</MSGNR>
-     <TEXT>&amp;1 &amp;2 &amp;3 &amp;4</TEXT>
+     <TEXT>&amp;1&amp;2&amp;3&amp;4</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -36,13 +36,13 @@
      <SPRSL>E</SPRSL>
      <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
      <MSGNR>004</MSGNR>
-     <TEXT>No data found for the given selection of table.</TEXT>
+     <TEXT>No &amp;1 data found!</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
      <MSGNR>005</MSGNR>
-     <TEXT>Error during ALV displaying.</TEXT>
+     <TEXT>Error during ALV displaying!</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -54,7 +54,24 @@
      <SPRSL>E</SPRSL>
      <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
      <MSGNR>007</MSGNR>
-     <TEXT>You are clicking the record: &amp;1</TEXT>
+     <TEXT>You are clicking the record: &amp;1.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>Please select &amp;1&amp;2&amp;3!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>009</MSGNR>
+     <TEXT>Display &amp;1 detail successfully.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>010</MSGNR>
     </T100>
    </T100>
   </asx:values>

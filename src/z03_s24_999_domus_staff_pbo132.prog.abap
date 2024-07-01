@@ -2,11 +2,11 @@
 *& Include          Z03_S24_999_DOMUS_STAFF_PBO132
 *&---------------------------------------------------------------------*
 *&---------------------------------------------------------------------*
-*& Module STATUS_0132 OUTPUT
+*& Module PREPARE_DATA_0132 OUTPUT
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-MODULE STATUS_0132 OUTPUT.
+MODULE PREPARE_DATA_0132 OUTPUT.
 * Set color for each quotation status
       PERFORM SET_INIT_STATUS_COLOR.
 ENDMODULE.

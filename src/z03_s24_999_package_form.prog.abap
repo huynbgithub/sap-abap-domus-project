@@ -52,7 +52,7 @@ FORM GET_PACKAGE_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
     FROM Y03S24999_PACKGE
     WHERE NAME IN @P_PKNAME
       AND IS_DELETED <> @ABAP_TRUE
-    ORDER BY CREATED_ON DESCENDING, CREATED_AT DESCENDING
+    ORDER BY UPDATED_ON DESCENDING, UPDATED_AT DESCENDING
     INTO CORRESPONDING FIELDS OF TABLE @IT_PACKAGE.
 
   IF SY-SUBRC <> 0.
@@ -236,13 +236,7 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
       CLEAR: U_OKCODE.
 
     WHEN 'INSERT_PCKSER'.
-      DATA: LV_SUCCESS TYPE ABAP_BOOL.
-* Get data from SERVICE_0128 table
-      PERFORM GET_SERVICE_0128_DATA CHANGING LV_SUCCESS.
-      IF LV_SUCCESS = ABAP_FALSE.
-        RETURN.
-      ENDIF.
-      CALL SCREEN 0128 STARTING AT 10 08 ENDING AT 70 15.
+      PERFORM PROCESS_INSERT_PCKSER.
       CLEAR: U_OKCODE.
 
     WHEN 'DELETE_PCKSER'.
@@ -250,16 +244,7 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
       CLEAR: U_OKCODE.
 
     WHEN 'INSERT_PCKIMG'.
-      READ TABLE GT_PCKIMG INDEX 1 INTO GS_PCKIMG.
-      CLEAR: GS_PCKIMG.
-      IF GS_PACKAGE_DETAIL-ID <> ''.
-        GS_PCKIMG-PACKAGE_ID = GS_PACKAGE_DETAIL-ID.
-      ENDIF.
-
-      PERFORM CREATE_UUID_C36_STATIC CHANGING GS_PCKIMG-ID.
-
-      APPEND GS_PCKIMG TO GT_PCKIMG.
-
+      PERFORM PROCESS_INSERT_PCKSER.
       CLEAR: U_OKCODE.
 
     WHEN 'DELETE_PCKIMG'.
@@ -267,6 +252,7 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
       CLEAR: U_OKCODE.
 
     WHEN 'INSERT_PCKPRV'.
+      PERFORM PROCESS_INSERT_PCKPRV.
       CLEAR: U_OKCODE.
 
     WHEN 'SAVE'.
@@ -288,6 +274,56 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
   ENDCASE.
 ENDFORM.
 *&---------------------------------------------------------------------*
+*& Form PROCESS_INSERT_PCKSER
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      -->
+*&---------------------------------------------------------------------*
+FORM PROCESS_INSERT_PCKSER.
+  DATA: LV_SUCCESS TYPE ABAP_BOOL.
+* Get data from SERVICE_0128 table
+  PERFORM GET_SERVICE_0128_DATA CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+  CALL SCREEN 0128 STARTING AT 10 08 ENDING AT 70 15.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_INSERT_PCKIMG
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      -->
+*&---------------------------------------------------------------------*
+FORM PROCESS_INSERT_PCKIMG.
+  READ TABLE GT_PCKIMG INDEX 1 INTO GS_PCKIMG.
+  CLEAR: GS_PCKIMG.
+  IF GS_PACKAGE_DETAIL-ID <> ''.
+    GS_PCKIMG-PACKAGE_ID = GS_PACKAGE_DETAIL-ID.
+  ENDIF.
+
+  PERFORM CREATE_UUID_C36_STATIC CHANGING GS_PCKIMG-ID.
+
+  APPEND GS_PCKIMG TO GT_PCKIMG.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_INSERT_PCKPRV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      -->
+*&---------------------------------------------------------------------*
+FORM PROCESS_INSERT_PCKPRV.
+  DATA: LV_SUCCESS TYPE ABAP_BOOL.
+* Get data from PRODUCT_0127 table
+  PERFORM GET_PRODUCT_0127_DATA CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+  CALL SCREEN 0127 STARTING AT 10 08 ENDING AT 70 20.
+ENDFORM.
+*&---------------------------------------------------------------------*
 *& Form HANDLE_UCOMM_0122
 *&---------------------------------------------------------------------*
 *& text
@@ -298,39 +334,49 @@ FORM HANDLE_UCOMM_0122 USING U_OKCODE.
   CASE U_OKCODE.
 
     WHEN 'VIEW_PACKAGE'.
-
-      IF O_PACKAGE_ALV_TABLE IS NOT INITIAL.
-
-        DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
-        DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
-
-        CALL METHOD O_PACKAGE_ALV_TABLE->GET_SELECTED_ROWS
-          IMPORTING
-            ET_INDEX_ROWS = LT_INDEX_ROWS.
-
-        IF LINES( LT_INDEX_ROWS ) = 1.
-
-          READ TABLE LT_INDEX_ROWS INDEX 1 INTO LS_INDEX_ROW.
-          READ TABLE IT_PACKAGE INDEX LS_INDEX_ROW INTO DATA(LS_PACKAGE).
-
-          GV_PACKAGE_ID = LS_PACKAGE-ID.
-
-          PERFORM PREPARE_PACKAGE_DETAIL USING GV_PACKAGE_ID.
-          PACKAGE_SCREEN_MODE = '0129'.
-
-        ELSEIF LINES( LT_INDEX_ROWS ) = 0.
-          MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Package' DISPLAY LIKE 'E'.
-        ELSEIF LINES( LT_INDEX_ROWS ) > 1.
-          MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'only one Package' DISPLAY LIKE 'E'.
-        ENDIF.
-
-      ELSE.
-        MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Package' DISPLAY LIKE 'E'.
-      ENDIF.
-
+      PERFORM PROCESS_VIEW_PACKAGE_DETAIL CHANGING GV_PACKAGE_ID.
       CLEAR: U_OKCODE.
+
     WHEN OTHERS.
   ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_VIEW_PACKAGE_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  CH_PACKAGE_ID
+*& <--  CH_PACKAGE_ID
+*&---------------------------------------------------------------------*
+FORM PROCESS_VIEW_PACKAGE_DETAIL CHANGING CH_PACKAGE_ID.
+  IF O_PACKAGE_ALV_TABLE IS NOT INITIAL.
+
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+
+    CALL METHOD O_PACKAGE_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+
+    IF LINES( LT_INDEX_ROWS ) = 1.
+
+      READ TABLE LT_INDEX_ROWS INDEX 1 INTO LS_INDEX_ROW.
+      READ TABLE IT_PACKAGE INDEX LS_INDEX_ROW INTO DATA(LS_PACKAGE).
+
+      CH_PACKAGE_ID = LS_PACKAGE-ID.
+
+      PERFORM PREPARE_PACKAGE_DETAIL USING CH_PACKAGE_ID.
+      PACKAGE_SCREEN_MODE = '0129'.
+
+    ELSEIF LINES( LT_INDEX_ROWS ) = 0.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Package' DISPLAY LIKE 'E'.
+    ELSEIF LINES( LT_INDEX_ROWS ) > 1.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'only one Package' DISPLAY LIKE 'E'.
+    ENDIF.
+
+  ELSE.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Package' DISPLAY LIKE 'E'.
+  ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form PREPARE_PACKAGE_DETAIL
@@ -475,14 +521,69 @@ FORM HANDLE_UCOMM_0128 USING U_OKCODE.
   CASE U_OKCODE.
 
     WHEN 'ENTER_128'.
-      PERFORM HANDLE_ENTER_ON_SCREEN_0128.
+      PERFORM HANDLE_ENTER_ON_SCREEN_0127.
       CLEAR: U_OKCODE.
     WHEN 'CANCLE_128'.
-
       CLEAR: U_OKCODE.
       LEAVE TO SCREEN 0.
+
     WHEN OTHERS.
   ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Include          Z03_S24_999_PACKAGE_FORM
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0127
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0127 USING U_OKCODE.
+
+  CASE U_OKCODE.
+
+    WHEN 'ENTER_127' OR 'VIEW_PRODUCT_0127'.
+      PERFORM HANDLE_ENTER_ON_SCREEN_0127.
+      CLEAR: U_OKCODE.
+    WHEN 'CANCLE_127'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_ENTER_ON_SCREEN_0127
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_ENTER_ON_SCREEN_0127.
+  IF O_PRODUCT_0127_ALV_TABLE IS NOT INITIAL.
+
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+
+    CALL METHOD O_PRODUCT_0127_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+    IF LINES( LT_INDEX_ROWS ) = 1.
+
+    ELSEIF LINES( LT_INDEX_ROWS ) = 0.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Product' DISPLAY LIKE 'E'.
+    ELSEIF LINES( LT_INDEX_ROWS ) > 1.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'only one Product' DISPLAY LIKE 'E'.
+    ENDIF.
+
+  ELSE.
+
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Product' DISPLAY LIKE 'E'.
+  ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form HANDLE_ENTER_ON_SCREEN_0128
@@ -531,6 +632,43 @@ FORM HANDLE_ENTER_ON_SCREEN_0128.
   ELSE.
 
     MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Service' DISPLAY LIKE 'E'.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_SERVICE_0127_DATA
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM GET_PRODUCT_0127_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
+  CLEAR: IT_PRODUCT_0127[], CH_V_SUCCESS.
+
+  SELECT P~*
+    FROM Y03S24999_PRODCT AS P
+    LEFT JOIN @GT_PCKPRV AS GP
+    ON P~ID = GP~PRODUCT_ID
+    WHERE P~IS_DELETED <> @ABAP_TRUE
+    AND GP~PRODUCT_ID IS NULL
+    ORDER BY P~UPDATED_ON DESCENDING, P~UPDATED_ON DESCENDING, P~PRODUCT_CODE
+    INTO CORRESPONDING FIELDS OF TABLE @IT_PRODUCT_0127.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_PRODUCT_0127[].
+
+    IF O_PRODUCT_0127_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_PRODUCT_0127_CONTAINER->FREE.
+      CLEAR O_PRODUCT_0127_CONTAINER.
+    ENDIF.
+    IF O_PRODUCT_0127_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_PRODUCT_0127_ALV_TABLE.
+    ENDIF.
+
+    MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'All products were selected!' DISPLAY LIKE 'E'.
+    CH_V_SUCCESS = ABAP_FALSE.
+  ELSE.
+    CH_V_SUCCESS = ABAP_TRUE.
   ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
@@ -779,7 +917,13 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 FORM CHANGE_PACKAGE_BASIC_DETAIL .
   DATA: LS_PACKGE TYPE Y03S24999_PACKGE.
+
   MOVE-CORRESPONDING GS_PACKAGE_DETAIL TO LS_PACKGE.
+
+  LS_PACKGE-UPDATED_BY = SY-UNAME.
+  LS_PACKGE-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+  LS_PACKGE-UPDATED_ON = SY-DATUM.
+
   UPDATE Y03S24999_PACKGE FROM LS_PACKGE.
 
   IF SY-SUBRC <> 0.
@@ -1047,7 +1191,7 @@ ENDFORM.
 *& <--  p2        text
 *&---------------------------------------------------------------------*
 FORM WARNING_PACKAGE_CHANGES_EXIST .
-  DATA: LD_CHOICE TYPE C.
+  DATA: LD_CHOICE TYPE CHAR01.
   IF GS_PACKAGE_DETAIL_BEFORE_MOD <> GS_PACKAGE_DETAIL OR
      GT_PCKPRV_BEFORE_MOD <> GT_PCKPRV OR
      GT_PCKSER_BEFORE_MOD <> GT_PCKSER OR
@@ -1068,4 +1212,118 @@ FORM WARNING_PACKAGE_CHANGES_EXIST .
     ENDIF.
 
   ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_PRODUCT_0127_ALV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_PRODUCT_0127_ALV.
+  DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
+        LS_LAYOUT    TYPE LVC_S_LAYO.
+*        LS_VARIANT   TYPE DISVARIANT.
+
+* Define Table Structure / Define fields catalog
+  PERFORM PREPARE_PRO_0127_FIELD_CATALOG
+    CHANGING LT_FIELD_CAT.
+
+* Prepare Layout
+  PERFORM PREPARE_PRODUCT_0127_LAYOUT
+    CHANGING LS_LAYOUT.
+** Prepare Variant
+*  PERFORM PREPARE_VARIANT
+*    CHANGING LS_VARIANT.
+
+* Show ALV
+  PERFORM DISPLAY_PRODUCT_0127_ALV_TABLE
+    CHANGING LS_LAYOUT
+*            LS_VARIANT
+             LT_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form ADD_PRODUCT_0127_FCAT
+*&---------------------------------------------------------------------*
+FORM ADD_PRODUCT_0127_FCAT USING U_FIELDNAME
+                    U_SCRTEXT_M
+                    U_OUTPUTLEN
+                    U_KEY
+                    U_HOTSPOT
+                    U_EMPHASIZE
+              CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
+  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
+  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
+  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
+  LS_FIELD_CAT-KEY = U_KEY.
+  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
+  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PRODUCT_0127_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+FORM PREPARE_PRO_0127_FIELD_CATALOG
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+
+***** Full form:
+  PERFORM: ADD_PRODUCT_0127_FCAT USING 'PRODUCT_CODE' 'Code'        20 '' 'X'  'C500'  CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0127_FCAT USING 'BRAND'        'Brand'       14 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0127_FCAT USING 'PRODUCT_NAME' 'Name'        14 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0127_FCAT USING 'CREATED_BY'   'Created By'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0127_FCAT USING 'CREATED_AT'   'Created At'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0127_FCAT USING 'CREATED_ON'   'Created On'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0127_FCAT USING 'UPDATED_BY'   'Updated By'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0127_FCAT USING 'UPDATED_AT'   'Updated At'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0127_FCAT USING 'UPDATED_ON'   'Updated On'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DISPLAY_PRODUCT_0127_ALV_TABLE
+*&---------------------------------------------------------------------*
+FORM DISPLAY_PRODUCT_0127_ALV_TABLE
+  USING    U_S_LAYOUT    TYPE LVC_S_LAYO
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+*          IM_S_VARIANT   TYPE DISVARIANT
+
+  IF O_PRODUCT_0127_CONTAINER IS INITIAL.
+    O_PRODUCT_0127_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0127' ).
+  ENDIF.
+
+  IF O_PRODUCT_0127_ALV_TABLE IS INITIAL.
+    O_PRODUCT_0127_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_PRODUCT_0127_CONTAINER ).
+  ENDIF.
+
+  O_PRODUCT_0127_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
+    EXPORTING
+      IS_LAYOUT                     = U_S_LAYOUT      " Layout
+*      I_SAVE                        = 'A'
+*      IS_VARIANT                    = IM_S_VARIANT
+    CHANGING
+      IT_OUTTAB                     = IT_PRODUCT_0127     " Output Table
+      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
+    EXCEPTIONS
+      INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
+      PROGRAM_ERROR                 = 2                " Program Errors
+      TOO_MANY_LINES                = 3                " Too many Rows in Ready for Input Grid
+      OTHERS                        = 4
+  ).
+
+  IF SY-SUBRC = 0.
+    MESSAGE S006(Z03S24999_DOMUS_MSGS) WITH 'Product'.
+  ELSE.
+    MESSAGE E005(Z03S24999_DOMUS_MSGS).
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PRODUCT_0127_LAYOUT
+*&---------------------------------------------------------------------*
+FORM PREPARE_PRODUCT_0127_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
+
+*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
+  CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
+  CH_S_LAYOUT-SEL_MODE = 'A'.
+
 ENDFORM.

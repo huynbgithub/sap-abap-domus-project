@@ -1,22 +1,22 @@
 *----------------------------------------------------------------------*
-***INCLUDE Z03_S24_999_DOMUS_STAFF_PBO128.
+***INCLUDE Z03_S24_999_DOMUS_STAFF_PBO127.
 *----------------------------------------------------------------------*
 *&---------------------------------------------------------------------*
-*& Module STATUS_0128 OUTPUT
+*& Module STATUS_0127 OUTPUT
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-MODULE STATUS_0128 OUTPUT.
-  SET PF-STATUS 'ZSTATUS_0128'.
-  SET TITLEBAR 'ZTITLE_0128'.
+MODULE STATUS_0127 OUTPUT.
+  SET PF-STATUS 'ZSTATUS_0127'.
+  SET TITLEBAR 'ZTITLE_0127'.
 ENDMODULE.
 *&---------------------------------------------------------------------*
-*& Module PREPARE_DATA_0128 OUTPUT
+*& Module PREPARE_DATA_0127 OUTPUT
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-MODULE PREPARE_DATA_0128 OUTPUT.
+MODULE PREPARE_DATA_0127 OUTPUT.
   IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB2.
-      PERFORM SHOW_SERVICE_0128_ALV.
+      PERFORM SHOW_PRODUCT_0127_ALV.
   ENDIF.
 ENDMODULE.

@@ -528,6 +528,84 @@
     <item>
      <HEADER>
       <PROGRAM>Z03_S24_999_DOMUS_STAFF</PROGRAM>
+      <SCREEN>0127</SCREEN>
+      <LANGUAGE>E</LANGUAGE>
+      <DESCRIPT>Package Detail Product</DESCRIPT>
+      <TYPE>M</TYPE>
+      <NEXTSCREEN>0127</NEXTSCREEN>
+      <LINES>027</LINES>
+      <COLUMNS>121</COLUMNS>
+     </HEADER>
+     <CONTAINERS>
+      <RPY_DYCATT>
+       <TYPE>SCREEN</TYPE>
+       <NAME>SCREEN</NAME>
+      </RPY_DYCATT>
+      <RPY_DYCATT>
+       <TYPE>CUST_CTRL</TYPE>
+       <NAME>CUSTOM_CONTROL_ALV_0127</NAME>
+       <ELEMENT_OF>SCREEN</ELEMENT_OF>
+       <LINE>002</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>060</LENGTH>
+       <HEIGHT>015</HEIGHT>
+      </RPY_DYCATT>
+     </CONTAINERS>
+     <FIELDS>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>PUSH</TYPE>
+       <NAME>VIEW_PRODUCT_0127</NAME>
+       <TEXT>__</TEXT>
+       <ICON_NAME>ICON_SELECT_DETAIL</ICON_NAME>
+       <WITH_ICON>X</WITH_ICON>
+       <LINE>001</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>007</LENGTH>
+       <VISLENGTH>002</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <PUSH_FCODE>VIEW_PRODUCT_0127</PUSH_FCODE>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>OKCODE</TYPE>
+       <NAME>GV_OKCODE_0127</NAME>
+       <TEXT>____________________</TEXT>
+       <LENGTH>020</LENGTH>
+       <VISLENGTH>020</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <INPUT_FLD>X</INPUT_FLD>
+      </RPY_DYFATC>
+     </FIELDS>
+     <FLOW_LOGIC>
+      <RPY_DYFLOW>
+       <LINE>PROCESS BEFORE OUTPUT.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE> MODULE STATUS_0127.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE> MODULE PREPARE_DATA_0127.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>*</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>PROCESS AFTER INPUT.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE> MODULE USER_COMMAND_0127.</LINE>
+      </RPY_DYFLOW>
+     </FLOW_LOGIC>
+    </item>
+    <item>
+     <HEADER>
+      <PROGRAM>Z03_S24_999_DOMUS_STAFF</PROGRAM>
       <SCREEN>0128</SCREEN>
       <LANGUAGE>E</LANGUAGE>
       <DESCRIPT>Package Detail Service</DESCRIPT>
@@ -1961,7 +2039,7 @@
     <ADM>
      <ACTCODE>000003</ACTCODE>
      <MENCODE>000020</MENCODE>
-     <PFKCODE>000004</PFKCODE>
+     <PFKCODE>000005</PFKCODE>
     </ADM>
     <STA>
      <RSMPE_STAT>
@@ -1971,6 +2049,13 @@
       <PFKCODE>000001</PFKCODE>
       <BUTCODE>0001</BUTCODE>
       <INT_NOTE>Screen 0100 GUI Status</INT_NOTE>
+     </RSMPE_STAT>
+     <RSMPE_STAT>
+      <CODE>ZSTATUS_0127</CODE>
+      <MODAL>P</MODAL>
+      <PFKCODE>000005</PFKCODE>
+      <BUTCODE>0001</BUTCODE>
+      <INT_NOTE>GUI Status fot 0127</INT_NOTE>
      </RSMPE_STAT>
      <RSMPE_STAT>
       <CODE>ZSTATUS_0128</CODE>
@@ -2006,6 +2091,13 @@
       <FUN_TEXT>Cancel</FUN_TEXT>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
+      <CODE>CANCLE_127</CODE>
+      <TEXTNO>001</TEXTNO>
+      <TEXT_TYPE>S</TEXT_TYPE>
+      <ICON_ID>@0W@</ICON_ID>
+      <FUN_TEXT>Cancel</FUN_TEXT>
+     </RSMPE_FUNT>
+     <RSMPE_FUNT>
       <CODE>CANCLE_128</CODE>
       <TEXTNO>001</TEXTNO>
       <TEXT_TYPE>S</TEXT_TYPE>
@@ -2023,6 +2115,13 @@
       <FUN_TEXT>Display</FUN_TEXT>
       <ICON_TEXT>Display List</ICON_TEXT>
       <INFO_TEXT>Display List</INFO_TEXT>
+     </RSMPE_FUNT>
+     <RSMPE_FUNT>
+      <CODE>ENTER_127</CODE>
+      <TEXTNO>001</TEXTNO>
+      <TEXT_TYPE>S</TEXT_TYPE>
+      <ICON_ID>@0V@</ICON_ID>
+      <FUN_TEXT>Continue</FUN_TEXT>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
       <CODE>ENTER_128</CODE>
@@ -2327,6 +2426,18 @@
       <NO>02</NO>
       <PFNO>12</PFNO>
      </RSMPE_BUT>
+     <RSMPE_BUT>
+      <PFK_CODE>000005</PFK_CODE>
+      <CODE>0001</CODE>
+      <NO>01</NO>
+      <PFNO>00</PFNO>
+     </RSMPE_BUT>
+     <RSMPE_BUT>
+      <PFK_CODE>000005</PFK_CODE>
+      <CODE>0001</CODE>
+      <NO>02</NO>
+      <PFNO>12</PFNO>
+     </RSMPE_BUT>
     </BUT>
     <PFK>
      <RSMPE_PFK>
@@ -2407,6 +2518,18 @@
       <FUNCODE>CANCLE_128</FUNCODE>
       <FUNNO>001</FUNNO>
      </RSMPE_PFK>
+     <RSMPE_PFK>
+      <CODE>000005</CODE>
+      <PFNO>00</PFNO>
+      <FUNCODE>ENTER_127</FUNCODE>
+      <FUNNO>001</FUNNO>
+     </RSMPE_PFK>
+     <RSMPE_PFK>
+      <CODE>000005</CODE>
+      <PFNO>12</PFNO>
+      <FUNCODE>CANCLE_127</FUNCODE>
+      <FUNNO>001</FUNNO>
+     </RSMPE_PFK>
     </PFK>
     <SET>
      <RSMPE_STAF>
@@ -2428,6 +2551,14 @@
      <RSMPE_STAF>
       <STATUS>ZSTATUS_001</STATUS>
       <FUNCTION>SAVE</FUNCTION>
+     </RSMPE_STAF>
+     <RSMPE_STAF>
+      <STATUS>ZSTATUS_0127</STATUS>
+      <FUNCTION>CANCLE_127</FUNCTION>
+     </RSMPE_STAF>
+     <RSMPE_STAF>
+      <STATUS>ZSTATUS_0127</STATUS>
+      <FUNCTION>ENTER_127</FUNCTION>
      </RSMPE_STAF>
      <RSMPE_STAF>
       <STATUS>ZSTATUS_0128</STATUS>
@@ -2522,11 +2653,28 @@
       <MODAL>P</MODAL>
       <INT_NOTE>GUI Status for 0128</INT_NOTE>
      </RSMPE_ATRT>
+     <RSMPE_ATRT>
+      <OBJ_TYPE>P</OBJ_TYPE>
+      <OBJ_CODE>000005</OBJ_CODE>
+      <MODAL>P</MODAL>
+      <INT_NOTE>GUI Status fot 0127</INT_NOTE>
+     </RSMPE_ATRT>
+     <RSMPE_ATRT>
+      <OBJ_TYPE>B</OBJ_TYPE>
+      <OBJ_CODE>000005</OBJ_CODE>
+      <SUB_CODE>0001</SUB_CODE>
+      <MODAL>P</MODAL>
+      <INT_NOTE>GUI Status fot 0127</INT_NOTE>
+     </RSMPE_ATRT>
     </DOC>
     <TIT>
      <RSMPE_TITT>
       <CODE>ZTITLE_001</CODE>
       <TEXT>Welcome Staff</TEXT>
+     </RSMPE_TITT>
+     <RSMPE_TITT>
+      <CODE>ZTITLE_0127</CODE>
+      <TEXT>Product List</TEXT>
      </RSMPE_TITT>
      <RSMPE_TITT>
       <CODE>ZTITLE_0128</CODE>

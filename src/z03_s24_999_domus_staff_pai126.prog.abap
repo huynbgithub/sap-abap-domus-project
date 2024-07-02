@@ -1,14 +1,14 @@
 *&---------------------------------------------------------------------*
-*& Include          Z03_S24_999_DOMUS_STAFF_PAI120
+*& Include          Z03_S24_999_DOMUS_STAFF_PAI126
 *&---------------------------------------------------------------------*
 *&---------------------------------------------------------------------*
-*&      Module  USER_COMMAND_0120  INPUT
+*&      Module  USER_COMMAND_0126  INPUT
 *&---------------------------------------------------------------------*
 *       text
 *----------------------------------------------------------------------*
-MODULE USER_COMMAND_0120 INPUT.
-  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB2 AND G_ZTAB_001-SUBSCREEN = '0120'.
-    PERFORM HANDLE_UCOMM_0120
-    USING GV_OKCODE.
+MODULE USER_COMMAND_0126 INPUT.
+  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB2.
+    PERFORM HANDLE_UCOMM_0126
+    USING GV_OKCODE_0126.
   ENDIF.
 ENDMODULE.

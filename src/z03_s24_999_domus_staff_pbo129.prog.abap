@@ -2,15 +2,21 @@
 ***INCLUDE Z03_S24_999_DOMUS_STAFF_PBO129.
 *----------------------------------------------------------------------*
 *&---------------------------------------------------------------------*
-*& Module PREPARE_DATA_0129 OUTPUT
+*& Module ADJUST_TABLE_LINE_0129 OUTPUT
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-MODULE PREPARE_DATA_0129 OUTPUT.
+MODULE ADJUST_TABLE_LINE_0129 OUTPUT.
   PCKPRV_TABLE_CONTROL-LINES = LINES( GT_PCKPRV ).
   PCKSER_TABLE_CONTROL-LINES = LINES( GT_PCKSER ).
   PCKIMG_TABLE_CONTROL-LINES = LINES( GT_PCKIMG ).
-
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Module CALCULATE_TOTAL_PRICE_0129 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE CALCULATE_TOTAL_PRICE_0129 OUTPUT.
   GV_PCKPRV_TOTAL_PRICE = 0.
   LOOP AT GT_PCKPRV INTO DATA(LS_PCKPRV_ROW).
     GV_PCKPRV_TOTAL_PRICE += LS_PCKPRV_ROW-TOTAL_PRICE.
@@ -144,6 +150,9 @@ ENDMODULE.
 *&
 *&---------------------------------------------------------------------*
 MODULE MODIFY_PCKPRV_SCREEN OUTPUT.
+  "Calculate 1 Product line Total Price
+  GS_PCKPRV-TOTAL_PRICE = GS_PCKPRV-DISPLAY_PRICE * GS_PCKPRV-QUANTITY.
+
   LOOP AT SCREEN.
     CASE GV_PACKAGE_SCREEN_MODE.
       WHEN GC_PACKAGE_MODE_DISPLAY.

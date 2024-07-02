@@ -58,7 +58,6 @@ DATA: GT_QUOTATION_COLOR TYPE STANDARD TABLE OF TY_QUOTATION_COLOR.
 DATA: O_QUOTATION_CONTAINER TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
       O_QUOTATION_ALV_TABLE TYPE REF TO CL_GUI_ALV_GRID,
       O_QUOTATION_HANDLER TYPE REF TO CL_QUOTATION_ALV_HANDLER.
-
 *&---------------------------------------------------------------------*
 *& Selection Screen
 *&---------------------------------------------------------------------*

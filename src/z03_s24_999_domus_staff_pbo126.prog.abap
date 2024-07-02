@@ -1,20 +1,22 @@
+*----------------------------------------------------------------------*
+***INCLUDE Z03_S24_999_DOMUS_STAFF_PBO126.
+*----------------------------------------------------------------------*
 *&---------------------------------------------------------------------*
-*& Include          Z03_S24_999_DOMUS_STAFF_PBO130
-*&---------------------------------------------------------------------*
-*&---------------------------------------------------------------------*
-*& Module SET_INITIAL_VALUES_0131 OUTPUT
+*& Module STATUS_0126 OUTPUT
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-MODULE SET_INITIAL_VALUES_0131 OUTPUT.
-  PERFORM SET_QCODE_INITIAL_VALUES.
+MODULE STATUS_0126 OUTPUT.
+  SET PF-STATUS 'ZSTATUS_0126'.
+  SET TITLEBAR 'ZTITLE_0126'.
 ENDMODULE.
 *&---------------------------------------------------------------------*
-*& Module PREPARE_DATA_0132 OUTPUT
+*& Module PREPARE_DATA_0127 OUTPUT
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-MODULE PREPARE_DATA_0132 OUTPUT.
-* Set color for each quotation status
-      PERFORM SET_INIT_STATUS_COLOR.
+MODULE PREPARE_DATA_0126 OUTPUT.
+  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB2.
+      PERFORM SHOW_PROVRT_0126_ALV.
+  ENDIF.
 ENDMODULE.

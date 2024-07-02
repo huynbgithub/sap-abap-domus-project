@@ -36,3 +36,23 @@ ENDMODULE.
 MODULE MODIFY_PCKIMG_TABLE INPUT.
   MODIFY GT_PCKIMG FROM GS_PCKIMG INDEX PCKIMG_TABLE_CONTROL-CURRENT_LINE.
 ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  VALIDATE_PCKPRV_INPUTS_0129  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE VALIDATE_PCKPRV_INPUTS_0129 INPUT.
+  IF GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_CHANGE OR GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_CREATE.
+    PERFORM CHECK_PCKPRV_QUANTITY.
+  ENDIF.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  VALIDATE_PCKIMG_INPUTS_0129  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE VALIDATE_PCKIMG_INPUTS_0129 INPUT.
+  IF GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_CHANGE OR GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_CREATE.
+    PERFORM CHECK_PCKIMG_URL.
+  ENDIF.
+ENDMODULE.

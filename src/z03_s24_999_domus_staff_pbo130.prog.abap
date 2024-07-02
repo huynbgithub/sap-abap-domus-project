@@ -10,11 +10,11 @@ MODULE SET_INITIAL_VALUES_0131 OUTPUT.
   PERFORM SET_QCODE_INITIAL_VALUES.
 ENDMODULE.
 *&---------------------------------------------------------------------*
-*& Module PREPARE_DATA_0132 OUTPUT
+*& Module PREPARE_DATA_0130 OUTPUT
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-MODULE PREPARE_DATA_0132 OUTPUT.
+MODULE PREPARE_DATA_0130 OUTPUT.
 * Set color for each quotation status
       PERFORM SET_INIT_STATUS_COLOR.
 ENDMODULE.

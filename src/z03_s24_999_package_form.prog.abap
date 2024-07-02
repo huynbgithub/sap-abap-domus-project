@@ -12,7 +12,7 @@
 FORM HANDLE_UCOMM_0120 USING U_OKCODE.
   CASE U_OKCODE.
     WHEN 'EXECUTE'.
-      PERFORM PROCESS_0122_PACKAGE_LIST.
+      PERFORM PROCESS_PACKAGE_LIST.
       CLEAR: U_OKCODE.
 
     WHEN 'VIEW_PACKAGE'.
@@ -23,14 +23,14 @@ FORM HANDLE_UCOMM_0120 USING U_OKCODE.
   ENDCASE.
 ENDFORM.
 *&---------------------------------------------------------------------*
-*& Form PROCESS_0122_PACKAGE_LIST
+*& Form PROCESS_PACKAGE_LIST
 *&---------------------------------------------------------------------*
 *& text
 *&---------------------------------------------------------------------*
 *& -->  p1        text
 *& <--  p2        text
 *&---------------------------------------------------------------------*
-FORM PROCESS_0122_PACKAGE_LIST.
+FORM PROCESS_PACKAGE_LIST.
   DATA: LV_SUCCESS TYPE ABAP_BOOL.
 * Get data from PACKAGE table
   PERFORM GET_PACKAGE_DATA CHANGING LV_SUCCESS.
@@ -55,7 +55,7 @@ FORM GET_PACKAGE_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
     FROM Y03S24999_PACKGE
     WHERE NAME IN @P_PKNAME
       AND IS_DELETED <> @ABAP_TRUE
-    ORDER BY UPDATED_ON DESCENDING, UPDATED_AT DESCENDING
+    ORDER BY UPDATED_ON DESCENDING, UPDATED_AT DESCENDING, NAME ASCENDING
     INTO CORRESPONDING FIELDS OF TABLE @IT_PACKAGE.
 
   IF SY-SUBRC <> 0.
@@ -135,7 +135,7 @@ FORM PREPARE_PACKAGE_FIELD_CATALOG
   CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
 
 ***** Full form:
-  PERFORM: ADD_PACKAGE_FCAT USING 'NAME'           'Name'              32 '' 'X'  'C500'  CHANGING CH_T_FIELD_CAT,
+  PERFORM: ADD_PACKAGE_FCAT USING 'NAME'           'Name'              32 '' 'X'  'C300'  CHANGING CH_T_FIELD_CAT,
            ADD_PACKAGE_FCAT USING 'DESCRIPTION'    'Description'       64 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
            ADD_PACKAGE_FCAT USING 'CREATED_BY'     'Created By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
            ADD_PACKAGE_FCAT USING 'CREATED_AT'     'Created At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
@@ -153,7 +153,7 @@ FORM DISPLAY_PACKAGE_ALV_TABLE
 *          IM_S_VARIANT   TYPE DISVARIANT
 
   IF O_PACKAGE_CONTAINER IS INITIAL.
-    O_PACKAGE_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0122' ).
+    O_PACKAGE_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0120' ).
   ENDIF.
 
   IF O_PACKAGE_ALV_TABLE IS INITIAL.
@@ -204,7 +204,7 @@ ENDFORM.
 *
 *  CH_S_VARIANT-REPORT = SY-REPID.
 *  CH_S_VARIANT-HANDLE = 001.
-*  CH_S_VARIANT-VARIANT = '/CUSTOM_CONTROL_ALV_0122'.
+*  CH_S_VARIANT-VARIANT = '/CUSTOM_CONTROL_ALV_0120'.
 *
 *ENDFORM.
 *&---------------------------------------------------------------------*
@@ -218,7 +218,7 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
   CASE U_OKCODE.
     WHEN 'BACK_TO_PACKAGE_LIST'.
       PACKAGE_SCREEN_MODE = '0120'.
-      PERFORM PROCESS_0122_PACKAGE_LIST.
+      PERFORM PROCESS_PACKAGE_LIST.
       CLEAR: U_OKCODE.
 
     WHEN 'DISPLAY<->CHANGE'.
@@ -247,7 +247,7 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
       CLEAR: U_OKCODE.
 
     WHEN 'INSERT_PCKIMG'.
-      PERFORM PROCESS_INSERT_PCKSER.
+      PERFORM PROCESS_INSERT_PCKIMG.
       CLEAR: U_OKCODE.
 
     WHEN 'DELETE_PCKIMG'.
@@ -256,6 +256,10 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
 
     WHEN 'INSERT_PCKPRV'.
       PERFORM PROCESS_INSERT_PCKPRV.
+      CLEAR: U_OKCODE.
+
+    WHEN 'DELETE_PCKPRV'.
+      PERFORM DELETE_SELECTED_PCKPRVS.
       CLEAR: U_OKCODE.
 
     WHEN 'SAVE'.
@@ -350,8 +354,9 @@ FORM PROCESS_VIEW_PACKAGE_DETAIL CHANGING CH_PACKAGE_ID.
       READ TABLE IT_PACKAGE INDEX LS_INDEX_ROW INTO DATA(LS_PACKAGE).
 
       CH_PACKAGE_ID = LS_PACKAGE-ID.
+* Prepare Package Detail to display on Screen 0129
       PERFORM PREPARE_PACKAGE_DETAIL USING CH_PACKAGE_ID.
-* Change Screen to the selected Package detail 0129 Screen
+* Change Screen from 0120 to 0129
       PACKAGE_SCREEN_MODE = '0129'.
 
     ELSEIF LINES( LT_INDEX_ROWS ) = 0.
@@ -377,15 +382,7 @@ FORM PREPARE_PACKAGE_DETAIL USING U_PACKAGE_ID.
   CLEAR: GV_PCKPRV_TOTAL_PRICE.
   CLEAR: GV_PCKSER_TOTAL_PRICE.
 
-  SELECT SINGLE *
-    FROM Y03S24999_PACKGE
-    INTO CORRESPONDING FIELDS OF GS_PACKAGE_DETAIL
-    WHERE ID = U_PACKAGE_ID AND IS_DELETED <> ABAP_TRUE.
-
-  IF SY-SUBRC <> 0.
-    MESSAGE E004(Z03S24999_DOMUS_MSGS) WITH 'Package'.
-  ENDIF.
-
+  PERFORM GET_PACKAGE_BASIC_INFO USING U_PACKAGE_ID.
   PERFORM GET_PACKAGE_PRODUCT_ITEMS USING U_PACKAGE_ID.
   PERFORM GET_PACKAGE_SERVICE_ITEMS USING U_PACKAGE_ID.
   PERFORM GET_PACKAGE_IMAGE_ITEMS   USING U_PACKAGE_ID.
@@ -402,6 +399,23 @@ FORM PREPARE_PACKAGE_DETAIL USING U_PACKAGE_ID.
   GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
 
   MESSAGE S009(Z03S24999_DOMUS_MSGS) WITH 'Package'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_PACKAGE_BASIC_INFO
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_PACKAGE_ID
+*&---------------------------------------------------------------------*
+FORM GET_PACKAGE_BASIC_INFO USING U_PACKAGE_ID.
+  SELECT SINGLE *
+    FROM Y03S24999_PACKGE
+    INTO CORRESPONDING FIELDS OF GS_PACKAGE_DETAIL
+    WHERE ID = U_PACKAGE_ID AND IS_DELETED <> ABAP_TRUE.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E004(Z03S24999_DOMUS_MSGS) WITH 'Package'.
+  ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form GET_PACKAGE_PRODUCT_VARIANT_ITEMS
@@ -439,11 +453,6 @@ FORM GET_PACKAGE_PRODUCT_ITEMS USING U_PACKAGE_ID.
     IF SY-SUBRC <> 0.
       MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Product Name' DISPLAY LIKE 'E'.
     ENDIF.
-
-*    GV_PCKPRV_TOTAL_PRICE = 0.
-*    LOOP AT GT_PCKPRV INTO DATA(LS_ROW).
-*      GV_PCKPRV_TOTAL_PRICE += LS_ROW-TOTAL_PRICE.
-*    ENDLOOP.
 
   ENDIF.
 ENDFORM.
@@ -1028,6 +1037,7 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 FORM CHANGE_PACKAGE_DETAIL .
   PERFORM CHANGE_PACKAGE_BASIC_DETAIL.
+  PERFORM CHANGE_PACKAGE_PROVRTS_DETAIL.
   PERFORM CHANGE_PACKAGE_SERVICES_DETAIL.
   PERFORM CHANGE_PACKAGE_IMAGES_DETAIL.
 ENDFORM.
@@ -1055,6 +1065,18 @@ FORM CHANGE_PACKAGE_BASIC_DETAIL .
   ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
+*& Form CHANGE_PACKAGE_PROVRTS_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHANGE_PACKAGE_PROVRTS_DETAIL .
+  PERFORM MODIFY_PCKPRV_TABLE.
+  PERFORM SOFT_DELETE_PCKPRV_TABLE.
+ENDFORM.
+*&---------------------------------------------------------------------*
 *& Form CHANGE_PACKAGE_SERVICES_DETAIL
 *&---------------------------------------------------------------------*
 *& text
@@ -1077,6 +1099,30 @@ ENDFORM.
 FORM CHANGE_PACKAGE_IMAGES_DETAIL .
   PERFORM MODIFY_PCKIMG_TABLE.
   PERFORM SOFT_DELETE_PCKIMG_TABLE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form MODIFY_PCKPRV_TABLE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM MODIFY_PCKPRV_TABLE .
+  DATA: LT_PI TYPE STANDARD TABLE OF Y03S24999_PCKPRV.
+  MOVE-CORRESPONDING GT_PCKPRV TO LT_PI.
+
+  LOOP AT LT_PI INTO DATA(LS_PI).
+    LS_PI-UPDATED_BY = SY-UNAME.
+    LS_PI-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+    LS_PI-UPDATED_ON = SY-DATUM.
+
+    MODIFY Y03S24999_PCKPRV FROM LS_PI.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Package Product Variant details'.
+    ENDIF.
+  ENDLOOP.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form MODIFY_PCKSER_TABLE
@@ -1127,6 +1173,35 @@ FORM MODIFY_PCKIMG_TABLE .
   ENDLOOP.
 ENDFORM.
 *&---------------------------------------------------------------------*
+*& Form SOFT_DELETE_PCKPRV_TABLE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SOFT_DELETE_PCKPRV_TABLE .
+  DATA: LT_PID TYPE STANDARD TABLE OF Y03S24999_PCKPRV.
+
+  SELECT 'X' AS IS_DELETED, GPD~*
+    FROM @GT_PCKPRV_DELETED AS GPD
+    INTO CORRESPONDING FIELDS OF TABLE @LT_PID.
+
+  IF SY-SUBRC = 0.
+    LOOP AT LT_PID INTO DATA(LS_PID).
+      LS_PID-UPDATED_BY = SY-UNAME.
+      LS_PID-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+      LS_PID-UPDATED_ON = SY-DATUM.
+
+      MODIFY Y03S24999_PCKPRV FROM LS_PID.
+
+      IF SY-SUBRC <> 0.
+        MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Soft delete Package Product Variant failed!'.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
 *& Form SOFT_DELETE_PCKSER_TABLE
 *&---------------------------------------------------------------------*
 *& text
@@ -1147,7 +1222,7 @@ FORM SOFT_DELETE_PCKSER_TABLE .
       LS_PID-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
       LS_PID-UPDATED_ON = SY-DATUM.
 
-      UPDATE Y03S24999_PCKSER FROM LS_PID.
+      MODIFY Y03S24999_PCKSER FROM LS_PID.
 
       IF SY-SUBRC <> 0.
         MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Soft delete Package Service failed!'.
@@ -1176,7 +1251,7 @@ FORM SOFT_DELETE_PCKIMG_TABLE .
       LS_PID-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
       LS_PID-UPDATED_ON = SY-DATUM.
 
-      UPDATE Y03S24999_PCKIMG FROM LS_PID.
+      MODIFY Y03S24999_PCKIMG FROM LS_PID.
 
       IF SY-SUBRC <> 0.
         MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Soft delete Package Image failed!'.
@@ -1302,7 +1377,79 @@ FORM HANDLE_PCKIMG_FINAL_DELETION TABLES U_ITAB LIKE GT_PCKIMG.
     DELETE TABLE GT_PCKIMG FROM S_ROW.
 
     IF SY-SUBRC <> 0.
-      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'One deleting Service in Package has caused an error!'.
+      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'One deleting Image in Package has caused an error!'.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DELETE_SELECTED_PCKPRVS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM DELETE_SELECTED_PCKPRVS.
+  DATA: LD_SEL_PCKPRVS LIKE GT_PCKPRV.
+  LOOP AT GT_PCKPRV INTO DATA(LS_PI).
+    IF LS_PI-SEL = 'X'.
+      APPEND LS_PI TO LD_SEL_PCKPRVS.
+    ENDIF.
+  ENDLOOP.
+
+  IF LINES( LD_SEL_PCKPRVS ) = 0.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'a Product Variant for deletion' DISPLAY LIKE 'E'.
+    LEAVE LIST-PROCESSING.
+  ELSEIF LINES( LD_SEL_PCKPRVS ) > 1.
+    PERFORM WARNING_MULTI_SELECTED_PCKPRV TABLES LD_SEL_PCKPRVS.
+
+  ELSEIF LINES( LD_SEL_PCKPRVS ) = 1.
+    PERFORM HANDLE_PCKPRV_FINAL_DELETION TABLES LD_SEL_PCKPRVS.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form WARNING_MULTI_SELECTED_PCKPRV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM WARNING_MULTI_SELECTED_PCKPRV TABLES U_ITAB LIKE GT_PCKPRV.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Do you want to delete MULTIPLE products?'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    PERFORM HANDLE_PCKPRV_FINAL_DELETION TABLES U_ITAB.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_PCKPRV_FINAL_DELETION
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_PCKPRV_FINAL_DELETION TABLES U_ITAB LIKE GT_PCKPRV.
+  LOOP AT U_ITAB INTO DATA(S_ROW).
+    APPEND S_ROW TO GT_PCKPRV_DELETED.
+
+    DELETE TABLE GT_PCKPRV FROM S_ROW.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'One deleting Product in Package has caused an error!'.
     ENDIF.
   ENDLOOP.
 ENDFORM.
@@ -1393,9 +1540,9 @@ FORM PREPARE_PRO_0127_FIELD_CATALOG
   CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
 
 ***** Full form:
-  PERFORM: ADD_PRODUCT_0127_FCAT USING 'PRODUCT_CODE' 'Code'        20 '' 'X'  'C500'  CHANGING CH_T_FIELD_CAT,
-           ADD_PRODUCT_0127_FCAT USING 'BRAND'        'Brand'       14 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
-           ADD_PRODUCT_0127_FCAT USING 'PRODUCT_NAME' 'Name'        14 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+  PERFORM: ADD_PRODUCT_0127_FCAT USING 'PRODUCT_CODE' 'Code'        12 '' 'X'  'C100'  CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0127_FCAT USING 'BRAND'        'Brand'       16 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0127_FCAT USING 'PRODUCT_NAME' 'Name'        22 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
            ADD_PRODUCT_0127_FCAT USING 'CREATED_BY'   'Created By'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
            ADD_PRODUCT_0127_FCAT USING 'CREATED_AT'   'Created At'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
            ADD_PRODUCT_0127_FCAT USING 'CREATED_ON'   'Created On'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
@@ -1560,5 +1707,45 @@ FORM PREPARE_PROVRT_0126_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
 *  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
   CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
   CH_S_LAYOUT-SEL_MODE = 'A'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHECK_PCKPRV_QUANTITY
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHECK_PCKPRV_QUANTITY .
+  IF GS_PCKPRV-QUANTITY < 1 OR GS_PCKPRV-QUANTITY > 255.
+    MESSAGE E012(Z03S24999_DOMUS_MSGS).
+    SET CURSOR FIELD 'GS_PCKPRV-QUANTITY' LINE PCKPRV_TABLE_CONTROL-CURRENT_LINE.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHECK_PCKIMG_URL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHECK_PCKIMG_URL .
+  IF gs_pckimg-image_url CP 'https://*' OR gs_pckimg-image_url CP 'http://*'.
+    IF gs_pckimg-image_url CP '*.jpg' OR
+       gs_pckimg-image_url CP '*.jpeg' OR
+       gs_pckimg-image_url CP '*.png' OR
+       gs_pckimg-image_url CP '*.avif' OR
+       gs_pckimg-image_url CP '*.gif'.
+
+    ELSE.
+      MESSAGE e000(z03s24999_domus_msgs) WITH 'Invalid File Extension for Image!'.
+      SET CURSOR FIELD 'gs_pckimg-image_url' LINE pckimg_table_control-current_line.
+    ENDIF.
+  ELSE.
+    MESSAGE e000(z03s24999_domus_msgs) WITH 'Invalid URL - Must start with https:// or http://.'.
+    SET CURSOR FIELD 'gs_pckimg-image_url' LINE pckimg_table_control-current_line.
+  ENDIF.
 
 ENDFORM.

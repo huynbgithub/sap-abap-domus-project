@@ -80,6 +80,18 @@
      <MSGNR>011</MSGNR>
      <TEXT>Change &amp;1 failed!</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>012</MSGNR>
+     <TEXT>Quantity field must be an Integer value from 1 to 255!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>013</MSGNR>
+     <TEXT>Invalid URL of &amp;1.</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

@@ -23,191 +23,6 @@ FORM HANDLE_UCOMM_0120 USING U_OKCODE.
   ENDCASE.
 ENDFORM.
 *&---------------------------------------------------------------------*
-*& Form PROCESS_PACKAGE_LIST
-*&---------------------------------------------------------------------*
-*& text
-*&---------------------------------------------------------------------*
-*& -->  p1        text
-*& <--  p2        text
-*&---------------------------------------------------------------------*
-FORM PROCESS_PACKAGE_LIST.
-  DATA: LV_SUCCESS TYPE ABAP_BOOL.
-* Get data from PACKAGE table
-  PERFORM GET_PACKAGE_DATA CHANGING LV_SUCCESS.
-  IF LV_SUCCESS = ABAP_FALSE.
-    RETURN.
-  ENDIF.
-* Show PACKAGE ALV
-  PERFORM SHOW_PACKAGE_ALV.
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Form GET_PACKAGE_DATA
-*&---------------------------------------------------------------------*
-*& text
-*&---------------------------------------------------------------------*
-*& -->  p1        text
-*& <--  p2        text
-*&---------------------------------------------------------------------*
-FORM GET_PACKAGE_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
-  CLEAR: IT_PACKAGE[], CH_V_SUCCESS.
-
-  SELECT *
-    FROM Y03S24999_PACKGE
-    WHERE NAME IN @P_PKNAME
-      AND IS_DELETED <> @ABAP_TRUE
-    ORDER BY UPDATED_ON DESCENDING, UPDATED_AT DESCENDING, NAME ASCENDING
-    INTO CORRESPONDING FIELDS OF TABLE @IT_PACKAGE.
-
-  IF SY-SUBRC <> 0.
-    CLEAR IT_PACKAGE[].
-
-    IF O_PACKAGE_CONTAINER IS NOT INITIAL.
-      CALL METHOD O_PACKAGE_CONTAINER->FREE.
-      CLEAR O_PACKAGE_CONTAINER.
-    ENDIF.
-    IF O_PACKAGE_ALV_TABLE IS NOT INITIAL.
-      CLEAR O_PACKAGE_ALV_TABLE.
-    ENDIF.
-    IF O_PACKAGE_HANDLER IS NOT INITIAL.
-      CLEAR O_PACKAGE_HANDLER.
-    ENDIF.
-
-    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Package' DISPLAY LIKE 'E'.
-    CH_V_SUCCESS = ABAP_FALSE.
-    RETURN.
-  ELSE.
-    CH_V_SUCCESS = ABAP_TRUE.
-  ENDIF.
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Form SHOW_PACKAGE_ALV
-*&---------------------------------------------------------------------*
-*& text
-*&---------------------------------------------------------------------*
-*& -->  p1        text
-*& <--  p2        text
-*&---------------------------------------------------------------------*
-FORM SHOW_PACKAGE_ALV.
-  DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
-        LS_LAYOUT    TYPE LVC_S_LAYO.
-*        LS_VARIANT   TYPE DISVARIANT.
-
-* Define Table Structure / Define fields catalog
-  PERFORM PREPARE_PACKAGE_FIELD_CATALOG
-    CHANGING LT_FIELD_CAT.
-
-* Prepare Layout
-  PERFORM PREPARE_PACKAGE_LAYOUT
-    CHANGING LS_LAYOUT.
-** Prepare Variant
-*  PERFORM PREPARE_VARIANT
-*    CHANGING LS_VARIANT.
-
-* Show ALV
-  PERFORM DISPLAY_PACKAGE_ALV_TABLE
-    CHANGING LS_LAYOUT
-*            LS_VARIANT
-             LT_FIELD_CAT.
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Form ADD_PACKAGE_FCAT
-*&---------------------------------------------------------------------*
-FORM ADD_PACKAGE_FCAT USING U_FIELDNAME
-                    U_SCRTEXT_M
-                    U_OUTPUTLEN
-                    U_KEY
-                    U_HOTSPOT
-                    U_EMPHASIZE
-              CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
-  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
-  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
-  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
-  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
-  LS_FIELD_CAT-KEY = U_KEY.
-  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
-  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
-  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Form PREPARE_PACKAGE_FIELD_CATALOG
-*&---------------------------------------------------------------------*
-FORM PREPARE_PACKAGE_FIELD_CATALOG
-  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
-
-***** Full form:
-  PERFORM: ADD_PACKAGE_FCAT USING 'NAME'           'Name'              32 '' 'X'  'C300'  CHANGING CH_T_FIELD_CAT,
-           ADD_PACKAGE_FCAT USING 'DESCRIPTION'    'Description'       64 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
-           ADD_PACKAGE_FCAT USING 'CREATED_BY'     'Created By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
-           ADD_PACKAGE_FCAT USING 'CREATED_AT'     'Created At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
-           ADD_PACKAGE_FCAT USING 'CREATED_ON'     'Created On'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
-           ADD_PACKAGE_FCAT USING 'UPDATED_BY'     'Updated By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
-           ADD_PACKAGE_FCAT USING 'UPDATED_AT'     'Updated At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
-           ADD_PACKAGE_FCAT USING 'UPDATED_ON'     'Updated On'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Form DISPLAY_PACKAGE_ALV_TABLE
-*&---------------------------------------------------------------------*
-FORM DISPLAY_PACKAGE_ALV_TABLE
-  USING    U_S_LAYOUT    TYPE LVC_S_LAYO
-  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
-*          IM_S_VARIANT   TYPE DISVARIANT
-
-  IF O_PACKAGE_CONTAINER IS INITIAL.
-    O_PACKAGE_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0120' ).
-  ENDIF.
-
-  IF O_PACKAGE_ALV_TABLE IS INITIAL.
-    O_PACKAGE_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_PACKAGE_CONTAINER ).
-  ENDIF.
-
-  O_PACKAGE_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
-    EXPORTING
-      IS_LAYOUT                     = U_S_LAYOUT      " Layout
-*      I_SAVE                        = 'A'
-*      IS_VARIANT                    = IM_S_VARIANT
-    CHANGING
-      IT_OUTTAB                     = IT_PACKAGE     " Output Table
-      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
-    EXCEPTIONS
-      INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
-      PROGRAM_ERROR                 = 2                " Program Errors
-      TOO_MANY_LINES                = 3                " Too many Rows in Ready for Input Grid
-      OTHERS                        = 4
-  ).
-
-  IF O_PACKAGE_HANDLER IS INITIAL.
-    O_PACKAGE_HANDLER = NEW CL_PACKAGE_ALV_HANDLER( ).
-    SET HANDLER O_PACKAGE_HANDLER->HOTSPOT_CLICK FOR O_PACKAGE_ALV_TABLE.
-  ENDIF.
-
-  IF SY-SUBRC = 0.
-    MESSAGE S006(Z03S24999_DOMUS_MSGS) WITH 'Package'.
-  ELSE.
-    MESSAGE E005(Z03S24999_DOMUS_MSGS).
-  ENDIF.
-
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Form PREPARE_PACKAGE_LAYOUT
-*&---------------------------------------------------------------------*
-FORM PREPARE_PACKAGE_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
-
-*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
-  CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
-  CH_S_LAYOUT-SEL_MODE = 'A'.
-
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Form PREPARE_VARIANT
-*&---------------------------------------------------------------------*
-*FORM PREPARE_VARIANT CHANGING CH_S_VARIANT TYPE DISVARIANT.
-*
-*  CH_S_VARIANT-REPORT = SY-REPID.
-*  CH_S_VARIANT-HANDLE = 001.
-*  CH_S_VARIANT-VARIANT = '/CUSTOM_CONTROL_ALV_0120'.
-*
-*ENDFORM.
-*&---------------------------------------------------------------------*
 *& Form HANDLE_UCOMM_0129
 *&---------------------------------------------------------------------*
 *& text
@@ -280,6 +95,271 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
     WHEN OTHERS.
   ENDCASE.
 ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0128
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0128 USING U_OKCODE.
+
+  CASE U_OKCODE.
+
+    WHEN 'ENTER_128'.
+      PERFORM HANDLE_ENTER_ON_SCREEN_0128.
+      CLEAR: U_OKCODE.
+
+    WHEN 'CANCLE_128'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Include          Z03_S24_999_PACKAGE_FORM
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0127
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0127 USING U_OKCODE.
+
+  CASE U_OKCODE.
+
+    WHEN 'ENTER_127' OR 'VIEW_PRODUCT_0127'.
+      PERFORM HANDLE_ENTER_ON_SCREEN_0127.
+      CLEAR: U_OKCODE.
+    WHEN 'CANCLE_127'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0126
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0126 USING U_OKCODE.
+
+  CASE U_OKCODE.
+
+    WHEN 'ENTER_126'.
+      PERFORM HANDLE_ENTER_ON_SCREEN_0126.
+      CLEAR: U_OKCODE.
+    WHEN 'CANCLE_126'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_PACKAGE_LIST
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_PACKAGE_LIST.
+  DATA: LV_SUCCESS TYPE ABAP_BOOL.
+
+  PERFORM SET_INIT_PACKAGE_COLOR.
+* Get data from PACKAGE table
+  PERFORM GET_PACKAGE_DATA CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+* Show PACKAGE ALV
+  PERFORM SHOW_PACKAGE_ALV.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_PACKAGE_DATA
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM GET_PACKAGE_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
+  CLEAR: IT_PACKAGE[], CH_V_SUCCESS.
+
+  SELECT *
+    FROM Y03S24999_PACKGE
+    WHERE NAME IN @P_PKNAME
+      AND IS_DELETED <> @ABAP_TRUE
+    ORDER BY UPDATED_ON DESCENDING, UPDATED_AT DESCENDING, NAME ASCENDING
+    INTO CORRESPONDING FIELDS OF TABLE @IT_PACKAGE.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_PACKAGE[].
+
+    IF O_PACKAGE_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_PACKAGE_CONTAINER->FREE.
+      CLEAR O_PACKAGE_CONTAINER.
+    ENDIF.
+    IF O_PACKAGE_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_PACKAGE_ALV_TABLE.
+    ENDIF.
+    IF O_PACKAGE_HANDLER IS NOT INITIAL.
+      CLEAR O_PACKAGE_HANDLER.
+    ENDIF.
+
+    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Package' DISPLAY LIKE 'E'.
+    CH_V_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ELSE.
+    CH_V_SUCCESS = ABAP_TRUE.
+  ENDIF.
+
+  LOOP AT IT_PACKAGE ASSIGNING FIELD-SYMBOL(<LS_DATA>).
+    DATA: LV_LINE_INDEX TYPE SYST-TABIX.
+    CLEAR: LV_LINE_INDEX.
+    LV_LINE_INDEX = SY-TABIX.
+    PERFORM CHANGE_PACKAGE_COLOR USING LV_LINE_INDEX CHANGING <LS_DATA>-LINE_COLOR.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_PACKAGE_ALV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_PACKAGE_ALV.
+  DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
+        LS_LAYOUT    TYPE LVC_S_LAYO.
+*        LS_VARIANT   TYPE DISVARIANT.
+
+* Define Table Structure / Define fields catalog
+  PERFORM PREPARE_PACKAGE_FIELD_CATALOG
+    CHANGING LT_FIELD_CAT.
+
+* Prepare Layout
+  PERFORM PREPARE_PACKAGE_LAYOUT
+    CHANGING LS_LAYOUT.
+** Prepare Variant
+*  PERFORM PREPARE_VARIANT
+*    CHANGING LS_VARIANT.
+
+* Show ALV
+  PERFORM DISPLAY_PACKAGE_ALV_TABLE
+    CHANGING LS_LAYOUT
+*            LS_VARIANT
+             LT_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form ADD_PACKAGE_FCAT
+*&---------------------------------------------------------------------*
+FORM ADD_PACKAGE_FCAT USING U_FIELDNAME
+                    U_SCRTEXT_M
+                    U_OUTPUTLEN
+                    U_KEY
+                    U_HOTSPOT
+                    U_EMPHASIZE
+              CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
+  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
+  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
+  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
+  LS_FIELD_CAT-KEY = U_KEY.
+  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
+  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PACKAGE_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+FORM PREPARE_PACKAGE_FIELD_CATALOG
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+
+***** Full form:
+  PERFORM: ADD_PACKAGE_FCAT USING 'NAME'         'Name'         28 ''  'X' '' CHANGING CH_T_FIELD_CAT,
+           ADD_PACKAGE_FCAT USING 'DESCRIPTION'  'Description'  64 ''  ''  ''     CHANGING CH_T_FIELD_CAT,
+           ADD_PACKAGE_FCAT USING 'CREATED_BY'   'Created By'   10 ''  ''  ''     CHANGING CH_T_FIELD_CAT,
+           ADD_PACKAGE_FCAT USING 'CREATED_AT'   'Created At'   10 ''  ''  'C601' CHANGING CH_T_FIELD_CAT,
+           ADD_PACKAGE_FCAT USING 'CREATED_ON'   'Created On'   10 ''  ''  'C701' CHANGING CH_T_FIELD_CAT,
+           ADD_PACKAGE_FCAT USING 'UPDATED_BY'   'Updated By'   10 ''  ''  ''     CHANGING CH_T_FIELD_CAT,
+           ADD_PACKAGE_FCAT USING 'UPDATED_AT'   'Updated At'   10 ''  ''  'C601' CHANGING CH_T_FIELD_CAT,
+           ADD_PACKAGE_FCAT USING 'UPDATED_ON'   'Updated On'   10 ''  ''  'C701' CHANGING CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DISPLAY_PACKAGE_ALV_TABLE
+*&---------------------------------------------------------------------*
+FORM DISPLAY_PACKAGE_ALV_TABLE
+  USING    U_S_LAYOUT    TYPE LVC_S_LAYO
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+*          IM_S_VARIANT   TYPE DISVARIANT
+
+  IF O_PACKAGE_CONTAINER IS INITIAL.
+    O_PACKAGE_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0120' ).
+  ENDIF.
+
+  IF O_PACKAGE_ALV_TABLE IS INITIAL.
+    O_PACKAGE_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_PACKAGE_CONTAINER ).
+  ENDIF.
+
+  O_PACKAGE_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
+    EXPORTING
+      IS_LAYOUT                     = U_S_LAYOUT      " Layout
+*      I_SAVE                        = 'A'
+*      IS_VARIANT                    = IM_S_VARIANT
+    CHANGING
+      IT_OUTTAB                     = IT_PACKAGE     " Output Table
+      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
+    EXCEPTIONS
+      INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
+      PROGRAM_ERROR                 = 2                " Program Errors
+      TOO_MANY_LINES                = 3                " Too many Rows in Ready for Input Grid
+      OTHERS                        = 4
+  ).
+
+  IF O_PACKAGE_HANDLER IS INITIAL.
+    O_PACKAGE_HANDLER = NEW CL_PACKAGE_ALV_HANDLER( ).
+    SET HANDLER O_PACKAGE_HANDLER->HOTSPOT_CLICK FOR O_PACKAGE_ALV_TABLE.
+  ENDIF.
+
+  IF SY-SUBRC = 0.
+    MESSAGE S006(Z03S24999_DOMUS_MSGS) WITH 'Package'.
+  ELSE.
+    MESSAGE E005(Z03S24999_DOMUS_MSGS).
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PACKAGE_LAYOUT
+*&---------------------------------------------------------------------*
+FORM PREPARE_PACKAGE_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
+
+*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
+  CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
+  CH_S_LAYOUT-CTAB_FNAME = 'LINE_COLOR'.
+  CH_S_LAYOUT-SEL_MODE = 'A'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_VARIANT
+*&---------------------------------------------------------------------*
+*FORM PREPARE_VARIANT CHANGING CH_S_VARIANT TYPE DISVARIANT.
+*
+*  CH_S_VARIANT-REPORT = SY-REPID.
+*  CH_S_VARIANT-HANDLE = 001.
+*  CH_S_VARIANT-VARIANT = '/CUSTOM_CONTROL_ALV_0120'.
+*
+*ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form PROCESS_INSERT_PCKSER
 *&---------------------------------------------------------------------*
@@ -356,8 +436,6 @@ FORM PROCESS_VIEW_PACKAGE_DETAIL CHANGING CH_PACKAGE_ID.
       CH_PACKAGE_ID = LS_PACKAGE-ID.
 * Prepare Package Detail to display on Screen 0129
       PERFORM PREPARE_PACKAGE_DETAIL USING CH_PACKAGE_ID.
-* Change Screen from 0120 to 0129
-      PACKAGE_SCREEN_MODE = '0129'.
 
     ELSEIF LINES( LT_INDEX_ROWS ) = 0.
       MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Package' DISPLAY LIKE 'E'.
@@ -396,9 +474,13 @@ FORM PREPARE_PACKAGE_DETAIL USING U_PACKAGE_ID.
   CLEAR: GT_PCKSER_DELETED.
   CLEAR: GT_PCKIMG_DELETED.
 
+* Set Screen Mode to View only
   GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
+* Change Screen from 0120 to 0129
+  PACKAGE_SCREEN_MODE = '0129'.
 
   MESSAGE S009(Z03S24999_DOMUS_MSGS) WITH 'Package'.
+
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form GET_PACKAGE_BASIC_INFO
@@ -499,79 +581,6 @@ FORM GET_PACKAGE_IMAGE_ITEMS USING U_PACKAGE_ID.
   IF SY-SUBRC <> 0.
     MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Package Image' DISPLAY LIKE 'E'.
   ENDIF.
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Include          Z03_S24_999_PACKAGE_FORM
-*&---------------------------------------------------------------------*
-*&---------------------------------------------------------------------*
-*& Form HANDLE_UCOMM_0128
-*&---------------------------------------------------------------------*
-*& text
-*&---------------------------------------------------------------------*
-*&      --> U_OKCODE
-*&
-*&---------------------------------------------------------------------*
-FORM HANDLE_UCOMM_0128 USING U_OKCODE.
-
-  CASE U_OKCODE.
-
-    WHEN 'ENTER_128'.
-      PERFORM HANDLE_ENTER_ON_SCREEN_0128.
-      CLEAR: U_OKCODE.
-
-    WHEN 'CANCLE_128'.
-      CLEAR: U_OKCODE.
-      LEAVE TO SCREEN 0.
-
-    WHEN OTHERS.
-  ENDCASE.
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Include          Z03_S24_999_PACKAGE_FORM
-*&---------------------------------------------------------------------*
-*&---------------------------------------------------------------------*
-*& Form HANDLE_UCOMM_0127
-*&---------------------------------------------------------------------*
-*& text
-*&---------------------------------------------------------------------*
-*&      --> U_OKCODE
-*&
-*&---------------------------------------------------------------------*
-FORM HANDLE_UCOMM_0127 USING U_OKCODE.
-
-  CASE U_OKCODE.
-
-    WHEN 'ENTER_127' OR 'VIEW_PRODUCT_0127'.
-      PERFORM HANDLE_ENTER_ON_SCREEN_0127.
-      CLEAR: U_OKCODE.
-    WHEN 'CANCLE_127'.
-      CLEAR: U_OKCODE.
-      LEAVE TO SCREEN 0.
-
-    WHEN OTHERS.
-  ENDCASE.
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Form HANDLE_UCOMM_0126
-*&---------------------------------------------------------------------*
-*& text
-*&---------------------------------------------------------------------*
-*&      --> U_OKCODE
-*&
-*&---------------------------------------------------------------------*
-FORM HANDLE_UCOMM_0126 USING U_OKCODE.
-
-  CASE U_OKCODE.
-
-    WHEN 'ENTER_126'.
-      PERFORM HANDLE_ENTER_ON_SCREEN_0126.
-      CLEAR: U_OKCODE.
-    WHEN 'CANCLE_126'.
-      CLEAR: U_OKCODE.
-      LEAVE TO SCREEN 0.
-
-    WHEN OTHERS.
-  ENDCASE.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form HANDLE_ENTER_ON_SCREEN_0126
@@ -1732,20 +1741,79 @@ ENDFORM.
 *& <--  p2        text
 *&---------------------------------------------------------------------*
 FORM CHECK_PCKIMG_URL .
-  IF gs_pckimg-image_url CP 'https://*' OR gs_pckimg-image_url CP 'http://*'.
-    IF gs_pckimg-image_url CP '*.jpg' OR
-       gs_pckimg-image_url CP '*.jpeg' OR
-       gs_pckimg-image_url CP '*.png' OR
-       gs_pckimg-image_url CP '*.avif' OR
-       gs_pckimg-image_url CP '*.gif'.
+  IF GS_PCKIMG-IMAGE_URL CP 'https://*' OR GS_PCKIMG-IMAGE_URL CP 'http://*'.
+    IF GS_PCKIMG-IMAGE_URL CP '*.jpg' OR
+       GS_PCKIMG-IMAGE_URL CP '*.jpeg' OR
+       GS_PCKIMG-IMAGE_URL CP '*.png' OR
+       GS_PCKIMG-IMAGE_URL CP '*.avif' OR
+       GS_PCKIMG-IMAGE_URL CP '*.gif'.
 
     ELSE.
-      MESSAGE e000(z03s24999_domus_msgs) WITH 'Invalid File Extension for Image!'.
-      SET CURSOR FIELD 'gs_pckimg-image_url' LINE pckimg_table_control-current_line.
+      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Invalid File Extension for Image!'.
+      SET CURSOR FIELD 'gs_pckimg-image_url' LINE PCKIMG_TABLE_CONTROL-CURRENT_LINE.
     ENDIF.
   ELSE.
-    MESSAGE e000(z03s24999_domus_msgs) WITH 'Invalid URL - Must start with https:// or http://.'.
-    SET CURSOR FIELD 'gs_pckimg-image_url' LINE pckimg_table_control-current_line.
+    MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Invalid URL - Must start with https:// or http://.'.
+    SET CURSOR FIELD 'gs_pckimg-image_url' LINE PCKIMG_TABLE_CONTROL-CURRENT_LINE.
   ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SET_INIT_PACKAGE_COLOR
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SET_INIT_PACKAGE_COLOR .
+  CLEAR: GT_PACKAGE_COLOR.
+  GT_PACKAGE_COLOR = VALUE #(
+                              ( COL = 3 INT = 0 INV = 0 )
+                              ( COL = 1 INT = 0 INV = 0 )
+                              ( COL = 5 INT = 0 INV = 0 )
+                              ( COL = 7 INT = 0 INV = 0 )
+                              ( COL = 5 INT = 1 INV = 0 )
+                              ( COL = 5 INT = 0 INV = 1 )
+                             ).
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_PACKAGE_COLOR
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      -->
+*&      <--
+*&---------------------------------------------------------------------*
+FORM CHANGE_PACKAGE_COLOR  USING    U_LINE_INDEX  TYPE SYST_TABIX
+                           CHANGING CH_LINE_COLOR TYPE LVC_T_SCOL.
+  DATA LS_COLOR TYPE LVC_S_SCOL.
+  DATA: LV_COLOR_INDEX TYPE INT1.
+
+  CLEAR: CH_LINE_COLOR.
+  LV_COLOR_INDEX = ( ( U_LINE_INDEX - 1 ) MOD 2 ) + 1.
+
+  TRY.
+      MOVE-CORRESPONDING GT_PACKAGE_COLOR[ LV_COLOR_INDEX ] TO LS_COLOR-COLOR.
+
+      LS_COLOR-FNAME = 'DESCRIPTION'.
+      APPEND LS_COLOR TO CH_LINE_COLOR.
+
+      MOVE-CORRESPONDING GT_PACKAGE_COLOR[ LV_COLOR_INDEX + 4 ] TO LS_COLOR-COLOR.
+
+      LS_COLOR-FNAME = 'NAME'.
+      APPEND LS_COLOR TO CH_LINE_COLOR.
+
+      MOVE-CORRESPONDING GT_PACKAGE_COLOR[ LV_COLOR_INDEX + 2 ] TO LS_COLOR-COLOR.
+
+      LS_COLOR-FNAME = 'CREATED_BY'.
+      APPEND LS_COLOR TO CH_LINE_COLOR.
+
+      LS_COLOR-FNAME = 'UPDATED_BY'.
+      APPEND LS_COLOR TO CH_LINE_COLOR.
+
+    CATCH CX_SY_ITAB_LINE_NOT_FOUND.
+
+  ENDTRY.
 
 ENDFORM.

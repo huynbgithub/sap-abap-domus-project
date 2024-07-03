@@ -10,24 +10,33 @@
 *&      --> U_QCODE
 *&---------------------------------------------------------------------*
 FORM HANDLE_UCOMM_0130 USING U_OKCODE.
-  DATA: LV_SUCCESS TYPE ABAP_BOOL.
-
   CASE U_OKCODE.
-
     WHEN 'EXECUTE'.
-* Get data from QUOTATION table
-      PERFORM GET_QUOTATION_DATA CHANGING LV_SUCCESS.
-      IF LV_SUCCESS = ABAP_FALSE.
-        RETURN.
-      ENDIF.
-* Show QUOTATION ALV
-      PERFORM SHOW_QUOTATION_ALV.
-
+      PERFORM PROCESS_QUOTATION_LIST_0130.
       CLEAR: U_OKCODE.
+
     WHEN OTHERS.
+
   ENDCASE.
 ENDFORM.
-
+*&---------------------------------------------------------------------*
+*& Form PROCESS_QUOTATION_LIST_0130
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_QUOTATION_LIST_0130.
+  DATA: LV_SUCCESS TYPE ABAP_BOOL.
+* Get data from QUOTATION table
+  PERFORM GET_QUOTATION_DATA CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+* Show QUOTATION ALV
+  PERFORM SHOW_QUOTATION_ALV.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form GET_QUOTATION_DATA
 *&---------------------------------------------------------------------*
@@ -74,7 +83,7 @@ FORM GET_QUOTATION_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
   ENDIF.
 
   LOOP AT IT_QUOTATION ASSIGNING FIELD-SYMBOL(<LS_DATA>).
-    PERFORM CHANGE_QUOTATION_COLOR USING <LS_DATA>-STATUS CHANGING <LS_DATA>-COLOR.
+    PERFORM CHANGE_QUOTATION_COLOR USING <LS_DATA>-STATUS CHANGING <LS_DATA>-LINE_COLOR.
   ENDLOOP.
 ENDFORM.
 
@@ -199,7 +208,7 @@ FORM PREPARE_QUOTATION_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
 
 *  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
   CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
-  CH_S_LAYOUT-CTAB_FNAME = 'COLOR'.
+  CH_S_LAYOUT-CTAB_FNAME = 'LINE_COLOR'.
 
 ENDFORM.
 *&---------------------------------------------------------------------*
@@ -244,17 +253,18 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form CHANGE_QUOTATION_COLOR
 *&---------------------------------------------------------------------*
-FORM CHANGE_QUOTATION_COLOR  USING    U_QSTATUS TYPE Y03S24999_QUOTA-STATUS
-                             CHANGING CH_COLOR  TYPE LVC_T_SCOL.
+FORM CHANGE_QUOTATION_COLOR  USING    U_QSTATUS      TYPE Y03S24999_QUOTA-STATUS
+                             CHANGING CH_LINE_COLOR  TYPE LVC_T_SCOL.
 
   DATA LS_COLOR TYPE LVC_S_SCOL.
-  CLEAR: CH_COLOR.
+  CLEAR: CH_LINE_COLOR.
 
   LS_COLOR-FNAME = 'STATUS'.
 
   TRY.
       MOVE-CORRESPONDING GT_QUOTATION_COLOR[ STATUS =  U_QSTATUS ] TO LS_COLOR-COLOR.
-      APPEND LS_COLOR TO CH_COLOR.
+      APPEND LS_COLOR TO CH_LINE_COLOR.
+
     CATCH CX_SY_ITAB_LINE_NOT_FOUND.
 
   ENDTRY.

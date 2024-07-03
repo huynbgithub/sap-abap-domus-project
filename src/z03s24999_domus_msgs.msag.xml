@@ -92,6 +92,12 @@
      <MSGNR>013</MSGNR>
      <TEXT>Invalid URL of &amp;1.</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>014</MSGNR>
+     <TEXT>Please fill in all required input fields!</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

@@ -35,9 +35,7 @@ FORM HANDLE_EXIT_COMMAND USING IN_UCOMM.
       LEAVE PROGRAM.
 
     WHEN OTHERS.
-
   ENDCASE.
-
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form HANDLE_UCOMM_1000

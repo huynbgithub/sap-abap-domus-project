@@ -9,7 +9,7 @@
 *----------------------------------------------------------------------*
 MODULE EXIT_COMMAND_0100_EVENT INPUT.
   PERFORM HANDLE_EXIT_COMMAND
-  USING SY-UCOMM.
+  USING GV_OKCODE.
 ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  USER_COMMAND_0100  INPUT

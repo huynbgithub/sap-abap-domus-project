@@ -61,6 +61,34 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
       PERFORM OPEN_PCKIMG_URL.
       CLEAR: U_OKCODE.
 
+    WHEN 'SAVE'.
+      CASE GV_PACKAGE_SCREEN_MODE.
+        WHEN GC_PACKAGE_MODE_DISPLAY.
+
+        WHEN GC_PACKAGE_MODE_CHANGE.
+          PERFORM CHANGE_PACKAGE_DETAIL.
+          PERFORM PREPARE_PACKAGE_DETAIL USING GV_PACKAGE_ID.
+
+          MESSAGE S010(Z03S24999_DOMUS_MSGS) WITH 'Package'.
+
+          GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
+
+        WHEN OTHERS.
+      ENDCASE.
+      CLEAR: U_OKCODE.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UC_BYPASS_REQUIRED_0129
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&---------------------------------------------------------------------*
+FORM HANDLE_UC_BYPASS_REQUIRED_0129 USING U_OKCODE.
+  CASE U_OKCODE.
     WHEN 'INSERT_PCKSER'.
       PERFORM PROCESS_INSERT_PCKSER.
       CLEAR: U_OKCODE.
@@ -85,21 +113,6 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
       PERFORM DELETE_SELECTED_PCKPRVS.
       CLEAR: U_OKCODE.
 
-    WHEN 'SAVE'.
-      CASE GV_PACKAGE_SCREEN_MODE.
-        WHEN GC_PACKAGE_MODE_DISPLAY.
-
-        WHEN GC_PACKAGE_MODE_CHANGE.
-          PERFORM CHANGE_PACKAGE_DETAIL.
-          PERFORM PREPARE_PACKAGE_DETAIL USING GV_PACKAGE_ID.
-
-          MESSAGE S010(Z03S24999_DOMUS_MSGS) WITH 'Package'.
-
-          GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
-
-        WHEN OTHERS.
-      ENDCASE.
-      CLEAR: U_OKCODE.
     WHEN OTHERS.
   ENDCASE.
 ENDFORM.
@@ -399,7 +412,7 @@ FORM PROCESS_INSERT_PCKIMG.
   ENDIF.
 
   PERFORM CREATE_UUID_C36_STATIC CHANGING GS_PCKIMG-ID.
-
+  GS_PCKIMG-IMAGE_URL = '...'.
   APPEND GS_PCKIMG TO GT_PCKIMG.
 ENDFORM.
 *&---------------------------------------------------------------------*
@@ -1727,6 +1740,34 @@ FORM PREPARE_PROVRT_0126_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
 
 ENDFORM.
 *&---------------------------------------------------------------------*
+*& Form CHECK_PACKAGE_DETAIL_NAME
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHECK_PACKAGE_DETAIL_NAME.
+  IF GS_PACKAGE_DETAIL-NAME IS INITIAL.
+    MESSAGE E014(Z03S24999_DOMUS_MSGS).
+    SET CURSOR FIELD 'GS_PACKAGE_DETAIL-NAME'.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHECK_PACKAGE_DETAIL_DESCRIPTION
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHECK_PCK_DETAIL_DESCRIPTION.
+  IF GS_PACKAGE_DETAIL-DESCRIPTION IS INITIAL.
+    MESSAGE E014(Z03S24999_DOMUS_MSGS).
+    SET CURSOR FIELD 'GS_PACKAGE_DETAIL-DESCRIPTION'.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
 *& Form CHECK_PCKPRV_QUANTITY
 *&---------------------------------------------------------------------*
 *& text
@@ -1734,10 +1775,15 @@ ENDFORM.
 *& -->  p1        text
 *& <--  p2        text
 *&---------------------------------------------------------------------*
-FORM CHECK_PCKPRV_QUANTITY .
-  IF GS_PCKPRV-QUANTITY < 1 OR GS_PCKPRV-QUANTITY > 255.
-    MESSAGE E012(Z03S24999_DOMUS_MSGS).
-    SET CURSOR FIELD 'GS_PCKPRV-QUANTITY' LINE PCKPRV_TABLE_CONTROL-CURRENT_LINE.
+FORM CHECK_PCKPRV_QUANTITY.
+  IF GS_PCKPRV-QUANTITY IS INITIAL.
+    MESSAGE E014(Z03S24999_DOMUS_MSGS).
+    SET CURSOR FIELD 'GS_PCKPRV-QUANTITY' LINE PCKIMG_TABLE_CONTROL-CURRENT_LINE.
+  ELSE.
+    IF GS_PCKPRV-QUANTITY < 1 OR GS_PCKPRV-QUANTITY > 255.
+      MESSAGE E012(Z03S24999_DOMUS_MSGS).
+      SET CURSOR FIELD 'GS_PCKPRV-QUANTITY' LINE PCKPRV_TABLE_CONTROL-CURRENT_LINE.
+    ENDIF.
   ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
@@ -1748,21 +1794,29 @@ ENDFORM.
 *& -->  p1        text
 *& <--  p2        text
 *&---------------------------------------------------------------------*
-FORM CHECK_PCKIMG_URL .
-  IF GS_PCKIMG-IMAGE_URL CP 'https://*' OR GS_PCKIMG-IMAGE_URL CP 'http://*'.
-    IF GS_PCKIMG-IMAGE_URL CP '*.jpg' OR
-       GS_PCKIMG-IMAGE_URL CP '*.jpeg' OR
-       GS_PCKIMG-IMAGE_URL CP '*.png' OR
-       GS_PCKIMG-IMAGE_URL CP '*.avif' OR
-       GS_PCKIMG-IMAGE_URL CP '*.gif'.
+FORM CHECK_PCKIMG_URL.
+  IF GS_PCKIMG-IMAGE_URL IS INITIAL.
 
-    ELSE.
-      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Invalid File Extension for Image!'.
-      SET CURSOR FIELD 'gs_pckimg-image_url' LINE PCKIMG_TABLE_CONTROL-CURRENT_LINE.
-    ENDIF.
+    MESSAGE E014(Z03S24999_DOMUS_MSGS).
+    SET CURSOR FIELD 'GS_PCKIMG-IMAGE_URL' LINE PCKIMG_TABLE_CONTROL-CURRENT_LINE.
+
   ELSE.
-    MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Invalid URL - Must start with https:// or http://.'.
-    SET CURSOR FIELD 'gs_pckimg-image_url' LINE PCKIMG_TABLE_CONTROL-CURRENT_LINE.
+    IF GS_PCKIMG-IMAGE_URL CP 'https://*' OR GS_PCKIMG-IMAGE_URL CP 'http://*'.
+      IF GS_PCKIMG-IMAGE_URL CP '*.jpg' OR
+         GS_PCKIMG-IMAGE_URL CP '*.jpeg' OR
+         GS_PCKIMG-IMAGE_URL CP '*.png' OR
+         GS_PCKIMG-IMAGE_URL CP '*.avif' OR
+         GS_PCKIMG-IMAGE_URL CP '*.gif'.
+
+      ELSE.
+        MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Invalid File Extension for Image!'.
+        SET CURSOR FIELD 'GS_PCKIMG-IMAGE_URL' LINE PCKIMG_TABLE_CONTROL-CURRENT_LINE.
+      ENDIF.
+    ELSE.
+      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Invalid URL - Must start with https:// or http://.'.
+      SET CURSOR FIELD 'GS_PCKIMG-IMAGE_URL' LINE PCKIMG_TABLE_CONTROL-CURRENT_LINE.
+    ENDIF.
+
   ENDIF.
 
 ENDFORM.

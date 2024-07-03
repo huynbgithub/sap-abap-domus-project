@@ -666,7 +666,7 @@
       <TYPE>I</TYPE>
       <NEXTSCREEN>0129</NEXTSCREEN>
       <LINES>026</LINES>
-      <COLUMNS>144</COLUMNS>
+      <COLUMNS>146</COLUMNS>
       <KEEP_SCPOS>X</KEEP_SCPOS>
      </HEADER>
      <CONTAINERS>
@@ -1545,21 +1545,36 @@
       <RPY_DYFLOW>
        <LINE>PROCESS AFTER INPUT.</LINE>
       </RPY_DYFLOW>
+      <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>  CHAIN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>     FIELD GS_PACKAGE_DETAIL-ID.</LINE>
+       <LINE>    FIELD:</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>     FIELD GS_PACKAGE_DETAIL-NAME.</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>     FIELD GS_PACKAGE_DETAIL-DESCRIPTION.</LINE>
+       <LINE>           GS_PACKAGE_DETAIL-NAME.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>*     MODULE VALIDATE_PO_INPUTS_0200.</LINE>
+       <LINE>    MODULE VALIDATE_PACKAGE_NAME_0129.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  ENDCHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>  CHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>    FIELD:</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>           GS_PACKAGE_DETAIL-DESCRIPTION.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>    MODULE VALIDATE_PCK_DESCRIPTION_0129.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>  ENDCHAIN.</LINE>
@@ -1569,106 +1584,91 @@
        <LINE>  LOOP AT GT_PCKPRV.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>     CHAIN.</LINE>
+       <LINE>    CHAIN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>       FIELD:</LINE>
+       <LINE>      FIELD:</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>              GS_PCKPRV-SEL,</LINE>
+       <LINE>            GS_PCKPRV-SEL,</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>              GS_PCKPRV-PRODUCT_NAME,</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>              GS_PCKPRV-VARIANT_CODE,</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>              GS_PCKPRV-DISPLAY_PRICE,</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>              GS_PCKPRV-QUANTITY,</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>              GS_PCKPRV-TOTAL_PRICE.</LINE>
+       <LINE>            GS_PCKPRV-QUANTITY.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>       MODULE VALIDATE_PCKPRV_INPUTS_0129.</LINE>
+       <LINE>      MODULE VALIDATE_PCKPRV_INPUTS_0129.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>       MODULE MODIFY_PCKPRV_TABLE ON CHAIN-REQUEST.</LINE>
+       <LINE>      MODULE MODIFY_PCKPRV_TABLE ON CHAIN-REQUEST.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>     ENDCHAIN.</LINE>
+       <LINE>    ENDCHAIN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>   ENDLOOP.</LINE>
+       <LINE>  ENDLOOP.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>  LOOP AT GT_PCKSER.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>     CHAIN.</LINE>
+       <LINE>    CHAIN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>       FIELD:</LINE>
+       <LINE>      FIELD:</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>              GS_PCKSER-SEL,</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>              GS_PCKSER-SERVICE_NAME,</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>              GS_PCKSER-DISPLAY_PRICE.</LINE>
+       <LINE>             GS_PCKSER-SEL.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>*       MODULE VALIDATE_.</LINE>
+       <LINE>      MODULE VALIDATE_PCKSER_INPUTS_0129.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>       MODULE MODIFY_PCKSER_TABLE ON CHAIN-REQUEST.</LINE>
+       <LINE>      MODULE MODIFY_PCKIMG_TABLE ON CHAIN-REQUEST.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>     ENDCHAIN.</LINE>
+       <LINE>    ENDCHAIN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>   ENDLOOP.</LINE>
+       <LINE>  ENDLOOP.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
        <LINE>  LOOP AT GT_PCKIMG.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>     CHAIN.</LINE>
+       <LINE>    CHAIN.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>       FIELD:</LINE>
+       <LINE>      FIELD:</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>              GS_PCKIMG-SEL,</LINE>
+       <LINE>             GS_PCKIMG-SEL,</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
-       <LINE>              GS_PCKIMG-IMAGE_URL.</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW/>
-      <RPY_DYFLOW>
-       <LINE>       MODULE VALIDATE_PCKIMG_INPUTS_0129.</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>       MODULE MODIFY_PCKIMG_TABLE ON CHAIN-REQUEST.</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>     ENDCHAIN.</LINE>
-      </RPY_DYFLOW>
-      <RPY_DYFLOW>
-       <LINE>   ENDLOOP.</LINE>
+       <LINE>             GS_PCKIMG-IMAGE_URL.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>
-       <LINE>   MODULE USER_COMMAND_0129.</LINE>
+       <LINE>      MODULE VALIDATE_PCKIMG_INPUTS_0129.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>      MODULE MODIFY_PCKIMG_TABLE ON CHAIN-REQUEST.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>    ENDCHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  ENDLOOP.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>  MODULE USER_COMMAND_0129.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>  MODULE UCOMM_BYPASS_REQUIRED_0129.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW/>
       <RPY_DYFLOW>

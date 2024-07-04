@@ -45,16 +45,7 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
       CLEAR: U_OKCODE.
 
     WHEN 'DISPLAY<->CHANGE'.
-      CASE GV_PACKAGE_SCREEN_MODE.
-        WHEN GC_PACKAGE_MODE_DISPLAY.
-          GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_CHANGE.
-
-        WHEN GC_PACKAGE_MODE_CHANGE.
-          PERFORM WARNING_PACKAGE_CHANGES_EXIST.
-          GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
-
-        WHEN OTHERS.
-      ENDCASE.
+      PERFORM PROCESS_PCK_DISPLAY_CHANGE..
       CLEAR: U_OKCODE.
 
     WHEN 'OPEN_PCKIMG_URL'.
@@ -62,33 +53,9 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
       CLEAR: U_OKCODE.
 
     WHEN 'SAVE'.
-      CASE GV_PACKAGE_SCREEN_MODE.
-        WHEN GC_PACKAGE_MODE_DISPLAY.
-
-        WHEN GC_PACKAGE_MODE_CHANGE.
-          PERFORM CHANGE_PACKAGE_DETAIL.
-          PERFORM PREPARE_PACKAGE_DETAIL USING GV_PACKAGE_ID.
-
-          MESSAGE S010(Z03S24999_DOMUS_MSGS) WITH 'Package'.
-
-          GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
-
-        WHEN OTHERS.
-      ENDCASE.
+      PERFORM PROCESS_PACKAGE_SAVE_EVENT.
       CLEAR: U_OKCODE.
 
-    WHEN OTHERS.
-  ENDCASE.
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Form HANDLE_UC_BYPASS_REQUIRED_0129
-*&---------------------------------------------------------------------*
-*& text
-*&---------------------------------------------------------------------*
-*&      --> U_OKCODE
-*&---------------------------------------------------------------------*
-FORM HANDLE_UC_BYPASS_REQUIRED_0129 USING U_OKCODE.
-  CASE U_OKCODE.
     WHEN 'INSERT_PCKSER'.
       PERFORM PROCESS_INSERT_PCKSER.
       CLEAR: U_OKCODE.
@@ -112,7 +79,6 @@ FORM HANDLE_UC_BYPASS_REQUIRED_0129 USING U_OKCODE.
     WHEN 'DELETE_PCKPRV'.
       PERFORM DELETE_SELECTED_PCKPRVS.
       CLEAR: U_OKCODE.
-
     WHEN OTHERS.
   ENDCASE.
 ENDFORM.
@@ -182,6 +148,49 @@ FORM HANDLE_UCOMM_0126 USING U_OKCODE.
     WHEN 'CANCLE_126'.
       CLEAR: U_OKCODE.
       LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_PACKAGE_SAVE_EVENT
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_PACKAGE_SAVE_EVENT.
+  CASE GV_PACKAGE_SCREEN_MODE.
+    WHEN GC_PACKAGE_MODE_DISPLAY.
+
+    WHEN GC_PACKAGE_MODE_CHANGE.
+      PERFORM CHANGE_PACKAGE_DETAIL.
+      PERFORM PREPARE_PACKAGE_DETAIL USING GV_PACKAGE_ID.
+
+      MESSAGE S010(Z03S24999_DOMUS_MSGS) WITH 'Package'.
+
+      GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_PCK_DISPLAY_CHANGE.
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_PCK_DISPLAY_CHANGE..
+  CASE GV_PACKAGE_SCREEN_MODE.
+    WHEN GC_PACKAGE_MODE_DISPLAY.
+      GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_CHANGE.
+
+    WHEN GC_PACKAGE_MODE_CHANGE.
+      PERFORM WARNING_PACKAGE_CHANGES_EXIST.
+      GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_DISPLAY.
 
     WHEN OTHERS.
   ENDCASE.

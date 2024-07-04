@@ -17,7 +17,7 @@ ENDMODULE.
 *       text
 *----------------------------------------------------------------------*
 MODULE USER_COMMAND_0100 INPUT.
-
+  CLEAR: GV_VALIDATION_BYPASSED.
 ENDMODULE.
 
 *&SPWIZARD: INPUT MODULE FOR TS 'ZTAB_001'. DO NOT CHANGE THIS LINE!
@@ -56,4 +56,20 @@ MODULE ZTAB_001_ACTIVE_TAB_SET INPUT.
     WHEN OTHERS.
 *&SPWIZARD:      DO NOTHING
   ENDCASE.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  SET_VALIDATION_BYPASSED_VALUE  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE SET_VALIDATION_BYPASSED_VALUE INPUT.
+  IF GV_OKCODE = 'INSERT_PCKPRV' OR
+     GV_OKCODE = 'DELETE_PCKPRV' OR
+     GV_OKCODE = 'INSERT_PCKSER' OR
+     GV_OKCODE = 'DELETE_PCKSER' OR
+     GV_OKCODE = 'INSERT_PCKIMG' OR
+     GV_OKCODE = 'DELETE_PCKIMG'.
+
+    GV_VALIDATION_BYPASSED = ABAP_TRUE.
+  ENDIF.
 ENDMODULE.

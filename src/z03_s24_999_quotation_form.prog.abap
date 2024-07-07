@@ -29,6 +29,8 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 FORM PROCESS_QUOTATION_LIST_0130.
   DATA: LV_SUCCESS TYPE ABAP_BOOL.
+
+  PERFORM INIT_QUOTATION_STATUS_COLOR CHANGING GT_QUOTATION_COLOR.
 * Get data from QUOTATION table
   PERFORM GET_QUOTATION_DATA CHANGING LV_SUCCESS.
   IF LV_SUCCESS = ABAP_FALSE.
@@ -86,7 +88,17 @@ FORM GET_QUOTATION_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
     PERFORM CHANGE_QUOTATION_COLOR USING <LS_DATA>-STATUS CHANGING <LS_DATA>-LINE_COLOR.
   ENDLOOP.
 ENDFORM.
-
+*&---------------------------------------------------------------------*
+*& Form INIT_QUOTATION_STATUS_COLOR
+*&---------------------------------------------------------------------*
+FORM INIT_QUOTATION_STATUS_COLOR CHANGING CH_QCOLOR LIKE GT_QUOTATION_COLOR.
+  IF CH_QCOLOR IS INITIAL.
+    CH_QCOLOR = VALUE #( ( STATUS = 'Negotiating' COL = 7 INT = 1 INV = 1 )
+                         ( STATUS = 'Accepted'    COL = 3 INT = 1 INV = 1 )
+                         ( STATUS = 'Cancelled'   COL = 6 INT = 1 INV = 1 )
+                         ( STATUS = 'Requested'   COL = 5 INT = 1 INV = 1 ) ).
+  ENDIF.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form SHOW_QUOTATION_ALV
 *&---------------------------------------------------------------------*
@@ -157,7 +169,6 @@ FORM PREPARE_QUOTA_FIELD_CATALOG
            ADD_QUOTATION_FCAT USING 'UPDATED_AT'     'Updated At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
            ADD_QUOTATION_FCAT USING 'UPDATED_ON'     'Updated On'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
 ENDFORM.
-
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_QUOTATION_ALV_TABLE
 *&---------------------------------------------------------------------*
@@ -240,15 +251,6 @@ FORM SET_QCODE_INITIAL_VALUES.
 *  P_QCODE-LOW    = 'Q*'. " Begin with 'Q'
     APPEND P_QCODE.
   ENDIF.
-ENDFORM.
-*&---------------------------------------------------------------------*
-*& Form SET_INIT_STATUS_COLOR
-*&---------------------------------------------------------------------*
-FORM SET_INIT_STATUS_COLOR.
-  GT_QUOTATION_COLOR = VALUE #( ( STATUS = 'Negotiating' COL = 7 INT = 1 INV = 1 )
-                                ( STATUS = 'Accepted'    COL = 3 INT = 1 INV = 1 )
-                                ( STATUS = 'Cancelled'   COL = 6 INT = 1 INV = 1 )
-                                ( STATUS = 'Requested'   COL = 5 INT = 1 INV = 1 ) ).
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form CHANGE_QUOTATION_COLOR

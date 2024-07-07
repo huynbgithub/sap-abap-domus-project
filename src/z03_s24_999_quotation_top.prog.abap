@@ -24,9 +24,9 @@ TYPES: BEGIN OF TY_QUOTATION,
        END OF TY_QUOTATION.
 * TYPE Declaration for Quotation Status Color
 TYPES: BEGIN OF TY_QUOTATION_COLOR,
-            STATUS TYPE Y03S24999_QUOTA-STATUS.
-            INCLUDE TYPE LVC_S_COLO.
-       TYPES END OF TY_QUOTATION_COLOR.
+         STATUS TYPE Y03S24999_QUOTA-STATUS.
+         INCLUDE TYPE LVC_S_COLO.
+TYPES END OF TY_QUOTATION_COLOR.
 *---------------------------------------------------------------------*
 * CLASS Definition
 *---------------------------------------------------------------------*
@@ -57,7 +57,7 @@ DATA: GT_QUOTATION_COLOR TYPE STANDARD TABLE OF TY_QUOTATION_COLOR.
 * ALV Table Object
 DATA: O_QUOTATION_CONTAINER TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
       O_QUOTATION_ALV_TABLE TYPE REF TO CL_GUI_ALV_GRID,
-      O_QUOTATION_HANDLER TYPE REF TO CL_QUOTATION_ALV_HANDLER.
+      O_QUOTATION_HANDLER   TYPE REF TO CL_QUOTATION_ALV_HANDLER.
 *&---------------------------------------------------------------------*
 *& Selection Screen
 *&---------------------------------------------------------------------*

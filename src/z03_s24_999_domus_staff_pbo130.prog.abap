@@ -7,14 +7,7 @@
 *&
 *&---------------------------------------------------------------------*
 MODULE SET_INITIAL_VALUES_0131 OUTPUT.
-  PERFORM SET_QCODE_INITIAL_VALUES.
-ENDMODULE.
-*&---------------------------------------------------------------------*
-*& Module PREPARE_DATA_0130 OUTPUT
-*&---------------------------------------------------------------------*
-*&
-*&---------------------------------------------------------------------*
-MODULE PREPARE_DATA_0130 OUTPUT.
-* Set color for each quotation status
-      PERFORM SET_INIT_STATUS_COLOR.
+  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB3 AND G_ZTAB_001-SUBSCREEN = '0130'.
+    PERFORM SET_QCODE_INITIAL_VALUES.
+  ENDIF.
 ENDMODULE.

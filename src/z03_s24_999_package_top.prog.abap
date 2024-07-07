@@ -122,6 +122,18 @@ CLASS CL_PACKAGE_ALV_HANDLER DEFINITION.
         ES_ROW_NO.
 
 ENDCLASS.
+************************************************************************
+* CLASS    c_event_receiver
+* DEFINITION
+************************************************************************
+CLASS C_EVENT_RECEIVER DEFINITION.
+* The class is used to test the events raised by the cl_gui_picture
+* class
+  PUBLIC SECTION.
+    METHODS EVENT_HANDLER_PICTURE_DBLCLICK
+      FOR EVENT PICTURE_DBLCLICK OF CL_GUI_PICTURE
+      IMPORTING MOUSE_POS_X MOUSE_POS_Y SENDER.
+ENDCLASS.
 *---------------------------------------------------------------------*
 * DATA Declaration
 *---------------------------------------------------------------------*
@@ -205,6 +217,14 @@ CONTROLS: PCKIMG_TABLE_CONTROL TYPE TABLEVIEW USING SCREEN 0129.
 
 * Package Color Table
 DATA: GT_PACKAGE_COLOR TYPE STANDARD TABLE OF LVC_S_COLO.
+
+DATA PCKIMG_URL TYPE CNDP_URL.
+DATA PCKIMG_CONTROL_1 TYPE REF TO CL_GUI_PICTURE.
+DATA PCKIMG_CONTAINER_1 TYPE REF TO CL_GUI_CUSTOM_CONTAINER.
+DATA PCKIMG_EVENT_RECEIVER  TYPE REF TO C_EVENT_RECEIVER.
+DATA PCKIMG_EVENT_TAB TYPE CNTL_SIMPLE_EVENTS.
+DATA PCKIMG_EVENT_TAB_LINE TYPE CNTL_SIMPLE_EVENT.
+DATA PCKIMG_RETURN TYPE I.
 *&---------------------------------------------------------------------*
 *& CONSTANTS DECLARATION
 *&---------------------------------------------------------------------*

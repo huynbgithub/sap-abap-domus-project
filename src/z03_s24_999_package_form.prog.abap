@@ -40,16 +40,19 @@ ENDFORM.
 FORM HANDLE_UCOMM_0129 USING U_OKCODE.
   CASE U_OKCODE.
     WHEN 'BACK_TO_PACKAGE_LIST'.
-      PACKAGE_SCREEN_MODE = '0120'.
-      PERFORM PROCESS_PACKAGE_LIST.
+      PERFORM PROCESS_BACK_TO_PACKAGE_LIST.
       CLEAR: U_OKCODE.
 
     WHEN 'DISPLAY<->CHANGE'.
-      PERFORM PROCESS_PCK_DISPLAY_CHANGE..
+      PERFORM PROCESS_PCK_DISPLAY_CHANGE.
       CLEAR: U_OKCODE.
 
     WHEN 'OPEN_PCKIMG_URL'.
       PERFORM OPEN_PCKIMG_URL.
+      CLEAR: U_OKCODE.
+
+    WHEN 'DISPLAY_PCKIMG'.
+      PERFORM DISPLAY_PCKIMG.
       CLEAR: U_OKCODE.
 
     WHEN 'SAVE'.
@@ -79,6 +82,7 @@ FORM HANDLE_UCOMM_0129 USING U_OKCODE.
     WHEN 'DELETE_PCKPRV'.
       PERFORM DELETE_SELECTED_PCKPRVS.
       CLEAR: U_OKCODE.
+
     WHEN OTHERS.
   ENDCASE.
 ENDFORM.
@@ -194,6 +198,43 @@ FORM PROCESS_PCK_DISPLAY_CHANGE..
 
     WHEN OTHERS.
   ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_BACK_TO_PACKAGE_LIST
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_BACK_TO_PACKAGE_LIST.
+  PERFORM RESET_PCKIMG_CONTAINER.
+  PACKAGE_SCREEN_MODE = '0120'.
+  PERFORM PROCESS_PACKAGE_LIST.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form RESET_PCKIMG_CONTAINER
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM RESET_PCKIMG_CONTAINER.
+  IF GV_PCKIMG_URL IS NOT INITIAL.
+    CLEAR GV_PCKIMG_URL.
+  ENDIF.
+  IF PCKIMG_CONTROL IS NOT INITIAL.
+    CALL METHOD PCKIMG_CONTROL->CLEAR_PICTURE.
+    CLEAR PCKIMG_CONTROL.
+  ENDIF.
+  IF PCKIMG_CONTAINER IS NOT INITIAL.
+    CALL METHOD PCKIMG_CONTAINER->FREE.
+    CLEAR PCKIMG_CONTAINER.
+  ENDIF.
+  IF PCKIMG_EVENT_RECEIVER IS NOT INITIAL.
+    CLEAR PCKIMG_EVENT_RECEIVER.
+  ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form PROCESS_PACKAGE_LIST
@@ -615,6 +656,10 @@ FORM GET_PACKAGE_IMAGE_ITEMS USING U_PACKAGE_ID.
 
   IF SY-SUBRC <> 0.
     MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Package Image' DISPLAY LIKE 'E'.
+  ELSE.
+    READ TABLE GT_PCKIMG INDEX 1 INTO DATA(LS_ROW).
+    GV_PCKIMG_URL = LS_ROW-IMAGE_URL.
+    PERFORM SHOW_PACKAGE_SELECTED_IMAGE USING GV_PCKIMG_URL.
   ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
@@ -1354,6 +1399,36 @@ FORM OPEN_PCKIMG_URL .
   ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
+*& Form DISPLAY_PCKIMG
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM DISPLAY_PCKIMG .
+  DATA: LV_SEL_PCKIMGS TYPE STANDARD TABLE OF TY_PCKIMG.
+
+  LOOP AT GT_PCKIMG INTO DATA(LS_ROW).
+    IF LS_ROW-SEL = 'X'.
+      APPEND LS_ROW TO LV_SEL_PCKIMGS.
+    ENDIF.
+  ENDLOOP.
+
+  IF LINES( LV_SEL_PCKIMGS ) = 1.
+
+    READ TABLE LV_SEL_PCKIMGS INDEX 1 INTO DATA(LS_IMAGE).
+
+    GV_PCKIMG_URL = LS_IMAGE-IMAGE_URL.
+    PERFORM SHOW_PACKAGE_SELECTED_IMAGE USING GV_PCKIMG_URL.
+
+  ELSEIF LINES( LV_SEL_PCKIMGS ) = 0.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Image' DISPLAY LIKE 'E'.
+  ELSEIF LINES( LV_SEL_PCKIMGS ) > 1.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'only one Image' DISPLAY LIKE 'E'.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
 *& Form DELETE_SELECTED_PCKIMGS
 *&---------------------------------------------------------------------*
 *& text
@@ -1891,5 +1966,62 @@ FORM CHANGE_PACKAGE_COLOR  USING    U_LINE_INDEX  TYPE SYST_TABIX
     CATCH CX_SY_ITAB_LINE_NOT_FOUND.
 
   ENDTRY.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_PACKAGE_SELECTED_IMAGE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_PACKAGE_SELECTED_IMAGE USING U_PCKIMG_URL TYPE CNDP_URL.
+  IF PCKIMG_CONTAINER IS INITIAL OR PCKIMG_CONTROL IS INITIAL.
+
+* Create controls
+    CREATE OBJECT PCKIMG_CONTAINER
+      EXPORTING
+        CONTAINER_NAME = 'CUSTOM_CONTROL_0129'.
+
+    CREATE OBJECT PCKIMG_CONTROL EXPORTING PARENT = PCKIMG_CONTAINER.
+
+* Register the events
+    PCKIMG_EVENT_TAB_LINE-EVENTID = CL_GUI_PICTURE=>EVENTID_PICTURE_DBLCLICK.
+    APPEND PCKIMG_EVENT_TAB_LINE TO PCKIMG_EVENT_TAB.
+    PCKIMG_EVENT_TAB_LINE-EVENTID = CL_GUI_PICTURE=>EVENTID_CONTEXT_MENU.
+    APPEND PCKIMG_EVENT_TAB_LINE TO PCKIMG_EVENT_TAB.
+    PCKIMG_EVENT_TAB_LINE-EVENTID = CL_GUI_PICTURE=>EVENTID_CONTEXT_MENU_SELECTED.
+    APPEND PCKIMG_EVENT_TAB_LINE TO PCKIMG_EVENT_TAB.
+
+    CALL METHOD PCKIMG_CONTROL->SET_REGISTERED_EVENTS
+      EXPORTING
+        EVENTS = PCKIMG_EVENT_TAB.
+
+* Create the event_receiver object and set the handlers for the events
+* of the picture controls
+    CREATE OBJECT PCKIMG_EVENT_RECEIVER.
+    SET HANDLER PCKIMG_EVENT_RECEIVER->EVENT_HANDLER_PICTURE_DBLCLICK
+                FOR PCKIMG_CONTROL.
+
+* Set the display mode to 'normal' (0)
+    CALL METHOD PCKIMG_CONTROL->SET_DISPLAY_MODE
+      EXPORTING
+        DISPLAY_MODE = CL_GUI_PICTURE=>DISPLAY_MODE_NORMAL.
+
+* Set 3D Border
+    CALL METHOD PCKIMG_CONTROL->SET_3D_BORDER
+      EXPORTING
+        BORDER = 1.
+
+    CALL METHOD PCKIMG_CONTROL->SET_DISPLAY_MODE
+      EXPORTING
+        DISPLAY_MODE = CL_GUI_PICTURE=>DISPLAY_MODE_STRETCH.
+
+  ENDIF.
+
+  CALL METHOD PCKIMG_CONTROL->LOAD_PICTURE_FROM_URL_ASYNC
+    EXPORTING
+      URL = U_PCKIMG_URL.
 
 ENDFORM.

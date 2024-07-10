@@ -104,6 +104,12 @@
      <MSGNR>015</MSGNR>
      <TEXT>Create &amp;1 failed!</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>016</MSGNR>
+     <TEXT>Create &amp;1 successfully.</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

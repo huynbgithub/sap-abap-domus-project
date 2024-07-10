@@ -1,7 +1,6 @@
 *&---------------------------------------------------------------------*
 *& Include          Z03_S24_999_CLASS_IMPLEMENT
 *&---------------------------------------------------------------------*
-
 *---------------------------------------------------------------------*
 * CL_QUOTATION_ALV_HANDLER IMPLEMENTATION
 *---------------------------------------------------------------------*
@@ -17,7 +16,6 @@ CLASS CL_QUOTATION_ALV_HANDLER IMPLEMENTATION.
   ENDMETHOD.
 
 ENDCLASS.
-
 *---------------------------------------------------------------------*
 * CL_PACKAGE_ALV_HANDLER IMPLEMENTATION
 *---------------------------------------------------------------------*
@@ -30,6 +28,21 @@ CLASS CL_PACKAGE_ALV_HANDLER IMPLEMENTATION.
     GV_PACKAGE_ID = LS_PACKAGE-ID.
     PERFORM PREPARE_PACKAGE_DETAIL USING GV_PACKAGE_ID.
     LEAVE TO SCREEN 0100.
+
+  ENDMETHOD.
+
+ENDCLASS.
+*---------------------------------------------------------------------*
+* CL_PACKAGE_PROVRT_ALV_HANDLER IMPLEMENTATION
+*---------------------------------------------------------------------*
+CLASS CL_PACKAGE_PROVRT_ALV_HANDLER IMPLEMENTATION.
+
+  METHOD HOTSPOT_CLICK.
+    READ TABLE IT_PROVRT_0126 INTO DATA(LS_PROVRT_0126)
+      INDEX E_ROW_ID-INDEX.
+
+    PERFORM PREPARE_PACKAGE_PROATV_0125 USING LS_PROVRT_0126-ID.
+    CALL SCREEN 0125 STARTING AT 15 06 ENDING AT 45 12.
 
   ENDMETHOD.
 
@@ -54,10 +67,10 @@ CLASS C_EVENT_RECEIVER IMPLEMENTATION.
 
     IF SENDER = PCKIMG_CONTROL.
       MESSAGE I000(0K) WITH
-        'Double Click' 'Upper Picture' POS_X POS_Y.          "#EC NOTEXT
+        'Double Click' 'Upper Picture' POS_X POS_Y.         "#EC NOTEXT
     ELSE.
       MESSAGE I000(0K) WITH
-        'Double Click' 'Lower Picture' POS_X POS_Y.          "#EC NOTEXT
+        'Double Click' 'Lower Picture' POS_X POS_Y.         "#EC NOTEXT
     ENDIF.
   ENDMETHOD.
 ENDCLASS.

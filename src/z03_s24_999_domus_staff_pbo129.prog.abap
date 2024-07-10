@@ -46,8 +46,8 @@ MODULE MODIFY_PACKAGE_SCREEN OUTPUT.
   IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB2 AND G_ZTAB_001-SUBSCREEN = '0129'.
     LOOP AT SCREEN.
       CASE GV_PACKAGE_SCREEN_MODE.
+* Display Mode
         WHEN GC_PACKAGE_MODE_DISPLAY.
-
           SCREEN-INPUT = '0'.
 
           IF SCREEN-NAME = 'BACK_TO_PACKAGE_LIST'.
@@ -81,9 +81,8 @@ MODULE MODIFY_PACKAGE_SCREEN OUTPUT.
           IF SCREEN-NAME = 'DISPLAY_PCKIMG'.
             SCREEN-INPUT = '1'.
           ENDIF.
-
+* Change Mode
         WHEN GC_PACKAGE_MODE_CHANGE.
-
           SCREEN-INPUT = '1'.
 
           IF SCREEN-NAME = 'BACK_TO_PACKAGE_LIST'.
@@ -109,17 +108,19 @@ MODULE MODIFY_PACKAGE_SCREEN OUTPUT.
           IF SCREEN-NAME = 'GS_PACKAGE_DETAIL-NAME' OR SCREEN-NAME = 'GS_PACKAGE_DETAIL-DESCRIPTION'.
             SCREEN-REQUIRED = '2'.
           ENDIF.
-
+* Create Mode
         WHEN GC_PACKAGE_MODE_CREATE.
 
           SCREEN-INPUT = '1'.
 
           IF SCREEN-NAME = 'BACK_TO_PACKAGE_LIST'.
-            SCREEN-INPUT = '0'.
+            SCREEN-INPUT = '1'.
           ENDIF.
 
           IF SCREEN-NAME = 'DISPLAY<->CHANGE'.
-            SCREEN-INPUT = '0'.
+            SCREEN-INVISIBLE = '1'.
+            SCREEN-ACTIVE    = '0'.
+            SCREEN-INPUT     = '0'.
           ENDIF.
 
           IF SCREEN-NAME = 'INSERT_PCKPRV' OR
@@ -134,10 +135,12 @@ MODULE MODIFY_PACKAGE_SCREEN OUTPUT.
             SCREEN-INPUT     = '1'.
           ENDIF.
 
-*        SCREEN-REQUIRED = '1'.
-
           IF SCREEN-NAME = 'GS_PACKAGE_DETAIL-ID'.
             SCREEN-INPUT = '0'.
+          ENDIF.
+
+          IF SCREEN-NAME = 'GS_PACKAGE_DETAIL-NAME' OR SCREEN-NAME = 'GS_PACKAGE_DETAIL-DESCRIPTION'.
+            SCREEN-REQUIRED = '2'.
           ENDIF.
 
         WHEN OTHERS.
@@ -170,8 +173,12 @@ MODULE MODIFY_PCKPRV_SCREEN OUTPUT.
             ENDIF.
           WHEN GC_PACKAGE_MODE_CREATE.
             SCREEN-INPUT = '0'.
-            IF SCREEN-NAME = 'GS_PCKPRV-SEL' OR SCREEN-NAME = 'GS_PCKPRV-QUANTITY'.
+            IF SCREEN-NAME = 'GS_PCKPRV-SEL'.
               SCREEN-INPUT = '1'.
+            ENDIF.
+            IF SCREEN-NAME = 'GS_PCKPRV-QUANTITY'.
+              SCREEN-INPUT = '1'.
+              SCREEN-REQUIRED = '2'.
             ENDIF.
           WHEN OTHERS.
         ENDCASE.
@@ -239,7 +246,9 @@ MODULE MODIFY_PCKIMG_SCREEN OUTPUT.
             ENDIF.
 
           WHEN GC_PACKAGE_MODE_CREATE.
-
+            IF SCREEN-NAME = 'GS_PCKIMG-IMAGE_URL'.
+              SCREEN-REQUIRED = '2'.
+            ENDIF.
           WHEN OTHERS.
         ENDCASE.
 

@@ -24,7 +24,7 @@ FORM HANDLE_UCOMM_0120 USING U_OKCODE.
       CLEAR: U_OKCODE.
 
     WHEN 'DELETE_PACKAGE'.
-
+      PERFORM PROCESS_DELETE_PACKAGES_0120.
       CLEAR: U_OKCODE.
 
     WHEN OTHERS.
@@ -265,7 +265,7 @@ ENDFORM.
 *& <--  p2        text
 *&---------------------------------------------------------------------*
 FORM GET_PACKAGE_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
-  CLEAR: IT_PACKAGE[], CH_V_SUCCESS.
+  CLEAR: IT_PACKAGE, CH_V_SUCCESS.
 
   SELECT *
     FROM Y03S24999_PACKGE
@@ -275,7 +275,7 @@ FORM GET_PACKAGE_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
     INTO CORRESPONDING FIELDS OF TABLE @IT_PACKAGE.
 
   IF SY-SUBRC <> 0.
-    CLEAR IT_PACKAGE[].
+    CLEAR IT_PACKAGE.
 
     IF O_PACKAGE_CONTAINER IS NOT INITIAL.
       CALL METHOD O_PACKAGE_CONTAINER->FREE.
@@ -485,6 +485,141 @@ FORM PROCESS_INSERT_PCKPRV.
     RETURN.
   ENDIF.
   CALL SCREEN 0127 STARTING AT 10 08 ENDING AT 70 20.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_DELETE_PACKAGES_0120
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->
+*& <--
+*&---------------------------------------------------------------------*
+FORM PROCESS_DELETE_PACKAGES_0120.
+  IF O_PACKAGE_ALV_TABLE IS NOT INITIAL.
+
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+
+    CALL METHOD O_PACKAGE_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+
+    IF LINES( LT_INDEX_ROWS ) = 0.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Package for deletion' DISPLAY LIKE 'E'.
+      LEAVE LIST-PROCESSING.
+
+    ELSE.
+      CLEAR: GT_PACKAGE_DELETED.
+
+      LOOP AT LT_INDEX_ROWS INTO LS_INDEX_ROW.
+        READ TABLE IT_PACKAGE INDEX LS_INDEX_ROW INTO DATA(LS_PACKAGE).
+        APPEND LS_PACKAGE TO GT_PACKAGE_DELETED.
+
+      ENDLOOP.
+
+      IF LINES( LT_INDEX_ROWS ) > 1.
+        PERFORM WARNING_MULTI_SELECTED_PACKAGE.
+
+      ELSEIF LINES( LT_INDEX_ROWS ) = 1.
+        PERFORM WARNING_SINGLE_PACKGE_DELETION.
+
+      ENDIF.
+
+    ENDIF.
+
+  ELSE.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Package' DISPLAY LIKE 'E'.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form WARNING_MULTI_SELECTED_PACKAGE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM WARNING_MULTI_SELECTED_PACKAGE.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Do you want to delete MULTIPLE packages?'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    PERFORM HANDLE_PACKAGE_FINAL_DELETION.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form WARNING_SINGLE_PACKGE_DELETION
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM WARNING_SINGLE_PACKGE_DELETION.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Are you sure to delete the package?'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    PERFORM HANDLE_PACKAGE_FINAL_DELETION.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_PACKAGE_FINAL_DELETION
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_PACKAGE_FINAL_DELETION.
+  DATA: LT_PID TYPE STANDARD TABLE OF Y03S24999_PACKGE.
+
+  SELECT 'X' AS IS_DELETED,
+         ID,
+         NAME,
+         DESCRIPTION,
+         CREATED_BY,
+         CREATED_AT,
+         CREATED_ON
+    FROM @GT_PACKAGE_DELETED AS D
+    INTO CORRESPONDING FIELDS OF TABLE @LT_PID.
+
+  IF SY-SUBRC = 0.
+    LOOP AT LT_PID INTO DATA(LS_PID).
+      LS_PID-UPDATED_BY = SY-UNAME.
+      LS_PID-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+      LS_PID-UPDATED_ON = SY-DATUM.
+
+      MODIFY Y03S24999_PACKGE FROM LS_PID.
+
+      IF SY-SUBRC <> 0.
+        MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'Delete Package failed!'.
+      ENDIF.
+    ENDLOOP.
+
+    PERFORM PROCESS_PACKAGE_LIST.
+    MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'Delete Package successfully!'.
+  ENDIF.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form PROCESS_VIEW_PACKAGE_DETAIL

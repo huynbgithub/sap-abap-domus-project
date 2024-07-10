@@ -244,7 +244,9 @@ MODULE MODIFY_PCKIMG_SCREEN OUTPUT.
         ENDCASE.
 
       ELSE.
-        SCREEN-INPUT     = '0'.
+        WRITE '' TO GS_PCKIMG-CREATED_AT.
+        SCREEN-INPUT = '0'.
+
       ENDIF.
 
       MODIFY SCREEN.

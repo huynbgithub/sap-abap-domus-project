@@ -15,6 +15,10 @@ FORM HANDLE_UCOMM_0130 USING U_OKCODE.
       PERFORM PROCESS_QUOTATION_LIST_0130.
       CLEAR: U_OKCODE.
 
+    WHEN 'VIEW_QUOTATION'.
+      PERFORM PROCESS_VIEW_QUOTATION_DETAIL CHANGING GV_QUOTATION_ID.
+      CLEAR: U_OKCODE.
+
     WHEN OTHERS.
 
   ENDCASE.
@@ -220,6 +224,7 @@ FORM PREPARE_QUOTATION_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
 *  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
   CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
   CH_S_LAYOUT-CTAB_FNAME = 'LINE_COLOR'.
+  CH_S_LAYOUT-SEL_MODE = 'A'.
 
 ENDFORM.
 *&---------------------------------------------------------------------*
@@ -271,4 +276,90 @@ FORM CHANGE_QUOTATION_COLOR  USING    U_QSTATUS      TYPE Y03S24999_QUOTA-STATUS
 
   ENDTRY.
 
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_VIEW_QUOTATION_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  CH_QUOTATION_ID
+*& <--  CH_QUOTATION_ID
+*&---------------------------------------------------------------------*
+FORM PROCESS_VIEW_QUOTATION_DETAIL CHANGING CH_QUOTATION_ID.
+  IF O_QUOTATION_ALV_TABLE IS NOT INITIAL.
+
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+
+    CALL METHOD O_QUOTATION_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+
+    IF LINES( LT_INDEX_ROWS ) = 1.
+
+      READ TABLE LT_INDEX_ROWS INDEX 1 INTO LS_INDEX_ROW.
+      READ TABLE IT_QUOTATION INDEX LS_INDEX_ROW INTO DATA(LS_QUOTATION).
+
+      CH_QUOTATION_ID = LS_QUOTATION-ID.
+* Prepare QUOTATION Detail to display on Screen 0139
+      PERFORM PREPARE_QUOTATION_DETAIL USING CH_QUOTATION_ID.
+
+    ELSEIF LINES( LT_INDEX_ROWS ) = 0.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Quotation' DISPLAY LIKE 'E'.
+    ELSEIF LINES( LT_INDEX_ROWS ) > 1.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'only one Quotation' DISPLAY LIKE 'E'.
+    ENDIF.
+
+  ELSE.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Quotation' DISPLAY LIKE 'E'.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_QUOTATION_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PREPARE_QUOTATION_DETAIL USING U_QUOTATION_ID.
+*  CLEAR: GV_QUOTATION_TOTAL_PRICE.
+*  CLEAR: GV_QVSPRV_TOTAL_PRICE.
+*  CLEAR: GV_QVSSER_TOTAL_PRICE.
+
+  PERFORM GET_QUOTATION_BASIC_INFO USING U_QUOTATION_ID.
+*  PERFORM GET_QUOTATION_PRODUCT_ITEMS USING U_QUOTATION_ID.
+*  PERFORM GET_QUOTATION_SERVICE_ITEMS USING U_QUOTATION_ID.
+*
+*  GS_QUOTATION_DETAIL_BEFORE_MOD = GS_QUOTATION_DETAIL.
+*  GT_QVSPRV_BEFORE_MOD = GT_QVSPRV.
+*  GT_QVSSER_BEFORE_MOD = GT_QVSSER.
+*
+*  CLEAR: GT_QVSPRV_DELETED.
+*  CLEAR: GT_QVSSER_DELETED.
+
+* Set Screen Mode to View only
+  GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_DISPLAY.
+* Change Screen from 0130 to 0139
+  QUOTATION_SCREEN_MODE = '0139'.
+
+  MESSAGE S009(Z03S24999_DOMUS_MSGS) WITH 'Quotation'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_QUOTATION_BASIC_INFO
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_QUOTATION_ID
+*&---------------------------------------------------------------------*
+FORM GET_QUOTATION_BASIC_INFO USING U_QUOTATION_ID.
+  SELECT SINGLE *
+    FROM Y03S24999_QUOTA
+    INTO CORRESPONDING FIELDS OF GS_QUOTATION_DETAIL
+    WHERE ID = U_QUOTATION_ID AND IS_DELETED <> ABAP_TRUE.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E004(Z03S24999_DOMUS_MSGS) WITH 'Quotation'.
+  ENDIF.
 ENDFORM.

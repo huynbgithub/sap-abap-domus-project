@@ -3,17 +3,20 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <TSTC>
-    <TCODE>Z03S24999_DOMUSSTAFF</TCODE>
+    <TCODE>Z03S24_G03_STAFF</TCODE>
     <PGMNA>Z03_S24_999_DOMUS_STAFF</PGMNA>
     <DYPNO>1000</DYPNO>
    </TSTC>
    <TSTCC>
-    <TCODE>Z03S24999_DOMUSSTAFF</TCODE>
+    <TCODE>Z03S24_G03_STAFF</TCODE>
+    <S_WEBGUI>1</S_WEBGUI>
+    <S_WIN32>X</S_WIN32>
+    <S_PLATIN>X</S_PLATIN>
    </TSTCC>
    <TSTCT>
     <SPRSL>E</SPRSL>
-    <TCODE>Z03S24999_DOMUSSTAFF</TCODE>
-    <TTEXT>Transaction for Domus Staff</TTEXT>
+    <TCODE>Z03S24_G03_STAFF</TCODE>
+    <TTEXT>Management T-Code for Domus Staff</TTEXT>
    </TSTCT>
   </asx:values>
  </asx:abap>

@@ -9,12 +9,21 @@
 *---------------------------------------------------------------------*
 * CLASS Declaration
 *---------------------------------------------------------------------*
-
+* CLASS C_EVENT_RECEIVER
+* DEFINITION
+CLASS C_EVENT_RECEIVER DEFINITION.
+  " The class is used to test the events raised by the cl_gui_pictureclass
+  PUBLIC SECTION.
+    METHODS EVENT_HANDLER_PICTURE_DBLCLICK
+      FOR EVENT PICTURE_DBLCLICK OF CL_GUI_PICTURE
+      IMPORTING MOUSE_POS_X MOUSE_POS_Y SENDER.
+ENDCLASS.
 *---------------------------------------------------------------------*
 * DATA Declaration
 *---------------------------------------------------------------------*
 DATA: GV_USERNAME TYPE Y03S24999_USER-USERNAME.
 DATA: GV_OKCODE TYPE SYST-UCOMM.
+DATA: GV_VALIDATION_BYPASSED TYPE ABAP_BOOL.
 
 *&SPWIZARD: FUNCTION CODES FOR TABSTRIP 'ZTAB_001'
 CONSTANTS: BEGIN OF C_ZTAB_001,

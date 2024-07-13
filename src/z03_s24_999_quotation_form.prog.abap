@@ -24,6 +24,114 @@ FORM HANDLE_UCOMM_0130 USING U_OKCODE.
   ENDCASE.
 ENDFORM.
 *&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0139
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0139 USING U_OKCODE.
+  CASE U_OKCODE.
+    WHEN 'BACK_TO_QUOTA_LIST'.
+      PERFORM PROCESS_BACK_TO_QUOTATION_LIST.
+      CLEAR: U_OKCODE.
+
+    WHEN 'SELECT_QUOVER'.
+      PERFORM PROCESS_VIEW_QUOVER_LIST.
+      CLEAR: U_OKCODE.
+
+    WHEN 'DISPLAY<->CHANGE'.
+      PERFORM PROCESS_QUO_DISPLAY_CHANGE.
+      CLEAR: U_OKCODE.
+*
+*    WHEN 'SAVE'.
+*      PERFORM PROCESS_QUOTATION_SAVE_EVENT.
+*      CLEAR: U_OKCODE.
+*
+*    WHEN 'INSERT_QVSSER'.
+*      PERFORM PROCESS_INSERT_QVSSER.
+*      CLEAR: U_OKCODE.
+*
+*    WHEN 'DELETE_QVSSER'.
+*      PERFORM DELETE_SELECTED_QVSSERS.
+*      CLEAR: U_OKCODE.
+*
+*    WHEN 'INSERT_QVSPRV'.
+*      PERFORM PROCESS_INSERT_QVSPRV.
+*      CLEAR: U_OKCODE.
+*
+*    WHEN 'DELETE_QVSPRV'.
+*      PERFORM DELETE_SELECTED_QVSPRVS.
+*      CLEAR: U_OKCODE.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0134
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0134 USING U_OKCODE.
+
+  CASE U_OKCODE.
+
+    WHEN 'ENTER_134'.
+      PERFORM HANDLE_ENTER_ON_SCREEN_0134.
+      CLEAR: U_OKCODE.
+
+    WHEN 'CANCLE_134'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_BACK_TO_QUOTATION_LIST
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_BACK_TO_QUOTATION_LIST.
+  IF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CREATE.
+*    PERFORM WARNING_EXIT_UNSAVED_QUOTATION.
+  ELSE.
+    PERFORM RESET_QUOPCKIMG_CONTAINER.
+    QUOTATION_SCREEN_MODE = '0130'.
+    PERFORM PROCESS_QUOTATION_LIST_0130.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form RESET_QUOPCKIMG_CONTAINER
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM RESET_QUOPCKIMG_CONTAINER.
+  IF GV_QUOPCKIMG_URL IS NOT INITIAL.
+    CLEAR GV_QUOPCKIMG_URL.
+  ENDIF.
+  IF QUOPCKIMG_CONTROL IS NOT INITIAL.
+    CALL METHOD QUOPCKIMG_CONTROL->CLEAR_PICTURE.
+    CLEAR QUOPCKIMG_CONTROL.
+  ENDIF.
+  IF QUOPCKIMG_CONTAINER IS NOT INITIAL.
+    CALL METHOD QUOPCKIMG_CONTAINER->FREE.
+    CLEAR QUOPCKIMG_CONTAINER.
+  ENDIF.
+  IF QUOPCKIMG_EVENT_RECEIVER IS NOT INITIAL.
+    CLEAR QUOPCKIMG_EVENT_RECEIVER.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
 *& Form PROCESS_QUOTATION_LIST_0130
 *&---------------------------------------------------------------------*
 *& text
@@ -362,10 +470,9 @@ FORM GET_QUOTATION_BASIC_INFO USING U_QUOTATION_ID
 
   SELECT SINGLE QUOTA~ID, QUOTATION_CODE, STATUS, CUSTOMER, STAFF,
                 QUOTA~CREATED_ON, QUOTA~CREATED_AT, EXPIRED_ON, EXPIRED_AT,
-                PACKGE~NAME AS PACKAGE_NAME, PCKIMG~IMAGE_URL,
+                PACKGE~NAME AS PACKAGE_NAME, PCKIMG~IMAGE_URL AS PCKIMG_URL,
                 QUOVER~ID AS QUOVER_ID,
-                MIN( PCKIMG~IMAGE_URL ) AS PCKIMG_URL,
-                MAX( QUOVER~VERSION_ORDER ) AS QUOVER_VERSION_ORDER,
+                QUOVER~VERSION_ORDER AS QUOVER_VERSION_ORDER,
                 QUOVER~CREATED_AT AS QUOVER_CREATED_AT,
                 QUOVER~CREATED_ON AS QUOVER_CREATED_ON
 
@@ -382,14 +489,12 @@ FORM GET_QUOTATION_BASIC_INFO USING U_QUOTATION_ID
 
     WHERE QUOTA~ID = @U_QUOTATION_ID AND
           QUOTA~IS_DELETED <> @ABAP_TRUE AND
-          QUOVER~IS_DELETED <> @ABAP_TRUE
-
-    GROUP BY QUOTA~ID, STATUS, CUSTOMER, STAFF, QUOTATION_CODE,
-             QUOTA~CREATED_ON, QUOTA~CREATED_AT, EXPIRED_ON, EXPIRED_AT,
-             PACKGE~NAME, PCKIMG~IMAGE_URL,
-             QUOVER~ID,
-             QUOVER~CREATED_AT,
-             QUOVER~CREATED_ON
+          QUOVER~IS_DELETED <> @ABAP_TRUE AND
+          PCKIMG~IS_DELETED <> @ABAP_TRUE AND
+          PCKIMG~IMAGE_URL <> '' AND
+          QUOVER~VERSION_ORDER = ( SELECT MAX( VERSION_ORDER )
+                                    FROM Y03S24999_QUOVER
+                                    WHERE QUOTATION_ID = @U_QUOTATION_ID )
 
     INTO CORRESPONDING FIELDS OF @GS_QUOTATION_DETAIL.
 
@@ -401,6 +506,7 @@ FORM GET_QUOTATION_BASIC_INFO USING U_QUOTATION_ID
     GV_QUOPCKIMG_URL = GS_QUOTATION_DETAIL-PCKIMG_URL.
     PERFORM SHOW_QUOPCK_SELECTED_IMAGE USING GV_QUOPCKIMG_URL.
   ENDIF.
+
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form SHOW_QUOPCK_SELECTED_IMAGE
@@ -471,14 +577,13 @@ FORM GET_QUOVER_PRODUCT_ITEMS USING U_QUOVER_ID.
   SELECT ' ' AS SEL,
          QVSPRV~*,
          PROVRT~VARIANT_CODE AS VARIANT_CODE,
-         PROVRT~DISPLAY_PRICE AS DISPLAY_PRICE,
-         ( DISPLAY_PRICE * QVSPRV~QUANTITY ) AS TOTAL_PRICE,
+         ( QVSPRV~PRICE * QVSPRV~QUANTITY ) AS TOTAL_PRICE,
          PROVRT~PRODUCT_ID
   FROM Y03S24999_QVSPRV AS QVSPRV
   JOIN Y03S24999_PROVRT AS PROVRT
   ON QVSPRV~PRODUCT_VARIANT_ID = PROVRT~ID
-  WHERE QVSPRV~IS_DELETED <> @ABAP_TRUE
-    AND QVSPRV~QUOTATION_VERSION_ID = @U_QUOVER_ID
+  WHERE QVSPRV~IS_DELETED <> @ABAP_TRUE AND
+        QVSPRV~QUOTATION_VERSION_ID = @U_QUOVER_ID
   INTO CORRESPONDING FIELDS OF TABLE @GT_QVSPRV.
 
   IF SY-SUBRC <> 0.
@@ -508,14 +613,12 @@ ENDFORM.
 FORM GET_QUOVER_SERVICE_ITEMS USING U_QUOVER_ID.
   SELECT ' ' AS SEL,
          QS~*,
-         S~NAME AS SERVICE_NAME,
-         S~DISPLAY_PRICE AS DISPLAY_PRICE
+         S~NAME AS SERVICE_NAME
   FROM Y03S24999_QVSSER AS QS
   JOIN Y03S24999_SERVCE AS S
   ON QS~SERVICE_ID = S~ID
-  WHERE S~IS_DELETED <> @ABAP_TRUE
-    AND QS~IS_DELETED <> @ABAP_TRUE
-    AND QS~QUOTATION_VERSION_ID = @U_QUOVER_ID
+  WHERE QS~IS_DELETED <> @ABAP_TRUE AND
+        QS~QUOTATION_VERSION_ID = @U_QUOVER_ID
   INTO CORRESPONDING FIELDS OF TABLE @GT_QVSSER.
 
   IF SY-SUBRC <> 0.
@@ -553,4 +656,230 @@ FORM GET_QUOMSG_ITEMS USING U_QUOTATION_ID.
     ENDLOOP.
   ENDIF.
 
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_VIEW_QUOVER_LIST
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_VIEW_QUOVER_LIST .
+  DATA: LV_SUCCESS TYPE ABAP_BOOL.
+* Get data from QUOVER_0134 table
+  PERFORM GET_QUOVER_0134_DATA CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+  CALL SCREEN 0134 STARTING AT 10 08 ENDING AT 70 15.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_QUOVER_0134_DATA
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      <-- LV_SUCCESS
+*&---------------------------------------------------------------------*
+FORM GET_QUOVER_0134_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
+  CLEAR: IT_QUOVER_0134[], CH_V_SUCCESS.
+
+  SELECT *
+    FROM Y03S24999_QUOVER
+    WHERE IS_DELETED <> @ABAP_TRUE
+    AND QUOTATION_ID = @GS_QUOTATION_DETAIL-ID
+    ORDER BY VERSION_ORDER DESCENDING
+    INTO CORRESPONDING FIELDS OF TABLE @IT_QUOVER_0134.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_QUOVER_0134[].
+
+    IF O_QUOVER_0134_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_QUOVER_0134_CONTAINER->FREE.
+      CLEAR O_QUOVER_0134_CONTAINER.
+    ENDIF.
+    IF O_QUOVER_0134_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_QUOVER_0134_ALV_TABLE.
+    ENDIF.
+
+    MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'No version history found!' DISPLAY LIKE 'E'.
+    CH_V_SUCCESS = ABAP_FALSE.
+  ELSE.
+    CH_V_SUCCESS = ABAP_TRUE.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_QUOVER_0134_ALV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_QUOVER_0134_ALV.
+  DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
+        LS_LAYOUT    TYPE LVC_S_LAYO.
+*        LS_VARIANT   TYPE DISVARIANT.
+
+* Define Table Structure / Define fields catalog
+  PERFORM PREPARE_VER_0134_FIELD_CATALOG
+    CHANGING LT_FIELD_CAT.
+
+* Prepare Layout
+  PERFORM PREPARE_QUOVER_0134_LAYOUT
+    CHANGING LS_LAYOUT.
+** Prepare Variant
+*  PERFORM PREPARE_VARIANT
+*    CHANGING LS_VARIANT.
+
+* Show ALV
+  PERFORM DISPLAY_QUOVER_0134_ALV_TABLE
+    CHANGING LS_LAYOUT
+*            LS_VARIANT
+             LT_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form ADD_QUOVER_0134_FCAT
+*&---------------------------------------------------------------------*
+FORM ADD_QUOVER_0134_FCAT USING U_FIELDNAME
+                    U_SCRTEXT_M
+                    U_OUTPUTLEN
+                    U_KEY
+                    U_HOTSPOT
+                    U_EMPHASIZE
+              CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
+  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
+  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
+  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
+  LS_FIELD_CAT-KEY = U_KEY.
+  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
+  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_QUOVER_0134_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+FORM PREPARE_VER_0134_FIELD_CATALOG
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+
+***** Full form:
+  PERFORM: ADD_QUOVER_0134_FCAT USING 'VERSION_ORDER'  'Version'           6  '' 'X'  'C500'  CHANGING CH_T_FIELD_CAT,
+           ADD_QUOVER_0134_FCAT USING 'CREATED_AT'     'Created At'        9  ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_QUOVER_0134_FCAT USING 'CREATED_ON'     'Created On'        9  ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_QUOVER_0134_FCAT USING 'TOTAL_PRICE'    'Total Price'       16 ''  ''  'C100'  CHANGING CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DISPLAY_QUOVER_0134_ALV_TABLE
+*&---------------------------------------------------------------------*
+FORM DISPLAY_QUOVER_0134_ALV_TABLE
+  USING    U_S_LAYOUT    TYPE LVC_S_LAYO
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+*          IM_S_VARIANT   TYPE DISVARIANT
+
+  IF O_QUOVER_0134_CONTAINER IS INITIAL.
+    O_QUOVER_0134_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0134' ).
+  ENDIF.
+
+  IF O_QUOVER_0134_ALV_TABLE IS INITIAL.
+    O_QUOVER_0134_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_QUOVER_0134_CONTAINER ).
+  ENDIF.
+
+  O_QUOVER_0134_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
+    EXPORTING
+      IS_LAYOUT                     = U_S_LAYOUT      " Layout
+*      I_SAVE                        = 'A'
+*      IS_VARIANT                    = IM_S_VARIANT
+    CHANGING
+      IT_OUTTAB                     = IT_QUOVER_0134     " Output Table
+      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
+    EXCEPTIONS
+      INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
+      PROGRAM_ERROR                 = 2                " Program Errors
+      TOO_MANY_LINES                = 3                " Too many Rows in Ready for Input Grid
+      OTHERS                        = 4
+  ).
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E005(Z03S24999_DOMUS_MSGS).
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_QUOVER_0134_LAYOUT
+*&---------------------------------------------------------------------*
+FORM PREPARE_QUOVER_0134_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
+
+*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
+  CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
+  CH_S_LAYOUT-SEL_MODE = 'A'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_ENTER_ON_SCREEN_0134
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_ENTER_ON_SCREEN_0134.
+  IF O_QUOVER_0134_ALV_TABLE IS NOT INITIAL.
+
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+
+    CALL METHOD O_QUOVER_0134_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+
+    IF LINES( LT_INDEX_ROWS ) = 1.
+      CLEAR: GV_QUOVER_TOTAL_PRICE.
+      CLEAR: GV_QVSPRV_TOTAL_PRICE.
+      CLEAR: GV_QVSSER_TOTAL_PRICE.
+
+      READ TABLE LT_INDEX_ROWS INDEX 1 INTO DATA(LS_INDEX_ROWS).
+      READ TABLE IT_QUOVER_0134 INDEX LS_INDEX_ROWS INTO DATA(LS_QUOVER_0134).
+
+      GS_QUOTATION_DETAIL-QUOVER_ID = LS_QUOVER_0134-ID.
+      GS_QUOTATION_DETAIL-QUOVER_VERSION_ORDER = LS_QUOVER_0134-VERSION_ORDER.
+      GS_QUOTATION_DETAIL-QUOVER_CREATED_ON = LS_QUOVER_0134-CREATED_ON.
+      GS_QUOTATION_DETAIL-QUOVER_CREATED_AT = LS_QUOVER_0134-CREATED_AT.
+
+      PERFORM GET_QUOVER_PRODUCT_ITEMS USING GS_QUOTATION_DETAIL-QUOVER_ID.
+      PERFORM GET_QUOVER_SERVICE_ITEMS USING GS_QUOTATION_DETAIL-QUOVER_ID.
+
+      MESSAGE S017(Z03S24999_DOMUS_MSGS) WITH GS_QUOTATION_DETAIL-QUOVER_VERSION_ORDER.
+
+    ELSE.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Version' DISPLAY LIKE 'E'.
+    ENDIF.
+
+    LEAVE TO SCREEN 0.
+
+  ELSE.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Version' DISPLAY LIKE 'E'.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_QUO_DISPLAY_CHANGE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_QUO_DISPLAY_CHANGE .
+  CASE GV_QUOTATION_SCREEN_MODE.
+    WHEN GC_QUOTATION_MODE_DISPLAY.
+      GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE.
+
+    WHEN GC_QUOTATION_MODE_CHANGE.
+*      PERFORM WARNING_QUOTATION_CHANGES_EXIST.
+      GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_DISPLAY.
+
+    WHEN OTHERS.
+  ENDCASE.
 ENDFORM.

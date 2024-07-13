@@ -22,6 +22,16 @@ MODULE MODIFY_QVSSER_TABLE INPUT.
   ENDIF.
 ENDMODULE.
 *&---------------------------------------------------------------------*
+*&      Module  MODIFY_QUOMSG_TABLE  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE MODIFY_QUOMSG_TABLE INPUT.
+  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB3 AND G_ZTAB_001-SUBSCREEN = '0139'.
+    MODIFY GT_QUOMSG FROM GS_QUOMSG INDEX QUOMSG_TABLE_CONTROL-CURRENT_LINE.
+  ENDIF.
+ENDMODULE.
+*&---------------------------------------------------------------------*
 *&      Module  USER_COMMAND_0139  INPUT
 *&---------------------------------------------------------------------*
 *       text

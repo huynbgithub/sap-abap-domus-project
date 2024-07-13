@@ -116,6 +116,12 @@
      <MSGNR>017</MSGNR>
      <TEXT>Display Quotation Ver.&amp;1 successfully.</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>018</MSGNR>
+     <TEXT>Send &amp;1 failed!</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

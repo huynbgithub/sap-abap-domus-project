@@ -9,6 +9,15 @@
 MODULE ADJUST_TABLE_LINE_0139 OUTPUT.
   QVSPRV_TABLE_CONTROL-LINES = LINES( GT_QVSPRV ).
   QVSSER_TABLE_CONTROL-LINES = LINES( GT_QVSSER ).
+  QUOMSG_TABLE_CONTROL-LINES = LINES( GT_QUOMSG ).
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Module RELOAD_QUOMSG_0139 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE RELOAD_QUOMSG_0139 OUTPUT.
+  PERFORM GET_QUOMSG_ITEMS USING GV_QUOTATION_ID.
 ENDMODULE.
 *&---------------------------------------------------------------------*
 *& Module CALCULATE_TOTAL_PRICE_0139 OUTPUT

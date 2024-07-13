@@ -3164,6 +3164,9 @@
        <LINE>PROCESS BEFORE OUTPUT.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
+       <LINE>  MODULE RELOAD_QUOMSG_0139.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
        <LINE>  MODULE ADJUST_TABLE_LINE_0139.</LINE>
       </RPY_DYFLOW>
       <RPY_DYFLOW>
@@ -3280,7 +3283,25 @@
       <RPY_DYFLOW>
        <LINE>  LOOP AT GT_QUOMSG.</LINE>
       </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>    CHAIN.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>      FIELD:</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>             GS_QUOMSG-CONTENT.</LINE>
+      </RPY_DYFLOW>
       <RPY_DYFLOW/>
+      <RPY_DYFLOW>
+       <LINE>*      MODULE VALIDATE_QUOMSG_INPUTS_0139.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>      MODULE MODIFY_QUOMSG_TABLE ON CHAIN-REQUEST.</LINE>
+      </RPY_DYFLOW>
+      <RPY_DYFLOW>
+       <LINE>    ENDCHAIN.</LINE>
+      </RPY_DYFLOW>
       <RPY_DYFLOW>
        <LINE>  ENDLOOP.</LINE>
       </RPY_DYFLOW>

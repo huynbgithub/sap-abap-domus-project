@@ -3,10 +3,10 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>ZI03_S24_999_DOMUS_QUOTA</DDLNAME>
+    <DDLNAME>ZI03_S24_999S_QUOTAAPP</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
-    <DDTEXT>Domus Quotation</DDTEXT>
-    <SOURCE_TYPE>W</SOURCE_TYPE>
+    <DDTEXT>View for Quotation of admin</DDTEXT>
+    <SOURCE_TYPE>P</SOURCE_TYPE>
    </DDLS>
   </asx:values>
  </asx:abap>

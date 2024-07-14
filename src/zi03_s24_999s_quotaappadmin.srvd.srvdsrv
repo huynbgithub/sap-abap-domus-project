@@ -1,0 +1,4 @@
+@EndUserText.label: 'ZI03_S24_999S_QUOTAAPP'
+define service ZI03_S24_999S_QUOTAAPPADMIN {
+  expose ZI03_S24_999S_QuotaApp as QuotationAdminApp;
+}

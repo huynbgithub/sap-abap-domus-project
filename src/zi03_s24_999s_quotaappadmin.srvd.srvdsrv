@@ -1,4 +1,4 @@
-@EndUserText.label: 'ZI03_S24_999S_QUOTAAPP'
+@EndUserText.label: 'ZI03_S24_999_DomusQuota'
 define service ZI03_S24_999S_QUOTAAPPADMIN {
-  expose ZI03_S24_999S_QuotaApp as QuotationAdminApp;
+  expose ZC_03_S24_999_DOMUS_QUOTA as DomusQuota;
 }

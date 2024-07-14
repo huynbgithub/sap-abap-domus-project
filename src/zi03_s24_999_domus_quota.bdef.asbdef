@@ -1,0 +1,44 @@
+managed;  //implementation in class zbp_i03_s24_999_domus_quota unique;
+with draft;
+
+define behavior for ZI03_S24_999_DOMUS_QUOTA alias DomusQuota
+persistent table y03s24999_quota
+draft table y03s24999_quotad
+lock master
+total etag UpdatedAt
+//authorization master ( instance )
+etag master UpdatedOn
+{
+  update;
+
+  field ( readonly ) Id;
+  field ( readonly ) QuotationCode;
+  field ( readonly ) Customer;
+  field ( readonly ) Status;
+  field ( readonly ) PackageName;
+  field ( readonly ) ExpiredOn;
+  field ( readonly ) ExpiredAt;
+  field ( readonly ) CreatedBy;
+  field ( readonly ) CreatedOn;
+  field ( readonly ) CreatedAt;
+  field ( readonly ) UpdatedBy;
+  field ( readonly ) UpdatedAt;
+  field ( readonly ) UpdatedOn;
+
+  draft determine action Prepare;
+  draft action Edit;
+  draft action Activate;
+  draft action Discard;
+  draft action Resume;
+
+
+
+
+  mapping for y03s24999_quota corresponding
+  {
+    Staff = staff;
+    UpdatedBy = updated_by;
+    UpdatedAt = updated_at;
+    UpdatedOn = updated_on;
+  }
+}

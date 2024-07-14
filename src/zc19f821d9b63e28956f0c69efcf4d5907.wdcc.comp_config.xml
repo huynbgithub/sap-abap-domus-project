@@ -7,7 +7,7 @@
      <ID>Z03S24_G03_CUSTOMER_BG_01</ID>
      <TITLE Transl="true">1</TITLE>
      <CATALOG_ID>/UI2/FLPD_CATALOG</CATALOG_ID>
-     <LAYOUT/>
+     <LAYOUT>{&quot;order&quot;:[&quot;48MC0MJCBPU76NMM2D2Y93R8Y&quot;],&quot;linkOrder&quot;:[]}</LAYOUT>
      <ORIGINAL_LANGUAGE>en</ORIGINAL_LANGUAGE>
      <IS_CATALOG_PAGE/>
      <IS_PERS_LOCKED>X</IS_PERS_LOCKED>
@@ -15,10 +15,28 @@
      <Node Name="EDM_P_HEADER" SimpleFormat="true">
       <Item Index="000001" SimpleFormat="true">
        <NAME Final="5 ">CONF_TIMESTAMP</NAME>
-       <VALUE>20240713215418</VALUE>
+       <VALUE>20240714032927</VALUE>
       </Item>
      </Node>
-     <Node Name="GADGET_USAGE" SimpleFormat="true"/>
+     <Node Name="GADGET_USAGE" SimpleFormat="true">
+      <Item Index="000001" SimpleFormat="true">
+       <USAGE_ID Final="5 ">48MC0MJCBPU76NMM2D2Y93R8Y</USAGE_ID>
+       <GADGET_ID>X-SAP-UI2-PAGE:X-SAP-UI2-CATALOGPAGE:Z03S24_G03_CUSTOMER_BC_01:48MC0MJCBPU76NMLYYW8TTBOF</GADGET_ID>
+       <TITLE Transl="true"/>
+       <CONFIGURATION/>
+       <LAYOUT_DATA/>
+       <REMOTE_CATALOG_ID/>
+       <REF_PAGE_ID/>
+       <REF_USAGE_ID/>
+       <IS_READ_ONLY/>
+       <Node Name="EDM_GU_HEADER" SimpleFormat="true">
+        <Item Index="000001" SimpleFormat="true">
+         <NAME Final="5 ">CONF_TIMESTAMP</NAME>
+         <VALUE>20240714032926</VALUE>
+        </Item>
+       </Node>
+      </Item>
+     </Node>
     </Item>
    </Node>
   </Item>

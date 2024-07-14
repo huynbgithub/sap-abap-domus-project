@@ -5,6 +5,11 @@
    <Node Name="PAGE" SimpleFormat="true">
     <Item Index="000001" SimpleFormat="true">
      <ID>Z03S24_G03_CUSTOMER_BG_01</ID>
+     <Node Name="GADGET_USAGE" SimpleFormat="true">
+      <Item Index="000001" SimpleFormat="true">
+       <USAGE_ID Final="5 ">48MC0MJCBPU76NMM2D2Y93R8Y</USAGE_ID>
+      </Item>
+     </Node>
     </Item>
    </Node>
   </Item>

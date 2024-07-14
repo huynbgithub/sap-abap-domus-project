@@ -1,0 +1,12 @@
+projection;
+use draft;
+
+define behavior for ZC_03_S24_999_DOMUS_QUOTA alias DomusQuota
+{
+  use update;
+  use action Prepare;
+  use action Edit;
+  use action Activate;
+  use action Discard;
+  use action Resume;
+}

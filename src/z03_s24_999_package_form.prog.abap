@@ -110,9 +110,6 @@ FORM HANDLE_UCOMM_0128 USING U_OKCODE.
   ENDCASE.
 ENDFORM.
 *&---------------------------------------------------------------------*
-*& Include          Z03_S24_999_PACKAGE_FORM
-*&---------------------------------------------------------------------*
-*&---------------------------------------------------------------------*
 *& Form HANDLE_UCOMM_0127
 *&---------------------------------------------------------------------*
 *& text
@@ -486,12 +483,10 @@ ENDFORM.
 FORM PROCESS_INSERT_PCKIMG.
   READ TABLE GT_PCKIMG INDEX 1 INTO GS_PCKIMG.
   CLEAR: GS_PCKIMG.
-  IF GV_PACKAGE_ID <> ''.
-    GS_PCKIMG-PACKAGE_ID = GV_PACKAGE_ID.
-  ENDIF.
 
   PERFORM CREATE_UUID_C36_STATIC CHANGING GS_PCKIMG-ID.
 
+  GS_PCKIMG-PACKAGE_ID = GV_PACKAGE_ID.
   GS_PCKIMG-IMAGE_URL = '...'.
   GS_PCKIMG-CREATED_BY = SY-UNAME.
   GS_PCKIMG-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
@@ -899,10 +894,7 @@ FORM HANDLE_ENTER_ON_SCREEN_0126.
           READ TABLE GT_PCKPRV INDEX 1 INTO GS_PCKPRV.
           CLEAR: GS_PCKPRV.
 
-          IF GV_PACKAGE_ID <> ''.
-            GS_PCKPRV-PACKAGE_ID = GV_PACKAGE_ID.
-          ENDIF.
-
+          GS_PCKPRV-PACKAGE_ID = GV_PACKAGE_ID.
           GS_PCKPRV-PRODUCT_VARIANT_ID = LS_PROVRT_0126-ID.
           GS_PCKPRV-VARIANT_CODE = LS_PROVRT_0126-VARIANT_CODE.
           GS_PCKPRV-PRODUCT_NAME = LS_PROVRT_0126-PRODUCT_NAME.
@@ -1033,9 +1025,7 @@ FORM HANDLE_ENTER_ON_SCREEN_0128.
         READ TABLE GT_PCKSER INDEX 1 INTO GS_PCKSER.
         CLEAR: GS_PCKSER.
 
-        IF GV_PACKAGE_ID <> ''.
-          GS_PCKSER-PACKAGE_ID = GV_PACKAGE_ID.
-        ENDIF.
+        GS_PCKSER-PACKAGE_ID = GV_PACKAGE_ID.
 
         READ TABLE IT_SERVICE_0128 INDEX LS_INDEX_ROW INTO DATA(LS_SERVICE_0128).
         GS_PCKSER-SERVICE_ID = LS_SERVICE_0128-ID.
@@ -1060,7 +1050,7 @@ FORM HANDLE_ENTER_ON_SCREEN_0128.
 
 ENDFORM.
 *&---------------------------------------------------------------------*
-*& Form GET_SERVICE_0127_DATA
+*& Form GET_PRODUCT_0127_DATA
 *&---------------------------------------------------------------------*
 *& text
 *&---------------------------------------------------------------------*
@@ -2132,10 +2122,6 @@ FORM PREPARE_PROVRT_0126_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
   CH_S_LAYOUT-SEL_MODE = 'A'.
 
 ENDFORM.
-
-
-
-
 *&---------------------------------------------------------------------*
 *& Form SHOW_PROATV_0125_ALV
 *&---------------------------------------------------------------------*

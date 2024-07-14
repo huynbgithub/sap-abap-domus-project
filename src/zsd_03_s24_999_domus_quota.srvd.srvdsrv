@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service for ZC_03_S24_999_DOMUS_QUOTA'
+define service ZSD_03_S24_999_DOMUS_QUOTA {
+  expose ZC_03_S24_999_DOMUS_QUOTA as DomusQuota;
+}

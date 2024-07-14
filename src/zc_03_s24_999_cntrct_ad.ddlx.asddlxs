@@ -1,0 +1,83 @@
+@Metadata.layer: #CUSTOMER
+@UI.headerInfo: {
+    typeName: 'Contract Detail',
+    typeNamePlural: 'Contracts',
+    title: {
+        label: 'Genaral',
+        value: 'ContractCode'
+    },
+    description: {
+        label: 'Status',
+        value: 'Status'
+    }
+}
+
+annotate view ZC_03_S24_999_CNTRCT_AD with
+{
+  @UI.facet: [{
+    id: 'General',
+    type: #IDENTIFICATION_REFERENCE,
+    label: 'General Information',
+    position: 10
+  }]
+  @UI.hidden: true
+  Id;
+  
+  @UI.lineItem: [{ position: 10}]
+  @UI.selectionField: [{ position: 10 }]
+  @UI.identification: [{ position: 10 }]
+  ContractCode;
+  
+  @UI.lineItem: [{ position: 20}]
+  @UI.selectionField: [{ position: 20 }]
+  @UI.identification: [{ position: 20 }]
+  Customer;
+
+  @UI.lineItem: [{ position: 30 }]
+  @UI.selectionField: [{ position: 30 }]
+  @UI.identification: [{ position: 30 }]
+  Staff;
+
+  @UI.lineItem: [{ position: 40}]
+  @UI.selectionField: [{ position: 40 }]
+  @UI.identification: [{ position: 40 }]
+  QuotationVersionName;
+
+  @UI.lineItem: [{ position: 50}]
+  @UI.selectionField: [{ position: 50 }]
+  @UI.identification: [{ position: 50 }]
+  Status;
+
+  
+
+  @UI.identification: [{ position: 60 }]
+    Signature;
+
+  @UI.identification: [{ position: 70 }]
+  CreatedBy;
+
+  @UI.identification: [{ position: 80 }]
+  CreatedAt;
+
+  @UI.identification: [{ position: 90 }]
+  CreatedOn;
+
+  @UI.identification: [{ position: 100 }]
+  UpdatedBy;
+
+  @UI.identification: [{ position: 110 }]
+  UpdatedAt;
+
+  @UI.identification: [{ position: 120 }]
+  UpdatedOn;
+
+  @UI.identification: [{ position: 130 }]
+  Description;
+
+  @UI.identification: [{ position: 140 }]
+  SignedOn;
+
+  @UI.identification: [{ position: 150 }]
+  SignedAt;
+
+}

@@ -1,0 +1,99 @@
+@Metadata.layer: #CUSTOMER
+@UI.headerInfo: {
+    typeName: 'Quotation Detail',
+    typeNamePlural: 'Quotations',
+    title: {
+        label: 'Genaral',
+        value: 'QuotationCode'
+    },
+    description: {
+        label: 'Staff',
+        value: 'Staff'
+    }
+}
+annotate view ZC_03_S24_999_DOMUS_QUOTA
+    with 
+{
+    @UI.facet: [{
+        id:'tab1',
+        type: #IDENTIFICATION_REFERENCE,
+        label: 'Quotation Data'
+    }]
+    
+  
+    @EndUserText.label: 'Quotation Code'
+    @UI.lineItem: [{ position: 10 }]
+    @UI.selectionField: [{ position: 10 }]
+    @UI.identification: [{ position: 10 }]
+    QuotationCode;
+
+    @EndUserText.label: 'Customer'
+    @UI.lineItem: [{ position: 20 }]
+    @UI.selectionField: [{ position: 20 }]
+    @UI.identification: [{ position: 20 }]
+    Customer;
+
+    @EndUserText.label: 'Staff'
+    @UI.lineItem: [{ position: 30 }]
+    @UI.selectionField: [{ position: 30 }]
+    @UI.identification: [{ position: 30 }]
+    Staff;
+
+    @EndUserText.label: 'Status'
+    @UI.lineItem: [{ position: 40, label: 'Status', importance: #HIGH  }]
+    @UI.selectionField: [{ position: 40 }]
+    @UI.identification: [{ position: 40 }]
+    Status;
+
+    @EndUserText.label: 'Package Name'
+    @UI.lineItem: [{ position: 50 }]
+    @UI.selectionField: [{ position: 50 }]
+    @UI.identification: [{ position: 50 }]
+     PackageName;
+
+    @EndUserText.label: 'Quotation ID'  
+    Id;
+
+    @EndUserText.label: 'ExpiredOn'
+    @UI.lineItem: [{ position: 60 }]
+    @UI.selectionField: [{ position: 60 }]
+    @UI.identification: [{ position: 60 }]
+    ExpiredOn;
+
+
+    @EndUserText.label: 'ExpiredAt'
+    @UI.lineItem: [{ position: 70 }]
+    @UI.selectionField: [{ position: 70 }]
+    @UI.identification: [{ position: 70 }]
+    ExpiredAt;
+
+
+    @EndUserText.label: 'Created By'
+    @UI.identification: [{ position: 80 }]
+    CreatedBy;
+
+
+    @EndUserText.label: 'Created On'
+    @UI.identification: [{ position: 90 }]
+    CreatedOn;   
+
+
+    @EndUserText.label: 'Created At'
+    @UI.identification: [{ position: 100 }]
+    CreatedAt;
+
+
+    @EndUserText.label: 'Last Changed By'
+    @UI.identification: [{ position: 110 }]
+    UpdatedBy;
+
+
+    @EndUserText.label: 'Last Changed At'
+    @UI.identification: [{ position: 120 }]
+    UpdatedAt;
+
+
+    @EndUserText.label: 'Last Changed On'
+    @UI.identification: [{ position: 130 }]
+    UpdatedOn;
+}

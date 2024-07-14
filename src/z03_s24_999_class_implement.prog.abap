@@ -47,6 +47,21 @@ CLASS CL_PACKAGE_PROVRT_ALV_HANDLER IMPLEMENTATION.
   ENDMETHOD.
 
 ENDCLASS.
+*---------------------------------------------------------------------*
+* CL_QUOTATION_PROVRT_ALV_HANDLER IMPLEMENTATION
+*---------------------------------------------------------------------*
+CLASS CL_QUOTA_PROVRT_ALV_HANDLER IMPLEMENTATION.
+
+  METHOD HOTSPOT_CLICK.
+    READ TABLE IT_PROVRT_0136 INTO DATA(LS_PROVRT_0136)
+      INDEX E_ROW_ID-INDEX.
+
+    PERFORM PREPARE_QUOTATION_PROATV_0135 USING LS_PROVRT_0136-ID.
+    CALL SCREEN 0135 STARTING AT 15 06 ENDING AT 45 12.
+
+  ENDMETHOD.
+
+ENDCLASS.
 ************************************************************************
 * CLASS   c_event_receiver
 * IMPLEMENTATION

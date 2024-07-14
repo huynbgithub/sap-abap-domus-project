@@ -47,26 +47,26 @@ FORM HANDLE_UCOMM_0139 USING U_OKCODE.
     WHEN 'SEND_MESSAGE'.
       PERFORM PROCESS_SEND_MESSAGE.
       CLEAR: U_OKCODE.
-*
-*    WHEN 'SAVE'.
-*      PERFORM PROCESS_QUOTATION_SAVE_EVENT.
-*      CLEAR: U_OKCODE.
-*
-*    WHEN 'INSERT_QVSSER'.
-*      PERFORM PROCESS_INSERT_QVSSER.
-*      CLEAR: U_OKCODE.
-*
-*    WHEN 'DELETE_QVSSER'.
-*      PERFORM DELETE_SELECTED_QVSSERS.
-*      CLEAR: U_OKCODE.
-*
-*    WHEN 'INSERT_QVSPRV'.
-*      PERFORM PROCESS_INSERT_QVSPRV.
-*      CLEAR: U_OKCODE.
-*
-*    WHEN 'DELETE_QVSPRV'.
-*      PERFORM DELETE_SELECTED_QVSPRVS.
-*      CLEAR: U_OKCODE.
+
+    WHEN 'SAVE'.
+      PERFORM PROCESS_QUOTATION_SAVE_EVENT.
+      CLEAR: U_OKCODE.
+
+    WHEN 'INSERT_QVSSER'.
+      PERFORM PROCESS_INSERT_QVSSER.
+      CLEAR: U_OKCODE.
+
+    WHEN 'DELETE_QVSSER'.
+      PERFORM DELETE_SELECTED_QVSSERS.
+      CLEAR: U_OKCODE.
+
+    WHEN 'INSERT_QVSPRV'.
+      PERFORM PROCESS_INSERT_QVSPRV.
+      CLEAR: U_OKCODE.
+
+    WHEN 'DELETE_QVSPRV'.
+      PERFORM DELETE_SELECTED_QVSPRVS.
+      CLEAR: U_OKCODE.
 
     WHEN OTHERS.
   ENDCASE.
@@ -451,9 +451,6 @@ FORM PREPARE_QUOTATION_DETAIL USING U_QUOTATION_ID.
   GT_QVSPRV_BEFORE_MOD = GT_QVSPRV.
   GT_QVSSER_BEFORE_MOD = GT_QVSSER.
 
-  CLEAR: GT_QVSPRV_DELETED.
-  CLEAR: GT_QVSSER_DELETED.
-
 * Set Screen Mode to View only
   GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_DISPLAY.
 * Change Screen from 0130 to 0139
@@ -498,7 +495,8 @@ FORM GET_QUOTATION_BASIC_INFO USING U_QUOTATION_ID
           PCKIMG~IMAGE_URL <> '' AND
           QUOVER~VERSION_ORDER = ( SELECT MAX( VERSION_ORDER )
                                     FROM Y03S24999_QUOVER
-                                    WHERE QUOTATION_ID = @U_QUOTATION_ID )
+                                    WHERE QUOTATION_ID = @U_QUOTATION_ID
+                                    AND IS_DELETED <> @ABAP_TRUE )
 
     INTO CORRESPONDING FIELDS OF @GS_QUOTATION_DETAIL.
 
@@ -857,16 +855,14 @@ FORM HANDLE_ENTER_ON_SCREEN_0134.
       PERFORM GET_QUOVER_SERVICE_ITEMS USING GS_QUOTATION_DETAIL-QUOVER_ID.
 
       MESSAGE S017(Z03S24999_DOMUS_MSGS) WITH GS_QUOTATION_DETAIL-QUOVER_VERSION_ORDER.
+      LEAVE TO SCREEN 0.
 
     ELSE.
       MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Version' DISPLAY LIKE 'E'.
     ENDIF.
 
-    LEAVE TO SCREEN 0.
-
   ELSE.
     MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Version' DISPLAY LIKE 'E'.
-
   ENDIF.
 
 ENDFORM.
@@ -884,7 +880,7 @@ FORM PROCESS_QUO_DISPLAY_CHANGE .
       GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE.
 
     WHEN GC_QUOTATION_MODE_CHANGE.
-*      PERFORM WARNING_QUOTATION_CHANGES_EXIST.
+      PERFORM WARNING_QUOTA_CHANGES_EXIST.
       GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_DISPLAY.
 
     WHEN OTHERS.
@@ -901,25 +897,1235 @@ ENDFORM.
 FORM PROCESS_SEND_MESSAGE .
   DATA: LS_QUOMSG TYPE Y03S24999_QUOMSG.
 
-    IF GV_QUOTATION_ID <> ''.
-      LS_QUOMSG-QUOTATION_ID = GV_QUOTATION_ID.
+  LS_QUOMSG-QUOTATION_ID = GV_QUOTATION_ID.
+  LS_QUOMSG-CONTENT = GV_QUOMSG_CONTENT.
+  LS_QUOMSG-IS_CUSTOMER_MESSAGE = ABAP_FALSE.
+  LS_QUOMSG-CREATED_BY = SY-UNAME.
+  LS_QUOMSG-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+  LS_QUOMSG-CREATED_ON = SY-DATUM.
+
+  PERFORM CREATE_UUID_C36_STATIC CHANGING LS_QUOMSG-ID.
+
+  INSERT Y03S24999_QUOMSG FROM LS_QUOMSG.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E018(Z03S24999_DOMUS_MSGS) WITH 'message'.
+  ELSE.
+    CLEAR: GV_QUOMSG_CONTENT.
+    PERFORM GET_QUOMSG_ITEMS USING GV_QUOTATION_ID.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DELETE_SELECTED_QVSSERS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM DELETE_SELECTED_QVSSERS.
+  DATA: LD_SEL_QVSSERS LIKE GT_QVSSER.
+  LOOP AT GT_QVSSER INTO DATA(LS_PI).
+    IF LS_PI-SEL = 'X'.
+      APPEND LS_PI TO LD_SEL_QVSSERS.
     ENDIF.
+  ENDLOOP.
 
-    LS_QUOMSG-CONTENT = GV_QUOMSG_CONTENT.
-    LS_QUOMSG-IS_CUSTOMER_MESSAGE = ABAP_FALSE.
-    LS_QUOMSG-CREATED_BY = SY-UNAME.
-    LS_QUOMSG-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
-    LS_QUOMSG-CREATED_ON = SY-DATUM.
+  IF LINES( LD_SEL_QVSSERS ) = 0.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'a Service for deletion' DISPLAY LIKE 'E'.
+    LEAVE LIST-PROCESSING.
+  ELSEIF LINES( LD_SEL_QVSSERS ) > 1.
+    PERFORM WARNING_MULTI_SELECTED_QVSSER TABLES LD_SEL_QVSSERS.
 
-    PERFORM CREATE_UUID_C36_STATIC CHANGING LS_QUOMSG-ID.
+  ELSEIF LINES( LD_SEL_QVSSERS ) = 1.
+    PERFORM HANDLE_QVSSER_FINAL_DELETION TABLES LD_SEL_QVSSERS.
 
-    INSERT Y03S24999_QUOMSG FROM LS_QUOMSG.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form WARNING_MULTI_SELECTED_QVSSER
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM WARNING_MULTI_SELECTED_QVSSER TABLES U_ITAB LIKE GT_QVSSER.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Do you want to delete MULTIPLE services?'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    PERFORM HANDLE_QVSSER_FINAL_DELETION TABLES U_ITAB.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_QVSSER_FINAL_DELETION
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_QVSSER_FINAL_DELETION TABLES U_ITAB LIKE GT_QVSSER.
+  LOOP AT U_ITAB INTO DATA(S_ROW).
+
+    DELETE TABLE GT_QVSSER FROM S_ROW.
 
     IF SY-SUBRC <> 0.
-      MESSAGE E018(Z03S24999_DOMUS_MSGS) WITH 'message'.
-    ELSE.
-      CLEAR: GV_QUOMSG_CONTENT.
-      PERFORM GET_QUOMSG_ITEMS USING GV_QUOTATION_ID.
+      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'One deleting Service in Quotation has caused an error!'.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DELETE_SELECTED_QVSPRVS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM DELETE_SELECTED_QVSPRVS.
+  DATA: LD_SEL_QVSPRVS LIKE GT_QVSPRV.
+  LOOP AT GT_QVSPRV INTO DATA(LS_PI).
+    IF LS_PI-SEL = 'X'.
+      APPEND LS_PI TO LD_SEL_QVSPRVS.
+    ENDIF.
+  ENDLOOP.
+
+  IF LINES( LD_SEL_QVSPRVS ) = 0.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'a Product Variant for deletion' DISPLAY LIKE 'E'.
+    LEAVE LIST-PROCESSING.
+  ELSEIF LINES( LD_SEL_QVSPRVS ) > 1.
+    PERFORM WARNING_MULTI_SELECTED_QVSPRV TABLES LD_SEL_QVSPRVS.
+
+  ELSEIF LINES( LD_SEL_QVSPRVS ) = 1.
+    PERFORM HANDLE_QVSPRV_FINAL_DELETION TABLES LD_SEL_QVSPRVS.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form WARNING_MULTI_SELECTED_QVSPRV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM WARNING_MULTI_SELECTED_QVSPRV TABLES U_ITAB LIKE GT_QVSPRV.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Do you want to delete MULTIPLE products?'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    PERFORM HANDLE_QVSPRV_FINAL_DELETION TABLES U_ITAB.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_QVSPRV_FINAL_DELETION
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_QVSPRV_FINAL_DELETION TABLES U_ITAB LIKE GT_QVSPRV.
+  LOOP AT U_ITAB INTO DATA(S_ROW).
+
+    DELETE TABLE GT_QVSPRV FROM S_ROW.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'One deleting Product in Quotation has caused an error!'.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_INSERT_QVSSER
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      -->
+*&---------------------------------------------------------------------*
+FORM PROCESS_INSERT_QVSSER.
+  DATA: LV_SUCCESS TYPE ABAP_BOOL.
+* Get data from SERVICE_0138 table
+  PERFORM GET_SERVICE_0138_DATA CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+  CALL SCREEN 0138 STARTING AT 10 08 ENDING AT 70 15.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_SERVICE_0138_DATA
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM GET_SERVICE_0138_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
+  CLEAR: IT_SERVICE_0138[], CH_V_SUCCESS.
+
+  SELECT S~*
+    FROM Y03S24999_SERVCE AS S
+    LEFT JOIN @GT_QVSSER AS GS
+    ON S~ID = GS~SERVICE_ID
+    WHERE S~IS_DELETED <> @ABAP_TRUE
+    AND GS~SERVICE_ID IS NULL
+    ORDER BY S~CREATED_ON DESCENDING, S~CREATED_AT DESCENDING
+    INTO CORRESPONDING FIELDS OF TABLE @IT_SERVICE_0138.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_SERVICE_0138[].
+
+    IF O_SERVICE_0138_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_SERVICE_0138_CONTAINER->FREE.
+      CLEAR O_SERVICE_0138_CONTAINER.
+    ENDIF.
+    IF O_SERVICE_0138_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_SERVICE_0138_ALV_TABLE.
     ENDIF.
 
+    MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'All services were selected!' DISPLAY LIKE 'E'.
+    CH_V_SUCCESS = ABAP_FALSE.
+  ELSE.
+    CH_V_SUCCESS = ABAP_TRUE.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_INSERT_QVSPRV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      -->
+*&---------------------------------------------------------------------*
+FORM PROCESS_INSERT_QVSPRV.
+  DATA: LV_SUCCESS TYPE ABAP_BOOL.
+* Get data from PRODUCT_0137 table
+  PERFORM GET_PRODUCT_0137_DATA CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+  CALL SCREEN 0137 STARTING AT 10 08 ENDING AT 70 20.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_PRODUCT_0137_DATA
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM GET_PRODUCT_0137_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
+  CLEAR: IT_PRODUCT_0137[], CH_V_SUCCESS.
+
+  SELECT P~*
+    FROM Y03S24999_PRODCT AS P
+    LEFT JOIN @GT_QVSPRV AS GP
+    ON P~ID = GP~PRODUCT_ID
+    WHERE P~IS_DELETED <> @ABAP_TRUE
+    AND GP~PRODUCT_ID IS NULL
+    ORDER BY P~UPDATED_ON DESCENDING, P~UPDATED_ON DESCENDING, P~PRODUCT_CODE
+    INTO CORRESPONDING FIELDS OF TABLE @IT_PRODUCT_0137.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_PRODUCT_0137[].
+
+    IF O_PRODUCT_0137_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_PRODUCT_0137_CONTAINER->FREE.
+      CLEAR O_PRODUCT_0137_CONTAINER.
+    ENDIF.
+    IF O_PRODUCT_0137_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_PRODUCT_0137_ALV_TABLE.
+    ENDIF.
+
+    MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'All products were selected!' DISPLAY LIKE 'E'.
+    CH_V_SUCCESS = ABAP_FALSE.
+  ELSE.
+    CH_V_SUCCESS = ABAP_TRUE.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_QUOTATION_SAVE_EVENT
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_QUOTATION_SAVE_EVENT .
+  CASE GV_QUOTATION_SCREEN_MODE.
+    WHEN GC_QUOTATION_MODE_DISPLAY.
+
+    WHEN GC_QUOTATION_MODE_CHANGE.
+      PERFORM CHANGE_QUOTATION_DETAIL USING GV_QUOTATION_ID.
+      PERFORM PREPARE_QUOTATION_DETAIL USING GV_QUOTATION_ID.
+
+      MESSAGE S010(Z03S24999_DOMUS_MSGS) WITH 'Quotation'.
+
+      GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_DISPLAY.
+
+    WHEN GC_QUOTATION_MODE_CREATE.
+*      PERFORM CHANGE_QUOTATION_DETAIL.
+*      PERFORM PREPARE_QUOTATION_DETAIL USING GV_QUOTATION_ID.
+*
+*      MESSAGE S016(Z03S24999_DOMUS_MSGS) WITH 'Quotation'.
+*
+*      GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_DISPLAY.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_PRODUCT_0137_ALV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_PRODUCT_0137_ALV.
+  DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
+        LS_LAYOUT    TYPE LVC_S_LAYO.
+*        LS_VARIANT   TYPE DISVARIANT.
+
+* Define Table Structure / Define fields catalog
+  PERFORM PREPARE_PRO_0137_FIELD_CATALOG
+    CHANGING LT_FIELD_CAT.
+
+* Prepare Layout
+  PERFORM PREPARE_PRODUCT_0137_LAYOUT
+    CHANGING LS_LAYOUT.
+** Prepare Variant
+*  PERFORM PREPARE_VARIANT
+*    CHANGING LS_VARIANT.
+
+* Show ALV
+  PERFORM DISPLAY_PRODUCT_0137_ALV_TABLE
+    CHANGING LS_LAYOUT
+*            LS_VARIANT
+             LT_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form ADD_PRODUCT_0137_FCAT
+*&---------------------------------------------------------------------*
+FORM ADD_PRODUCT_0137_FCAT USING U_FIELDNAME
+                    U_SCRTEXT_M
+                    U_OUTPUTLEN
+                    U_KEY
+                    U_HOTSPOT
+                    U_EMPHASIZE
+              CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
+  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
+  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
+  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
+  LS_FIELD_CAT-KEY = U_KEY.
+  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
+  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PRODUCT_0137_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+FORM PREPARE_PRO_0137_FIELD_CATALOG
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+
+***** Full form:
+  PERFORM: ADD_PRODUCT_0137_FCAT USING 'PRODUCT_CODE' 'Code'        12 '' 'X'  'C100'  CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0137_FCAT USING 'BRAND'        'Brand'       16 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0137_FCAT USING 'PRODUCT_NAME' 'Name'        22 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0137_FCAT USING 'CREATED_BY'   'Created By'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0137_FCAT USING 'CREATED_AT'   'Created At'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0137_FCAT USING 'CREATED_ON'   'Created On'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0137_FCAT USING 'UPDATED_BY'   'Updated By'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0137_FCAT USING 'UPDATED_AT'   'Updated At'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PRODUCT_0137_FCAT USING 'UPDATED_ON'   'Updated On'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DISPLAY_PRODUCT_0137_ALV_TABLE
+*&---------------------------------------------------------------------*
+FORM DISPLAY_PRODUCT_0137_ALV_TABLE
+  USING    U_S_LAYOUT    TYPE LVC_S_LAYO
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+*          IM_S_VARIANT   TYPE DISVARIANT
+
+  IF O_PRODUCT_0137_CONTAINER IS INITIAL.
+    O_PRODUCT_0137_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0137' ).
+  ENDIF.
+
+  IF O_PRODUCT_0137_ALV_TABLE IS INITIAL.
+    O_PRODUCT_0137_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_PRODUCT_0137_CONTAINER ).
+  ENDIF.
+
+  O_PRODUCT_0137_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
+    EXPORTING
+      IS_LAYOUT                     = U_S_LAYOUT      " Layout
+*      I_SAVE                        = 'A'
+*      IS_VARIANT                    = IM_S_VARIANT
+    CHANGING
+      IT_OUTTAB                     = IT_PRODUCT_0137     " Output Table
+      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
+    EXCEPTIONS
+      INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
+      PROGRAM_ERROR                 = 2                " Program Errors
+      TOO_MANY_LINES                = 3                " Too many Rows in Ready for Input Grid
+      OTHERS                        = 4
+  ).
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E005(Z03S24999_DOMUS_MSGS).
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PRODUCT_0137_LAYOUT
+*&---------------------------------------------------------------------*
+FORM PREPARE_PRODUCT_0137_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
+
+*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
+  CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
+  CH_S_LAYOUT-SEL_MODE = 'A'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_PROVRT_0136_ALV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_PROVRT_0136_ALV.
+  DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
+        LS_LAYOUT    TYPE LVC_S_LAYO.
+*        LS_VARIANT   TYPE DISVARIANT.
+
+* Define Table Structure / Define fields catalog
+  PERFORM PREPARE_PRO_0136_FIELD_CATALOG
+    CHANGING LT_FIELD_CAT.
+
+* Prepare Layout
+  PERFORM PREPARE_PROVRT_0136_LAYOUT
+    CHANGING LS_LAYOUT.
+** Prepare Variant
+*  PERFORM PREPARE_VARIANT
+*    CHANGING LS_VARIANT.
+
+* Show ALV
+  PERFORM DISPLAY_PROVRT_0136_ALV_TABLE
+    CHANGING LS_LAYOUT
+*            LS_VARIANT
+             LT_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form ADD_PROVRT_0136_FCAT
+*&---------------------------------------------------------------------*
+FORM ADD_PROVRT_0136_FCAT USING U_FIELDNAME
+                    U_SCRTEXT_M
+                    U_OUTPUTLEN
+                    U_KEY
+                    U_HOTSPOT
+                    U_EMPHASIZE
+              CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
+  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
+  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
+  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
+  LS_FIELD_CAT-KEY = U_KEY.
+  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
+  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PROVRT_0136_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+FORM PREPARE_PRO_0136_FIELD_CATALOG
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+
+***** Full form:
+  PERFORM: ADD_PROVRT_0136_FCAT USING 'VARIANT_CODE'  'Variant'     6 ''  'X'  'C311'  CHANGING CH_T_FIELD_CAT,
+           ADD_PROVRT_0136_FCAT USING 'PRODUCT_CODE'  'Code'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PROVRT_0136_FCAT USING 'PRODUCT_NAME'  'Name'        20 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PROVRT_0136_FCAT USING 'DISPLAY_PRICE' 'Price'       14 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PROVRT_0136_FCAT USING 'CREATED_BY'    'Created By'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PROVRT_0136_FCAT USING 'CREATED_AT'    'Created At'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PROVRT_0136_FCAT USING 'CREATED_ON'    'Created On'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PROVRT_0136_FCAT USING 'UPDATED_BY'    'Updated By'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PROVRT_0136_FCAT USING 'UPDATED_AT'    'Updated At'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_PROVRT_0136_FCAT USING 'UPDATED_ON'    'Updated On'  10 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DISPLAY_PROVRT_0136_ALV_TABLE
+*&---------------------------------------------------------------------*
+FORM DISPLAY_PROVRT_0136_ALV_TABLE
+  USING    U_S_LAYOUT    TYPE LVC_S_LAYO
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+*          IM_S_VARIANT   TYPE DISVARIANT
+
+  IF O_PROVRT_0136_CONTAINER IS INITIAL.
+    O_PROVRT_0136_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0136' ).
+  ENDIF.
+
+  IF O_PROVRT_0136_ALV_TABLE IS INITIAL.
+    O_PROVRT_0136_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_PROVRT_0136_CONTAINER ).
+  ENDIF.
+
+  O_PROVRT_0136_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
+    EXPORTING
+      IS_LAYOUT                     = U_S_LAYOUT      " Layout
+*      I_SAVE                        = 'A'
+*      IS_VARIANT                    = IM_S_VARIANT
+    CHANGING
+      IT_OUTTAB                     = IT_PROVRT_0136     " Output Table
+      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
+    EXCEPTIONS
+      INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
+      PROGRAM_ERROR                 = 2                " Program Errors
+      TOO_MANY_LINES                = 3                " Too many Rows in Ready for Input Grid
+      OTHERS                        = 4
+  ).
+
+  IF O_PROVRT_0136_HANDLER IS INITIAL.
+    O_PROVRT_0136_HANDLER = NEW CL_QUOTA_PROVRT_ALV_HANDLER( ).
+    SET HANDLER O_PROVRT_0136_HANDLER->HOTSPOT_CLICK FOR O_PROVRT_0136_ALV_TABLE.
+  ENDIF.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E005(Z03S24999_DOMUS_MSGS).
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PROVRT_0136_LAYOUT
+*&---------------------------------------------------------------------*
+FORM PREPARE_PROVRT_0136_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
+
+*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
+  CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
+  CH_S_LAYOUT-SEL_MODE = 'A'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_PROATV_0135_ALV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_PROATV_0135_ALV.
+  DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
+        LS_LAYOUT    TYPE LVC_S_LAYO.
+*        LS_VARIANT   TYPE DISVARIANT.
+
+* Define Table Structure / Define fields catalog
+  PERFORM PREPARE_PRO_0135_FIELD_CATALOG
+    CHANGING LT_FIELD_CAT.
+
+* Prepare Layout
+  PERFORM PREPARE_PROATV_0135_LAYOUT
+    CHANGING LS_LAYOUT.
+** Prepare Variant
+*  PERFORM PREPARE_VARIANT
+*    CHANGING LS_VARIANT.
+
+* Show ALV
+  PERFORM DISPLAY_PROATV_0135_ALV_TABLE
+    CHANGING LS_LAYOUT
+*            LS_VARIANT
+             LT_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form ADD_PROATV_0135_FCAT
+*&---------------------------------------------------------------------*
+FORM ADD_PROATV_0135_FCAT USING U_FIELDNAME
+                    U_SCRTEXT_M
+                    U_OUTPUTLEN
+                    U_KEY
+                    U_HOTSPOT
+                    U_EMPHASIZE
+              CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
+  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
+  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
+  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
+  LS_FIELD_CAT-KEY = U_KEY.
+  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
+  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PROATV_0135_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+FORM PREPARE_PRO_0135_FIELD_CATALOG
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+
+***** Full form:
+  PERFORM: ADD_PROATV_0135_FCAT USING 'ATTRIBUTE_NAME' 'Attribute' 12 ''  'X' 'C500'  CHANGING CH_T_FIELD_CAT,
+           ADD_PROATV_0135_FCAT USING 'VALUE'          'Value'     12 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DISPLAY_PROATV_0135_ALV_TABLE
+*&---------------------------------------------------------------------*
+FORM DISPLAY_PROATV_0135_ALV_TABLE
+  USING    U_S_LAYOUT    TYPE LVC_S_LAYO
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+*          IM_S_VARIANT   TYPE DISVARIANT
+
+  IF O_PROATV_0135_CONTAINER IS INITIAL.
+    O_PROATV_0135_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0135' ).
+  ENDIF.
+
+  IF O_PROATV_0135_ALV_TABLE IS INITIAL.
+    O_PROATV_0135_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_PROATV_0135_CONTAINER ).
+  ENDIF.
+
+  O_PROATV_0135_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
+    EXPORTING
+      IS_LAYOUT                     = U_S_LAYOUT      " Layout
+*      I_SAVE                        = 'A'
+*      IS_VARIANT                    = IM_S_VARIANT
+    CHANGING
+      IT_OUTTAB                     = IT_PROATV_0135     " Output Table
+      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
+    EXCEPTIONS
+      INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
+      PROGRAM_ERROR                 = 2                " Program Errors
+      TOO_MANY_LINES                = 3                " Too many Rows in Ready for Input Grid
+      OTHERS                        = 4
+  ).
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E005(Z03S24999_DOMUS_MSGS).
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PROATV_0135_LAYOUT
+*&---------------------------------------------------------------------*
+FORM PREPARE_PROATV_0135_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
+
+*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
+  CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_SERVICE_0138_ALV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_SERVICE_0138_ALV.
+  DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
+        LS_LAYOUT    TYPE LVC_S_LAYO.
+*        LS_VARIANT   TYPE DISVARIANT.
+
+* Define Table Structure / Define fields catalog
+  PERFORM PREPARE_SER_0138_FIELD_CATALOG
+    CHANGING LT_FIELD_CAT.
+
+* Prepare Layout
+  PERFORM PREPARE_SERVICE_0138_LAYOUT
+    CHANGING LS_LAYOUT.
+** Prepare Variant
+*  PERFORM PREPARE_VARIANT
+*    CHANGING LS_VARIANT.
+
+* Show ALV
+  PERFORM DISPLAY_SERVICE_0138_ALV_TABLE
+    CHANGING LS_LAYOUT
+*            LS_VARIANT
+             LT_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form ADD_SERVICE_0138_FCAT
+*&---------------------------------------------------------------------*
+FORM ADD_SERVICE_0138_FCAT USING U_FIELDNAME
+                    U_SCRTEXT_M
+                    U_OUTPUTLEN
+                    U_KEY
+                    U_HOTSPOT
+                    U_EMPHASIZE
+              CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
+  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
+  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
+  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
+  LS_FIELD_CAT-KEY = U_KEY.
+  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
+  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_SERVICE_0138_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+FORM PREPARE_SER_0138_FIELD_CATALOG
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+
+***** Full form:
+  PERFORM: ADD_SERVICE_0138_FCAT USING 'NAME'           'Name'              20 '' 'X'  'C500'  CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0138_FCAT USING 'DISPLAY_PRICE'  'Price'             14 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0138_FCAT USING 'DESCRIPTION'    'Description'       10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0138_FCAT USING 'CREATED_BY'     'Created By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0138_FCAT USING 'CREATED_AT'     'Created At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0138_FCAT USING 'CREATED_ON'     'Created On'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0138_FCAT USING 'UPDATED_BY'     'Updated By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0138_FCAT USING 'UPDATED_AT'     'Updated At'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_SERVICE_0138_FCAT USING 'UPDATED_ON'     'Updated On'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DISPLAY_SERVICE_0138_ALV_TABLE
+*&---------------------------------------------------------------------*
+FORM DISPLAY_SERVICE_0138_ALV_TABLE
+  USING    U_S_LAYOUT    TYPE LVC_S_LAYO
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+*          IM_S_VARIANT   TYPE DISVARIANT
+
+  IF O_SERVICE_0138_CONTAINER IS INITIAL.
+    O_SERVICE_0138_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0138' ).
+  ENDIF.
+
+  IF O_SERVICE_0138_ALV_TABLE IS INITIAL.
+    O_SERVICE_0138_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_SERVICE_0138_CONTAINER ).
+  ENDIF.
+
+  O_SERVICE_0138_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
+    EXPORTING
+      IS_LAYOUT                     = U_S_LAYOUT      " Layout
+*      I_SAVE                        = 'A'
+*      IS_VARIANT                    = IM_S_VARIANT
+    CHANGING
+      IT_OUTTAB                     = IT_SERVICE_0138     " Output Table
+      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
+    EXCEPTIONS
+      INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
+      PROGRAM_ERROR                 = 2                " Program Errors
+      TOO_MANY_LINES                = 3                " Too many Rows in Ready for Input Grid
+      OTHERS                        = 4
+  ).
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E005(Z03S24999_DOMUS_MSGS).
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_SERVICE_0138_LAYOUT
+*&---------------------------------------------------------------------*
+FORM PREPARE_SERVICE_0138_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
+
+*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
+  CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
+  CH_S_LAYOUT-SEL_MODE = 'A'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0137
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0137 USING U_OKCODE.
+
+  CASE U_OKCODE.
+
+    WHEN 'ENTER_137' OR 'VIEW_PRODUCT_0137'.
+      PERFORM HANDLE_ENTER_ON_SCREEN_0137.
+      CLEAR: U_OKCODE.
+    WHEN 'CANCLE_137'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_ENTER_ON_SCREEN_0137
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_ENTER_ON_SCREEN_0137.
+  IF O_PRODUCT_0137_ALV_TABLE IS NOT INITIAL.
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+
+    CALL METHOD O_PRODUCT_0137_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+
+    IF LINES( LT_INDEX_ROWS ) = 1.
+      READ TABLE LT_INDEX_ROWS INDEX 1 INTO LS_INDEX_ROW.
+      READ TABLE IT_PRODUCT_0137 INDEX LS_INDEX_ROW INTO DATA(LS_PRODUCT).
+
+      PERFORM PROCESS_PREPARE_0136_DATA USING LS_PRODUCT-ID.
+
+    ELSEIF LINES( LT_INDEX_ROWS ) = 0.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Product' DISPLAY LIKE 'E'.
+    ELSEIF LINES( LT_INDEX_ROWS ) > 1.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'only one Product' DISPLAY LIKE 'E'.
+    ENDIF.
+
+  ELSE.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Product' DISPLAY LIKE 'E'.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_PREPARE_0136_DATA
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_PREPARE_0136_DATA USING U_PRODUCT_ID.
+
+  CLEAR: IT_PROVRT_0136[].
+
+  SELECT PROVRT~*, PRODCT~PRODUCT_NAME, PRODCT~PRODUCT_CODE
+    FROM Y03S24999_PROVRT AS PROVRT
+    LEFT JOIN Y03S24999_PRODCT AS PRODCT
+    ON PRODCT~ID = PROVRT~PRODUCT_ID
+    WHERE PROVRT~IS_DELETED <> @ABAP_TRUE
+    AND PRODCT~ID = @U_PRODUCT_ID
+    ORDER BY PROVRT~VARIANT_CODE DESCENDING
+    INTO CORRESPONDING FIELDS OF TABLE @IT_PROVRT_0136.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_PROVRT_0136[].
+
+    IF O_PROVRT_0136_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_PROVRT_0136_CONTAINER->FREE.
+      CLEAR O_PROVRT_0136_CONTAINER.
+    ENDIF.
+    IF O_PROVRT_0136_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_PROVRT_0136_ALV_TABLE.
+    ENDIF.
+    IF O_PROVRT_0136_HANDLER IS NOT INITIAL.
+      CLEAR O_PROVRT_0136_HANDLER.
+    ENDIF.
+
+    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Product Variant of this product' DISPLAY LIKE 'E'.
+    RETURN.
+  ENDIF.
+
+  CALL SCREEN 0136 STARTING AT 15 06 ENDING AT 70 12.
+  LEAVE TO SCREEN 0.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0136
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0136 USING U_OKCODE.
+
+  CASE U_OKCODE.
+
+    WHEN 'ENTER_136'.
+      PERFORM HANDLE_ENTER_ON_SCREEN_0136.
+      CLEAR: U_OKCODE.
+    WHEN 'CANCLE_136'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_ENTER_ON_SCREEN_0136
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_ENTER_ON_SCREEN_0136.
+  IF O_PROVRT_0136_ALV_TABLE IS NOT INITIAL.
+
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+
+    CALL METHOD O_PROVRT_0136_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+
+    IF LINES( LT_INDEX_ROWS ) > 0.
+* Loop to append each selected Product Variant into Quotation Product Variant List
+      LOOP AT LT_INDEX_ROWS INTO LS_INDEX_ROW.
+        DATA: LV_IS_REPEATED TYPE ABAP_BOOL.
+        READ TABLE IT_PROVRT_0136 INDEX LS_INDEX_ROW INTO DATA(LS_PROVRT_0136).
+
+        LOOP AT GT_QVSPRV INTO DATA(LS_TEMP).
+          IF LS_TEMP-PRODUCT_VARIANT_ID = LS_PROVRT_0136-ID.
+            LS_TEMP-QUANTITY += 1.
+            MODIFY TABLE GT_QVSPRV FROM LS_TEMP.
+
+            LV_IS_REPEATED = ABAP_TRUE.
+            EXIT.
+          ENDIF.
+        ENDLOOP.
+
+        IF LV_IS_REPEATED <> ABAP_TRUE.
+          READ TABLE GT_QVSPRV INDEX 1 INTO GS_QVSPRV.
+          CLEAR: GS_QVSPRV.
+
+          GS_QVSPRV-PRODUCT_VARIANT_ID = LS_PROVRT_0136-ID.
+          GS_QVSPRV-VARIANT_CODE = LS_PROVRT_0136-VARIANT_CODE.
+          GS_QVSPRV-PRODUCT_NAME = LS_PROVRT_0136-PRODUCT_NAME.
+          GS_QVSPRV-PRICE = LS_PROVRT_0136-DISPLAY_PRICE.
+          GS_QVSPRV-QUANTITY = 1.
+          GS_QVSPRV-TOTAL_PRICE = GS_QVSPRV-PRICE.
+
+          PERFORM CREATE_UUID_C36_STATIC CHANGING GS_QVSPRV-ID.
+
+          APPEND GS_QVSPRV TO GT_QVSPRV.
+
+        ENDIF.
+
+      ENDLOOP.
+
+      LEAVE TO SCREEN 0.
+
+    ELSE.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Product Variant' DISPLAY LIKE 'E'.
+
+    ENDIF.
+
+  ELSE.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Product Variant' DISPLAY LIKE 'E'.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0138
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0138 USING U_OKCODE.
+
+  CASE U_OKCODE.
+
+    WHEN 'ENTER_138'.
+      PERFORM HANDLE_ENTER_ON_SCREEN_0138.
+      CLEAR: U_OKCODE.
+
+    WHEN 'CANCLE_138'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_ENTER_ON_SCREEN_0138
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_ENTER_ON_SCREEN_0138.
+  IF O_SERVICE_0138_ALV_TABLE IS NOT INITIAL.
+
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+
+    CALL METHOD O_SERVICE_0138_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+
+    IF LINES( LT_INDEX_ROWS ) > 0.
+* Loop to append each selected Services into Quotation Service List
+      LOOP AT LT_INDEX_ROWS INTO LS_INDEX_ROW.
+
+        READ TABLE GT_QVSSER INDEX 1 INTO GS_QVSSER.
+        CLEAR: GS_QVSSER.
+
+        READ TABLE IT_SERVICE_0138 INDEX LS_INDEX_ROW INTO DATA(LS_SERVICE_0138).
+        GS_QVSSER-SERVICE_ID = LS_SERVICE_0138-ID.
+        GS_QVSSER-SERVICE_NAME = LS_SERVICE_0138-NAME.
+        GS_QVSSER-PRICE = LS_SERVICE_0138-DISPLAY_PRICE.
+
+        PERFORM CREATE_UUID_C36_STATIC CHANGING GS_QVSSER-ID.
+
+        APPEND GS_QVSSER TO GT_QVSSER.
+      ENDLOOP.
+
+    ELSE.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Service' DISPLAY LIKE 'E'.
+    ENDIF.
+
+    LEAVE TO SCREEN 0.
+
+  ELSE.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'at least one Service' DISPLAY LIKE 'E'.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0135
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0135 USING U_OKCODE.
+  CASE U_OKCODE.
+    WHEN 'CANCLE_135'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_QUOTATION_PROATV_0135
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_PROVRT_ID
+*&---------------------------------------------------------------------*
+FORM PREPARE_QUOTATION_PROATV_0135  USING  U_PROVRT_ID.
+  SELECT PROATV~VALUE, PROATR~ATTRIBUTE_NAME
+    FROM Y03S24999_PROATV AS PROATV
+    LEFT JOIN Y03S24999_PROATR AS PROATR
+    ON PROATR~ID = PROATV~PRODUCT_ATTRIBUTE_ID
+    WHERE PROATV~IS_DELETED <> @ABAP_TRUE
+    AND PROATV~PRODUCT_VARIANT_ID = @U_PROVRT_ID
+    INTO CORRESPONDING FIELDS OF TABLE @IT_PROATV_0135.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_PROATV_0135[].
+
+    IF O_PROATV_0135_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_PROATV_0135_CONTAINER->FREE.
+      CLEAR O_PROATV_0135_CONTAINER.
+    ENDIF.
+    IF O_PROATV_0135_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_PROATV_0135_ALV_TABLE.
+    ENDIF.
+
+    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Attribute of this product' DISPLAY LIKE 'E'.
+    RETURN.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_QUOTATION_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHANGE_QUOTATION_DETAIL USING U_QUOTATION_ID.
+  DATA: LV_QUOVER_ID TYPE Y03S24999_QUOVER-ID.
+  DATA: LV_TOTAL_PRICE TYPE Y03S24999_QUOVER-TOTAL_PRICE VALUE 0.
+
+  PERFORM CREATE_QUOVER_BASIC_DETAIL USING U_QUOTATION_ID
+                                     CHANGING LV_QUOVER_ID.
+  PERFORM CREATE_QUOVER_PROVRTS_DETAIL USING LV_QUOVER_ID
+                                     CHANGING LV_TOTAL_PRICE.
+  PERFORM CREATE_QUOVER_SERVICES_DETAIL USING LV_QUOVER_ID
+                                     CHANGING LV_TOTAL_PRICE.
+  PERFORM INSERT_QUOVER_TOTAL_PRICE USING LV_QUOVER_ID
+                                          LV_TOTAL_PRICE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CREATE_QUOVER_BASIC_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CREATE_QUOVER_BASIC_DETAIL USING U_QUOTATION_ID
+                                CHANGING CH_QUOVER_ID.
+  DATA: LS_QUOVER TYPE Y03S24999_QUOVER.
+
+  LS_QUOVER-QUOTATION_ID = GV_QUOTATION_ID.
+  PERFORM CREATE_UUID_C36_STATIC CHANGING CH_QUOVER_ID.
+
+  LS_QUOVER-ID = CH_QUOVER_ID.
+
+  IF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE.
+
+    SELECT MAX( VERSION_ORDER ) + 1
+      FROM Y03S24999_QUOVER
+      WHERE QUOTATION_ID = @U_QUOTATION_ID
+      AND IS_DELETED <> @ABAP_TRUE
+      INTO @LS_QUOVER-VERSION_ORDER.
+
+    LS_QUOVER-CREATED_BY = SY-UNAME.
+    LS_QUOVER-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+    LS_QUOVER-CREATED_ON = SY-DATUM.
+
+    INSERT Y03S24999_QUOVER FROM LS_QUOVER.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Quotation Version basic information'.
+    ENDIF.
+
+  ELSEIF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CREATE.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CREATE_QUOVER_PROVRTS_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      -->
+*&---------------------------------------------------------------------*
+FORM CREATE_QUOVER_PROVRTS_DETAIL USING U_QUOVER_ID
+                                  CHANGING CH_TOTAL_PRICE TYPE Y03S24999_QUOVER-TOTAL_PRICE.
+  DATA: LT_PI TYPE STANDARD TABLE OF Y03S24999_QVSPRV.
+  MOVE-CORRESPONDING GT_QVSPRV TO LT_PI.
+
+  IF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE.
+    LOOP AT LT_PI INTO DATA(LS_PI).
+      LS_PI-QUOTATION_VERSION_ID = U_QUOVER_ID.
+
+      LS_PI-CREATED_BY = SY-UNAME.
+      LS_PI-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+      LS_PI-CREATED_ON = SY-DATUM.
+
+      INSERT Y03S24999_QVSPRV FROM LS_PI.
+
+      IF SY-SUBRC <> 0.
+        MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Quotation Product Variant details'.
+      ELSE.
+        CH_TOTAL_PRICE += ( LS_PI-PRICE * LS_PI-QUANTITY ).
+      ENDIF.
+    ENDLOOP.
+
+  ELSEIF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CREATE.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CREATE_QUOVER_SERVICES_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      -->
+*&---------------------------------------------------------------------*
+FORM CREATE_QUOVER_SERVICES_DETAIL USING U_QUOVER_ID
+                                   CHANGING CH_TOTAL_PRICE TYPE Y03S24999_QUOVER-TOTAL_PRICE.
+  DATA: LT_PI TYPE STANDARD TABLE OF Y03S24999_QVSSER.
+  MOVE-CORRESPONDING GT_QVSSER TO LT_PI.
+
+  IF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE.
+    LOOP AT LT_PI INTO DATA(LS_PI).
+      LS_PI-QUOTATION_VERSION_ID = U_QUOVER_ID.
+
+      LS_PI-CREATED_BY = SY-UNAME.
+      LS_PI-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+      LS_PI-CREATED_ON = SY-DATUM.
+
+      INSERT Y03S24999_QVSSER FROM LS_PI.
+
+      IF SY-SUBRC <> 0.
+        MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Quotation Service details'.
+      ELSE.
+        CH_TOTAL_PRICE += LS_PI-PRICE.
+      ENDIF.
+    ENDLOOP.
+
+  ELSEIF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CREATE.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form INSERT_QUOVER_TOTAL_PRICE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM INSERT_QUOVER_TOTAL_PRICE USING U_QUOVER_ID
+                                     U_TOTAL_PRICE TYPE Y03S24999_QUOVER-TOTAL_PRICE.
+
+  IF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE.
+
+    UPDATE Y03S24999_QUOVER
+      SET TOTAL_PRICE = U_TOTAL_PRICE
+      WHERE ID = U_QUOVER_ID.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Quotation Version total price'.
+    ENDIF.
+
+  ELSEIF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CREATE.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form WARNING_QUOTA_CHANGES_EXIST
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM WARNING_QUOTA_CHANGES_EXIST .
+  DATA: LD_CHOICE TYPE CHAR01.
+  IF GT_QVSPRV_BEFORE_MOD <> GT_QVSPRV OR
+     GT_QVSSER_BEFORE_MOD <> GT_QVSSER.
+    CALL FUNCTION 'POPUP_TO_CONFIRM'
+      EXPORTING
+        TEXT_QUESTION         = 'Do you want to save before switching mode?'
+        TEXT_BUTTON_1         = 'Yes'(001)
+        TEXT_BUTTON_2         = 'No'(002)
+        DISPLAY_CANCEL_BUTTON = ''
+      IMPORTING
+        ANSWER                = LD_CHOICE.
+    IF LD_CHOICE = '1'.
+      PERFORM CHANGE_QUOTATION_DETAIL USING GV_QUOTATION_ID.
+      PERFORM PREPARE_QUOTATION_DETAIL USING GV_QUOTATION_ID.
+    ELSEIF LD_CHOICE = '2'.
+      PERFORM PREPARE_QUOTATION_DETAIL USING GV_QUOTATION_ID.
+    ENDIF.
+
+  ENDIF.
 ENDFORM.

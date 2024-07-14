@@ -6,16 +6,24 @@
 PROGRAM Z03_S24_CUST_QUOTA.
 
 *---------------------------------------------------------------------*
-* DATA DECLARATIONS
+* TOP include
 *---------------------------------------------------------------------*
-DATA: GV_USERNAME TYPE Y03S24999_USER-USERNAME.
-DATA: GV_OKCODE TYPE SYST-UCOMM.
+INCLUDE Z03_S24_CUST_QUOTA_TOP.
 
 *---------------------------------------------------------------------*
 * MODULES
 *---------------------------------------------------------------------*
+
 * Screen 1000
 INCLUDE Z03_S24_CUST_AUTH_PBO1000.
 INCLUDE Z03_S24_CUST_AUTH_PAI1000.
 
+* Screen 100
+INCLUDE Z03_S24_CUST_PBO100.
+INCLUDE Z03_S24_CUST_PAI100.
+
+
+*---------------------------------------------------------------------*
+* Subroutine (FORM ... PERFORM)
+*---------------------------------------------------------------------*
 INCLUDE Z03_S24_CUST_FORM.

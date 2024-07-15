@@ -152,6 +152,42 @@
      <MSGNR>023</MSGNR>
      <TEXT>Create &amp;1 &amp;2 successfully.</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>024</MSGNR>
+     <TEXT>Welcome Customer!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>025</MSGNR>
+     <TEXT>You (&amp;1) are not Customer!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>026</MSGNR>
+     <TEXT>Accept Quotation successfully.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>027</MSGNR>
+     <TEXT>Accept Quotation failed!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>028</MSGNR>
+     <TEXT>Cancle Quotation successfully.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>029</MSGNR>
+     <TEXT>Cancle Quotation failed!</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

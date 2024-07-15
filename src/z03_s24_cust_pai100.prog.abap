@@ -3,8 +3,8 @@
 *&---------------------------------------------------------------------*
 
 MODULE USER_COMMAND_0100 INPUT.
-    PERFORM HANDLE_UCOMM_0100
-    USING GV_OKCODE.
+  PERFORM HANDLE_UCOMM_0100
+  USING GV_OKCODE.
 ENDMODULE.
 
 MODULE EXIT_COMMAND_100_EVENT INPUT.

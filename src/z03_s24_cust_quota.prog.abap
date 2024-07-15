@@ -26,6 +26,14 @@ INCLUDE Z03_S24_CUST_PAI100.
 INCLUDE Z03_S24_CUST_PBO200.
 INCLUDE Z03_S24_CUST_PAI200.
 
+* Screen 134
+INCLUDE Z03_S24_CUST_PBO134.
+INCLUDE Z03_S24_CUST_PAI134.
+
+*---------------------------------------------------------------------*
+* CLASS Implementation
+*---------------------------------------------------------------------*
+INCLUDE Z03_S24_CUST_CLASS_IMPLEMENT.
 
 *---------------------------------------------------------------------*
 * Subroutine (FORM ... PERFORM)

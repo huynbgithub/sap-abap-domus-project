@@ -22,6 +22,10 @@ INCLUDE Z03_S24_CUST_AUTH_PAI1000.
 INCLUDE Z03_S24_CUST_PBO100.
 INCLUDE Z03_S24_CUST_PAI100.
 
+* Screen 200
+INCLUDE Z03_S24_CUST_PBO200.
+INCLUDE Z03_S24_CUST_PAI200.
+
 
 *---------------------------------------------------------------------*
 * Subroutine (FORM ... PERFORM)

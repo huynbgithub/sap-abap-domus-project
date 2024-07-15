@@ -4,15 +4,15 @@
   <asx:values>
    <SRVB>
     <METADATA>
-     <NAME>ZUI_03_S24_999_CNTRT_ADAPP</NAME>
+     <NAME>ZUI_03_S24_999_CNTRCT_AD_APP</NAME>
      <TYPE>SRVB/SVB</TYPE>
-     <DESCRIPTION>Ui App for ZSD_03_S24_999_CNTRCT_AD_APP</DESCRIPTION>
+     <DESCRIPTION> Ui App for ZSD_03_S24_999_CNTRCT_AD_APP</DESCRIPTION>
      <LINKS>
       <item>
-       <HREF>/sap/bc/adt/businessservices/odatav2/ZUI_03_S24_999_CNTRT_ADAPP</HREF>
-       <REL>http://www.sap.com/categories/odatav2</REL>
-       <TYPE>application/vnd.sap.adt.businessservices.odatav2.v2+xml</TYPE>
-       <TITLE>ODATAV2</TITLE>
+       <HREF>/sap/bc/adt/businessservices/odatav4/ZUI_03_S24_999_CNTRCT_AD_APP</HREF>
+       <REL>http://www.sap.com/categories/odatav4</REL>
+       <TYPE>application/vnd.sap.adt.businessservices.odatav4.v1+xml</TYPE>
+       <TITLE>ODATAV4</TITLE>
       </item>
       <item>
        <HREF>/sap/bc/adt/businessservices/testclass</HREF>
@@ -26,13 +26,13 @@
     </METADATA>
     <CONTENT>
      <BIND_TYPE_IMPL>
-      <NAME>ZUI_03_S24_999_CNTRT_ADAPP</NAME>
+      <NAME>ZUI_03_S24_999_CNTRCT_AD_APP</NAME>
      </BIND_TYPE_IMPL>
      <BIND_TYPE>ODATA</BIND_TYPE>
-     <BIND_TYPE_VERSION>V2</BIND_TYPE_VERSION>
+     <BIND_TYPE_VERSION>V4</BIND_TYPE_VERSION>
      <SERVICES>
       <item>
-       <SERVICE_NAME>ZUI_03_S24_999_CNTRT_ADAPP</SERVICE_NAME>
+       <SERVICE_NAME>ZSD_03_S24_999_CNTRCT_AD_APP</SERVICE_NAME>
        <SERVICE_CONTENT>
         <item>
          <SERVICE_VERSION>0001</SERVICE_VERSION>

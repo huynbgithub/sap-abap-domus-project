@@ -54,7 +54,8 @@ FORM HANDLE_UCOMM_0100 USING U_OKCODE.
       MESSAGE 'All quotations' TYPE 'S'.
       PERFORM PROCESS_QUOTATION_LIST_0100.
       CLEAR: U_OKCODE.
-    WHEN 'DETAILS'.
+    WHEN 'VIEW_DETAILS'.
+      PERFORM PROCESS_VIEW_QUOTATION_DETAIL CHANGING GV_QUOTATION_ID.
       CLEAR: U_OKCODE.
     WHEN OTHERS.
   ENDCASE.
@@ -220,4 +221,171 @@ ENDFORM.
 FORM PREPARE_QUOTATION_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
   CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
   CH_S_LAYOUT-SEL_MODE = 'A'.
+ENDFORM.
+
+
+
+*&---------------------------------------------------------------------*
+*& Form PROCESS_VIEW_QUOTATION_DETAIL
+*&---------------------------------------------------------------------*
+FORM PROCESS_VIEW_QUOTATION_DETAIL CHANGING CH_QUOTATION_ID.
+  IF O_QUOTATION_ALV_TABLE IS NOT INITIAL.
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+    CALL METHOD O_QUOTATION_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+
+    IF LINES( LT_INDEX_ROWS ) = 1.
+      READ TABLE LT_INDEX_ROWS INDEX 1 INTO LS_INDEX_ROW.
+      READ TABLE IT_QUOTATION INDEX LS_INDEX_ROW INTO DATA(LS_QUOTATION).
+      CH_QUOTATION_ID = LS_QUOTATION-ID.
+      PERFORM PREPARE_QUOTATION_DETAIL USING CH_QUOTATION_ID.
+
+    ELSEIF LINES( LT_INDEX_ROWS ) = 0.
+      MESSAGE 'Select one Quotation' TYPE 'E'.
+    ELSEIF LINES( LT_INDEX_ROWS ) > 1.
+      MESSAGE 'Select only one Quotation' TYPE 'E'.
+    ENDIF.
+
+  ELSE.
+    MESSAGE 'Select one Quotation' TYPE 'E'.
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form PREPARE_QUOTATION_DETAIL
+*&---------------------------------------------------------------------*
+FORM PREPARE_QUOTATION_DETAIL USING U_QUOTATION_ID.
+  DATA: LV_QUOVER_ID TYPE Y03S24999_QUOVER-ID.
+  CLEAR: GV_QUOVER_TOTAL_PRICE.
+  CLEAR: GV_QVSPRV_TOTAL_PRICE.
+  CLEAR: GV_QVSSER_TOTAL_PRICE.
+
+  PERFORM GET_QUOTATION_BASIC_INFO USING U_QUOTATION_ID CHANGING LV_QUOVER_ID.
+  PERFORM GET_QUOVER_PRODUCT_ITEMS USING LV_QUOVER_ID.
+  PERFORM GET_QUOVER_SERVICE_ITEMS USING LV_QUOVER_ID.
+  PERFORM GET_QUOMSG_ITEMS         USING U_QUOTATION_ID.
+
+  QUOTATION_SCREEN_MODE = '0200'.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form GET_QUOTATION_BASIC_INFO
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_QUOTATION_ID
+*&---------------------------------------------------------------------*
+FORM GET_QUOTATION_BASIC_INFO USING U_QUOTATION_ID
+                              CHANGING CH_QUOVER_ID.
+
+  SELECT SINGLE QUOTA~ID, QUOTATION_CODE, STATUS, CUSTOMER, STAFF,
+                QUOTA~CREATED_ON, QUOTA~CREATED_AT, EXPIRED_ON, EXPIRED_AT,
+                PACKGE~NAME AS PACKAGE_NAME, PCKIMG~IMAGE_URL AS PCKIMG_URL,
+                QUOVER~ID AS QUOVER_ID,
+                QUOVER~VERSION_ORDER AS QUOVER_VERSION_ORDER,
+                QUOVER~CREATED_AT AS QUOVER_CREATED_AT,
+                QUOVER~CREATED_ON AS QUOVER_CREATED_ON
+
+    FROM Y03S24999_QUOTA AS QUOTA
+
+    LEFT JOIN Y03S24999_PACKGE AS PACKGE
+      ON QUOTA~PACKAGE_ID = PACKGE~ID
+
+    LEFT JOIN Y03S24999_PCKIMG AS PCKIMG
+      ON PCKIMG~PACKAGE_ID = PACKGE~ID
+
+    JOIN Y03S24999_QUOVER AS QUOVER
+      ON QUOVER~QUOTATION_ID = QUOTA~ID
+
+    WHERE QUOTA~ID = @U_QUOTATION_ID AND
+          QUOTA~IS_DELETED <> @ABAP_TRUE AND
+          QUOVER~IS_DELETED <> @ABAP_TRUE AND
+          PCKIMG~IS_DELETED <> @ABAP_TRUE AND
+          PCKIMG~IMAGE_URL <> '' AND
+          QUOVER~VERSION_ORDER = ( SELECT MAX( VERSION_ORDER )
+                                    FROM Y03S24999_QUOVER
+                                    WHERE QUOTATION_ID = @U_QUOTATION_ID
+                                    AND IS_DELETED <> @ABAP_TRUE )
+
+    INTO CORRESPONDING FIELDS OF @GS_QUOTATION_DETAIL.
+
+*    CH_QUOVER_ID = GS_QUOTATION_DETAIL-QUOVER_ID.
+*    GV_QUOPCKIMG_URL = GS_QUOTATION_DETAIL-PCKIMG_URL.
+*    PERFORM SHOW_QUOPCK_SELECTED_IMAGE USING GV_QUOPCKIMG_URL.
+ENDFORM.
+
+
+*&---------------------------------------------------------------------*
+*& Form GET_QUOVER_PRODUCT_VARIANT_ITEMS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_QUOVER_ID
+*&---------------------------------------------------------------------*
+FORM GET_QUOVER_PRODUCT_ITEMS USING U_QUOVER_ID.
+  SELECT ' ' AS SEL,
+         QVSPRV~*,
+         PROVRT~VARIANT_CODE AS VARIANT_CODE,
+         ( QVSPRV~PRICE * QVSPRV~QUANTITY ) AS TOTAL_PRICE,
+         PROVRT~PRODUCT_ID
+  FROM Y03S24999_QVSPRV AS QVSPRV
+  JOIN Y03S24999_PROVRT AS PROVRT
+  ON QVSPRV~PRODUCT_VARIANT_ID = PROVRT~ID
+  WHERE QVSPRV~IS_DELETED <> @ABAP_TRUE AND
+        QVSPRV~QUOTATION_VERSION_ID = @U_QUOVER_ID
+  INTO CORRESPONDING FIELDS OF TABLE @GT_QVSPRV.
+    SELECT GT~*,
+           PRODCT~PRODUCT_NAME
+    FROM @GT_QVSPRV AS GT
+    JOIN Y03S24999_PRODCT AS PRODCT
+    ON GT~PRODUCT_ID = PRODCT~ID
+    INTO CORRESPONDING FIELDS OF TABLE @GT_QVSPRV.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form GET_QUOMSG_ITEMS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_QUOVER_ID
+*&---------------------------------------------------------------------*
+FORM GET_QUOMSG_ITEMS USING U_QUOTATION_ID.
+  CLEAR: GT_QUOMSG.
+  SELECT QUOMSG~*
+  FROM Y03S24999_QUOMSG AS QUOMSG
+  JOIN Y03S24999_QUOTA AS QUOTA
+  ON QUOMSG~QUOTATION_ID = QUOTA~ID
+  WHERE QUOMSG~IS_DELETED <> @ABAP_TRUE
+    AND QUOMSG~QUOTATION_ID = @U_QUOTATION_ID
+  ORDER BY QUOMSG~CREATED_ON ASCENDING, QUOMSG~CREATED_AT ASCENDING
+  INTO CORRESPONDING FIELDS OF TABLE @GT_QUOMSG.
+  LOOP AT GT_QUOMSG INTO DATA(LS_ROW).
+    IF LS_ROW-IS_CUSTOMER_MESSAGE = ABAP_TRUE.
+      LS_ROW-USER_SENDING = 'Customer'.
+    ELSE.
+      LS_ROW-USER_SENDING = 'Staff'.
+    ENDIF.
+    MODIFY GT_QUOMSG FROM LS_ROW.
+  ENDLOOP.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form GET_QUOVER_SERVICE_ITEMS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_QUOVER_ID
+*&---------------------------------------------------------------------*
+FORM GET_QUOVER_SERVICE_ITEMS USING U_QUOVER_ID.
+  SELECT ' ' AS SEL,
+         QS~*,
+         S~NAME AS SERVICE_NAME
+  FROM Y03S24999_QVSSER AS QS
+  JOIN Y03S24999_SERVCE AS S
+  ON QS~SERVICE_ID = S~ID
+  WHERE QS~IS_DELETED <> @ABAP_TRUE AND
+        QS~QUOTATION_VERSION_ID = @U_QUOVER_ID
+  INTO CORRESPONDING FIELDS OF TABLE @GT_QVSSER.
 ENDFORM.

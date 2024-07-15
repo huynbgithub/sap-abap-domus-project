@@ -22,12 +22,12 @@ annotate view ZC_03_S24_999_CNTRCT_AD with
   }]
   @UI.hidden: true
   Id;
-  
+
   @UI.lineItem: [{ position: 10}]
   @UI.selectionField: [{ position: 10 }]
   @UI.identification: [{ position: 10 }]
   ContractCode;
-  
+
   @UI.lineItem: [{ position: 20}]
   @UI.selectionField: [{ position: 20 }]
   @UI.identification: [{ position: 20 }]
@@ -40,18 +40,19 @@ annotate view ZC_03_S24_999_CNTRCT_AD with
 
   @UI.lineItem: [{ position: 40}]
   @UI.selectionField: [{ position: 40 }]
-  @UI.identification: [{ position: 40 }]
-  QuotationVersionName;
+  @UI.identification: [{ position: 60 }]
+  Signature;
 
   @UI.lineItem: [{ position: 50}]
   @UI.selectionField: [{ position: 50 }]
   @UI.identification: [{ position: 50 }]
   Status;
-
   
 
-  @UI.identification: [{ position: 60 }]
-    Signature;
+  @UI.identification: [{ position: 40 }]
+  QuotationVersionName;
+
+
 
   @UI.identification: [{ position: 70 }]
   CreatedBy;

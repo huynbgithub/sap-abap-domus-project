@@ -10,3 +10,12 @@ MODULE EXIT_COMMAND_0100_EVENT INPUT.
   PERFORM HANDLE_EXIT_COMMAND
   USING SY-UCOMM.
 ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_0100 INPUT.
+  PERFORM HANDLE_USER_COMMAND_0100 USING SY-UCOMM.
+ENDMODULE.

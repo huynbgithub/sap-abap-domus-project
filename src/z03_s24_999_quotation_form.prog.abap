@@ -48,6 +48,10 @@ FORM HANDLE_UCOMM_0139 USING U_OKCODE.
       PERFORM PROCESS_SEND_MESSAGE.
       CLEAR: U_OKCODE.
 
+    WHEN 'MAKE_CONTRACT'.
+      PERFORM MAKE_CONTRACT USING GV_QUOTATION_ID.
+      CLEAR: U_OKCODE.
+
     WHEN 'SAVE'.
       PERFORM PROCESS_QUOTATION_SAVE_EVENT.
       CLEAR: U_OKCODE.
@@ -272,10 +276,10 @@ FORM PREPARE_QUOTA_FIELD_CATALOG
 
 ***** Full form:
   PERFORM: ADD_QUOTATION_FCAT USING 'QUOTATION_CODE' 'Quotation'         10 'X' 'X' ''      CHANGING CH_T_FIELD_CAT,
-           ADD_QUOTATION_FCAT USING 'CUSTOMER'       'Customer'          10 ''  ''  'C500'  CHANGING CH_T_FIELD_CAT,
-           ADD_QUOTATION_FCAT USING 'STAFF'          'Staff'             10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
+           ADD_QUOTATION_FCAT USING 'CUSTOMER'       'Customer'          10 ''  ''  'C700'  CHANGING CH_T_FIELD_CAT,
+           ADD_QUOTATION_FCAT USING 'STAFF'          'Staff'             10 ''  ''  'C500'      CHANGING CH_T_FIELD_CAT,
            ADD_QUOTATION_FCAT USING 'STATUS'         'Status'            10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
-           ADD_QUOTATION_FCAT USING 'PACKAGE_NAME'   'Reference Package' 32 ''  ''  'C700'  CHANGING CH_T_FIELD_CAT,
+           ADD_QUOTATION_FCAT USING 'PACKAGE_NAME'   'Reference Package' 32 ''  ''  'C400'  CHANGING CH_T_FIELD_CAT,
            ADD_QUOTATION_FCAT USING 'EXPIRED_ON'     'Expired On'        10 ''  ''  'C601'  CHANGING CH_T_FIELD_CAT,
            ADD_QUOTATION_FCAT USING 'EXPIRED_AT'     'Expired At'        10 ''  ''  'C701'  CHANGING CH_T_FIELD_CAT,
            ADD_QUOTATION_FCAT USING 'CREATED_BY'     'Created By'        10 ''  ''  ''      CHANGING CH_T_FIELD_CAT,
@@ -877,8 +881,13 @@ ENDFORM.
 FORM PROCESS_QUO_DISPLAY_CHANGE .
   CASE GV_QUOTATION_SCREEN_MODE.
     WHEN GC_QUOTATION_MODE_DISPLAY.
-      GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE.
-
+      IF GS_QUOTATION_DETAIL-STATUS = 'Requested' OR GS_QUOTATION_DETAIL-STATUS = 'Negotiating'.
+        GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE.
+      ELSEIF GS_QUOTATION_DETAIL-STATUS = 'Accepted'.
+        MESSAGE I000(Z03S24999_DOMUS_MSGS) WITH 'This quotation was' ' already Accepted by customer.' ' You cannot change it.'.
+      ELSE.
+        MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'You cannot edit a Cancelled quotation!'.
+      ENDIF.
     WHEN GC_QUOTATION_MODE_CHANGE.
       PERFORM WARNING_QUOTA_CHANGES_EXIST.
       GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_DISPLAY.
@@ -1959,6 +1968,7 @@ FORM CHANGE_QUOTATION_DETAIL USING U_QUOTATION_ID.
   DATA: LV_QUOVER_ID TYPE Y03S24999_QUOVER-ID.
   DATA: LV_TOTAL_PRICE TYPE Y03S24999_QUOVER-TOTAL_PRICE VALUE 0.
 
+  PERFORM CHANGE_QUOTA_BASIC_DETAIL USING U_QUOTATION_ID.
   PERFORM CREATE_QUOVER_BASIC_DETAIL USING U_QUOTATION_ID
                                      CHANGING LV_QUOVER_ID.
   PERFORM CREATE_QUOVER_PROVRTS_DETAIL USING LV_QUOVER_ID
@@ -1967,6 +1977,41 @@ FORM CHANGE_QUOTATION_DETAIL USING U_QUOTATION_ID.
                                      CHANGING LV_TOTAL_PRICE.
   PERFORM INSERT_QUOVER_TOTAL_PRICE USING LV_QUOVER_ID
                                           LV_TOTAL_PRICE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_QUOTA_BASIC_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHANGE_QUOTA_BASIC_DETAIL USING U_QUOTATION_ID.
+  DATA: LS_QUOTA TYPE Y03S24999_QUOTA.
+
+  IF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE.
+
+    SELECT SINGLE *
+      FROM Y03S24999_QUOTA
+      WHERE ID = @U_QUOTATION_ID
+      AND IS_DELETED <> @ABAP_TRUE
+      INTO @LS_QUOTA.
+
+    LS_QUOTA-STATUS = 'Negotiating'.
+    LS_QUOTA-UPDATED_BY = SY-UNAME.
+    LS_QUOTA-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+    LS_QUOTA-UPDATED_ON = SY-DATUM.
+
+    MODIFY Y03S24999_QUOTA FROM LS_QUOTA.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Quotation basic information'.
+    ENDIF.
+
+  ELSEIF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CREATE.
+
+  ENDIF.
+
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form CREATE_QUOVER_BASIC_DETAIL
@@ -2127,5 +2172,251 @@ FORM WARNING_QUOTA_CHANGES_EXIST .
       PERFORM PREPARE_QUOTATION_DETAIL USING GV_QUOTATION_ID.
     ENDIF.
 
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHECK_QVSPRV_QUANTITY
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHECK_QVSPRV_QUANTITY.
+  IF GS_QVSPRV-QUANTITY IS INITIAL.
+    MESSAGE E014(Z03S24999_DOMUS_MSGS).
+    SET CURSOR FIELD 'GS_QVSPRV-QUANTITY' LINE QVSPRV_TABLE_CONTROL-CURRENT_LINE.
+  ELSE.
+    IF GS_QVSPRV-QUANTITY < 1 OR GS_QVSPRV-QUANTITY > 255.
+      MESSAGE E012(Z03S24999_DOMUS_MSGS).
+      SET CURSOR FIELD 'GS_QVSPRV-QUANTITY' LINE QVSPRV_TABLE_CONTROL-CURRENT_LINE.
+    ENDIF.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHECK_QVSPRV_PRICE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHECK_QVSPRV_PRICE.
+  IF GS_QVSPRV-PRICE IS INITIAL.
+    MESSAGE E014(Z03S24999_DOMUS_MSGS).
+    SET CURSOR FIELD 'GS_QVSPRV-PRICE' LINE QVSPRV_TABLE_CONTROL-CURRENT_LINE.
+  ELSE.
+    IF GS_QVSPRV-PRICE < 0 OR GS_QVSPRV-PRICE > 999999999999.
+      MESSAGE E019(Z03S24999_DOMUS_MSGS).
+      SET CURSOR FIELD 'GS_QVSPRV-PRICE' LINE QVSPRV_TABLE_CONTROL-CURRENT_LINE.
+    ENDIF.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHECK_QVSSER_PRICE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHECK_QVSSER_PRICE .
+  IF GS_QVSSER-PRICE IS INITIAL.
+    MESSAGE E014(Z03S24999_DOMUS_MSGS).
+    SET CURSOR FIELD 'GS_QVSSER-PRICE' LINE QVSSER_TABLE_CONTROL-CURRENT_LINE.
+  ELSE.
+    IF GS_QVSSER-PRICE < 0 OR GS_QVSSER-PRICE > 999999999999.
+      MESSAGE E019(Z03S24999_DOMUS_MSGS).
+      SET CURSOR FIELD 'GS_QVSSER-PRICE' LINE QVSSER_TABLE_CONTROL-CURRENT_LINE.
+    ENDIF.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHECK_QUOMSG_CONTENT
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHECK_QUOMSG_CONTENT.
+  IF GV_QUOMSG_CONTENT IS INITIAL.
+    MESSAGE E020(Z03S24999_DOMUS_MSGS).
+    SET CURSOR FIELD 'GV_QUOMSG_CONTENT'.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0133
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0133 USING U_OKCODE.
+
+  CASE U_OKCODE.
+
+    WHEN 'ENTER_133'.
+      PERFORM HANDLE_ENTER_ON_SCREEN_0133.
+      CLEAR: U_OKCODE.
+
+    WHEN 'CANCLE_133'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_ENTER_ON_SCREEN_0133
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM HANDLE_ENTER_ON_SCREEN_0133.
+  DATA: LV_CONTRACT TYPE Y03S24999_CNTRCT.
+
+  PERFORM CREATE_UUID_C36_STATIC CHANGING LV_CONTRACT-ID.
+
+  PERFORM AUTO_GENERATE_CONTRACT_CODE CHANGING LV_CONTRACT-CONTRACT_CODE.
+  CONCATENATE 'CT' LV_CONTRACT-CONTRACT_CODE INTO LV_CONTRACT-CONTRACT_CODE.
+
+  LV_CONTRACT-QUOTATION_VERSION_ID = GS_QUOTATION_DETAIL-QUOVER_ID.
+  LV_CONTRACT-STAFF = GS_QUOTATION_DETAIL-STAFF.
+  LV_CONTRACT-CUSTOMER = GS_QUOTATION_DETAIL-CUSTOMER.
+  LV_CONTRACT-STATUS = 'Sent'.
+  LV_CONTRACT-CREATED_BY = SY-UNAME.
+  LV_CONTRACT-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+  LV_CONTRACT-CREATED_ON = SY-DATUM.
+
+  CLEAR: CTRDES_TEXT_TAB.
+  IF CTRDES_CONTAINER IS NOT INITIAL.
+    CTRDES_EDITOR->GET_TEXT_AS_STREAM( IMPORTING TEXT = CTRDES_TEXT_TAB ).
+  ENDIF.
+
+  CONCATENATE LINES OF CTRDES_TEXT_TAB INTO LV_CONTRACT-DESCRIPTION.
+
+  INSERT Y03S24999_CNTRCT FROM LV_CONTRACT.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E015(Z03S24999_DOMUS_MSGS) WITH 'Contract'.
+  ELSE.
+    DATA: LV_QUOMSG TYPE Y03S24999_QUOMSG.
+
+    PERFORM CREATE_UUID_C36_STATIC CHANGING LV_QUOMSG-ID.
+    LV_QUOMSG-QUOTATION_ID = GS_QUOTATION_DETAIL-ID.
+    CONCATENATE 'Contract' LV_CONTRACT-CONTRACT_CODE 'vừa được tạo thành công!' INTO LV_QUOMSG-CONTENT SEPARATED BY SPACE.
+    LV_QUOMSG-CREATED_BY = SY-UNAME.
+    LV_QUOMSG-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+    LV_QUOMSG-CREATED_ON = SY-DATUM.
+
+    INSERT Y03S24999_QUOMSG FROM LV_QUOMSG.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE S018(Z03S24999_DOMUS_MSGS) WITH 'Message to Customer' DISPLAY LIKE 'E'.
+    ENDIF.
+
+    MESSAGE I023(Z03S24999_DOMUS_MSGS) WITH 'Contract' LV_CONTRACT-CONTRACT_CODE.
+    MESSAGE S023(Z03S24999_DOMUS_MSGS) WITH 'Contract' LV_CONTRACT-CONTRACT_CODE.
+
+    PERFORM GET_QUOMSG_ITEMS USING GS_QUOTATION_DETAIL-ID.
+
+    LEAVE TO SCREEN 0.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form MAKE_CONTRACT
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM MAKE_CONTRACT USING U_QUOTATION_ID.
+  DATA: LV_VERORD TYPE Y03S24999_QUOVER-VERSION_ORDER .
+  SELECT MAX( VERSION_ORDER )
+      FROM Y03S24999_QUOVER
+      WHERE QUOTATION_ID = @U_QUOTATION_ID
+      AND IS_DELETED <> @ABAP_TRUE
+  INTO @LV_VERORD.
+
+  IF GS_QUOTATION_DETAIL-QUOVER_VERSION_ORDER = LV_VERORD.
+    PERFORM RESET_CTRDES_CONTAINER.
+    CALL SCREEN 0133 STARTING AT 10 08 ENDING AT 70 24.
+  ELSE.
+    MESSAGE I000(Z03S24999_DOMUS_MSGS) WITH 'You can just Make Contract' ' from the latest Quotation version!'.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form RESET_CTRDES_CONTAINER
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM RESET_CTRDES_CONTAINER.
+  IF CTRDES_TEXT_TAB IS NOT INITIAL.
+    CLEAR CTRDES_TEXT_TAB.
+  ENDIF.
+  IF CTRDES_EDITOR IS NOT INITIAL.
+    CALL METHOD CTRDES_EDITOR->DELETE_TEXT.
+    CLEAR CTRDES_EDITOR.
+  ENDIF.
+  IF CTRDES_CONTAINER IS NOT INITIAL.
+    CALL METHOD CTRDES_CONTAINER->FREE.
+    CLEAR CTRDES_CONTAINER.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_TEXT_EDITOR_0133
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_TEXT_EDITOR_0133 .
+
+  CREATE OBJECT: CTRDES_CONTAINER EXPORTING CONTAINER_NAME = 'CUSTOM_CONTROL_TEXT_0133',
+                 CTRDES_EDITOR    EXPORTING PARENT = CTRDES_CONTAINER
+                                            MAX_NUMBER_CHARS = 1333.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form AUTO_GENERATE_CONTRACT_CODE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM AUTO_GENERATE_CONTRACT_CODE CHANGING U_CODE.
+  CALL FUNCTION 'NUMBER_GET_NEXT'
+    EXPORTING
+      NR_RANGE_NR             = '1'
+      OBJECT                  = 'Z03G03_CTR'
+*     QUANTITY                = '1'
+*     SUBOBJECT               = ' '
+*     TOYEAR                  = '0000'
+*     IGNORE_BUFFER           = ' '
+    IMPORTING
+      NUMBER                  = U_CODE
+*     QUANTITY                =
+*     RETURNCODE              =
+    EXCEPTIONS
+      INTERVAL_NOT_FOUND      = 1
+      NUMBER_RANGE_NOT_INTERN = 2
+      OBJECT_NOT_FOUND        = 3
+      QUANTITY_IS_0           = 4
+      QUANTITY_IS_NOT_1       = 5
+      INTERVAL_OVERFLOW       = 6
+      BUFFER_OVERFLOW         = 7
+      OTHERS                  = 8.
+  IF SY-SUBRC <> 0.
+    MESSAGE E021(Z03S24999_DOMUS_MSGS) WITH 'Contract Code'.
   ENDIF.
 ENDFORM.

@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>Z03_S24_CUST_PACKAGE_CLASS_IMP</NAME>
+    <NAME>Z03_S24_CUST_PACKAGE_PAI0150</NAME>
     <SUBC>I</SUBC>
     <RLOAD>E</RLOAD>
     <UCCHECK>X</UCCHECK>
@@ -11,8 +11,8 @@
    <TPOOL>
     <item>
      <ID>R</ID>
-     <ENTRY>Include Z03_S24_CUST_PACKAGE_CLASS_IMP</ENTRY>
-     <LENGTH>38</LENGTH>
+     <ENTRY>Include Z03_S24_CUST_PACKAGE_PAI0150</ENTRY>
+     <LENGTH>36</LENGTH>
     </item>
    </TPOOL>
   </asx:values>

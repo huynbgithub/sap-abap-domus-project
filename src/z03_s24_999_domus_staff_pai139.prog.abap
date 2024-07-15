@@ -42,3 +42,48 @@ MODULE USER_COMMAND_0139 INPUT.
     USING GV_OKCODE.
   ENDIF.
 ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  VALIDATE_QVSPRV_INPUTS_0139  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE VALIDATE_QVSPRV_INPUTS_0139 INPUT.
+  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB3 AND G_ZTAB_001-SUBSCREEN = '0139'.
+    IF GV_VALIDATION_BYPASSED <> ABAP_TRUE.
+      IF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE OR GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CREATE.
+        PERFORM CHECK_QVSPRV_QUANTITY.
+        PERFORM CHECK_QVSPRV_PRICE.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  VALIDATE_QVSSER_INPUTS_0139  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE VALIDATE_QVSSER_INPUTS_0139 INPUT.
+  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB3 AND G_ZTAB_001-SUBSCREEN = '0139'.
+    IF GV_VALIDATION_BYPASSED <> ABAP_TRUE.
+      IF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CHANGE OR GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_CREATE.
+        PERFORM CHECK_QVSSER_PRICE.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  VALIDATE_QUOMSG_CONTENT_0139  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE VALIDATE_QUOMSG_CONTENT_0139 INPUT.
+  IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB3 AND G_ZTAB_001-SUBSCREEN = '0139'.
+    IF GV_VALIDATION_BYPASSED <> ABAP_TRUE.
+      IF GV_QUOTATION_SCREEN_MODE = GC_QUOTATION_MODE_DISPLAY.
+        IF GV_OKCODE = 'SEND_MESSAGE'.
+          PERFORM CHECK_QUOMSG_CONTENT.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+ENDMODULE.

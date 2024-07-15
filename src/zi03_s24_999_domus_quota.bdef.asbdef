@@ -1,4 +1,4 @@
-managed;  //implementation in class zbp_i03_s24_999_domus_quota unique;
+managed; //implementation in class ZBP_I03_S24_999_DOMUS_QUOTA unique;
 with draft;
 
 define behavior for ZI03_S24_999_DOMUS_QUOTA alias DomusQuota
@@ -11,19 +11,9 @@ etag master UpdatedOn
 {
   update;
 
-  field ( readonly ) Id;
-  field ( readonly ) QuotationCode;
-  field ( readonly ) Customer;
-  field ( readonly ) Status;
-  field ( readonly ) PackageName;
-  field ( readonly ) ExpiredOn;
-  field ( readonly ) ExpiredAt;
-  field ( readonly ) CreatedBy;
-  field ( readonly ) CreatedOn;
-  field ( readonly ) CreatedAt;
-  field ( readonly ) UpdatedBy;
-  field ( readonly ) UpdatedAt;
-  field ( readonly ) UpdatedOn;
+  field ( readonly ) Id,PackageName, QuotationCode, Customer, Status, ExpiredOn, ExpiredAt, CreatedBy, CreatedOn, CreatedAt, UpdatedBy, UpdatedAt, UpdatedOn;
+
+
 
   draft determine action Prepare;
   draft action Edit;
@@ -31,14 +21,21 @@ etag master UpdatedOn
   draft action Discard;
   draft action Resume;
 
-
-
-
   mapping for y03s24999_quota corresponding
   {
-    Staff = staff;
+    Id = id;
+    QuotationCode = quotation_code;
+    Customer = customer;
+    Status = status;
+    PackageId = package_id;
+    ExpiredOn = expired_on;
+    ExpiredAt = expired_at;
+    CreatedBy = created_by;
+    CreatedOn = created_on;
+    CreatedAt = created_at;
     UpdatedBy = updated_by;
     UpdatedAt = updated_at;
     UpdatedOn = updated_on;
+    Staff = staff;
   }
 }

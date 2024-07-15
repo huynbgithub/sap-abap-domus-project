@@ -122,6 +122,36 @@
      <MSGNR>018</MSGNR>
      <TEXT>Send &amp;1 failed!</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>019</MSGNR>
+     <TEXT>Price must be a number from 0 to 999,999,999,999.00!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>020</MSGNR>
+     <TEXT>Please input a message!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>021</MSGNR>
+     <TEXT>Auto generate &amp;1 failed!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>022</MSGNR>
+     <TEXT>&amp;1 failed!</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z03S24999_DOMUS_MSGS</ARBGB>
+     <MSGNR>023</MSGNR>
+     <TEXT>Create &amp;1 &amp;2 successfully.</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

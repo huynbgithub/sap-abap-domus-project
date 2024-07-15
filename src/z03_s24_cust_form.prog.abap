@@ -27,17 +27,17 @@ FORM HANDLE_UCOMM_1000 USING U_OKCODE
                              U_USERNAME.
   IF U_OKCODE = 'CFM'.
     DATA: LV_IS_CUSTOMER TYPE YS03S24999_ROLES-IS_CUSTOMER.
-      SELECT SINGLE IS_CUSTOMER FROM Y03S24999_USER
-        WHERE USERNAME = @U_USERNAME
-        INTO @LV_IS_CUSTOMER.
-      IF SY-SUBRC = 0.
-        IF LV_IS_CUSTOMER = ABAP_TRUE.
-          MESSAGE 'Welcome' TYPE 'S'.
-          CALL SCREEN 100.
-        ENDIF.
-        CLEAR: U_OKCODE.
+    SELECT SINGLE IS_CUSTOMER FROM Y03S24999_USER
+      WHERE USERNAME = @U_USERNAME
+      INTO @LV_IS_CUSTOMER.
+    IF SY-SUBRC = 0.
+      IF LV_IS_CUSTOMER = ABAP_TRUE.
+        MESSAGE 'Welcome' TYPE 'S'.
+        CALL SCREEN 100.
       ENDIF.
-   ENDIF.
+      CLEAR: U_OKCODE.
+    ENDIF.
+  ENDIF.
 ENDFORM.
 
 *&---------------------------------------------------------------------*
@@ -100,7 +100,8 @@ FORM GET_QUOTATION_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
       AND P~IS_DELETED <> @ABAP_TRUE
       AND Q~CUSTOMER = @GV_USERNAME
     ORDER BY Q~UPDATED_ON DESCENDING,
-             Q~UPDATED_AT DESCENDING
+             Q~UPDATED_AT DESCENDING,
+             Q~QUOTATION_CODE DESCENDING
     INTO CORRESPONDING FIELDS OF TABLE @IT_QUOTATION.
 
   IF SY-SUBRC <> 0.
@@ -267,7 +268,7 @@ FORM PREPARE_QUOTATION_DETAIL USING U_QUOTATION_ID.
   PERFORM GET_QUOVER_SERVICE_ITEMS USING LV_QUOVER_ID.
   PERFORM GET_QUOMSG_ITEMS         USING U_QUOTATION_ID.
 
-  QUOTATION_SCREEN_MODE = '0200'.
+  CALL SCREEN 200.
 ENDFORM.
 
 *&---------------------------------------------------------------------*
@@ -311,12 +312,10 @@ FORM GET_QUOTATION_BASIC_INFO USING U_QUOTATION_ID
 
     INTO CORRESPONDING FIELDS OF @GS_QUOTATION_DETAIL.
 
-*    CH_QUOVER_ID = GS_QUOTATION_DETAIL-QUOVER_ID.
+  CH_QUOVER_ID = GS_QUOTATION_DETAIL-QUOVER_ID.
 *    GV_QUOPCKIMG_URL = GS_QUOTATION_DETAIL-PCKIMG_URL.
 *    PERFORM SHOW_QUOPCK_SELECTED_IMAGE USING GV_QUOPCKIMG_URL.
 ENDFORM.
-
-
 *&---------------------------------------------------------------------*
 *& Form GET_QUOVER_PRODUCT_VARIANT_ITEMS
 *&---------------------------------------------------------------------*
@@ -325,6 +324,7 @@ ENDFORM.
 *&      --> U_QUOVER_ID
 *&---------------------------------------------------------------------*
 FORM GET_QUOVER_PRODUCT_ITEMS USING U_QUOVER_ID.
+
   SELECT ' ' AS SEL,
          QVSPRV~*,
          PROVRT~VARIANT_CODE AS VARIANT_CODE,
@@ -336,41 +336,24 @@ FORM GET_QUOVER_PRODUCT_ITEMS USING U_QUOVER_ID.
   WHERE QVSPRV~IS_DELETED <> @ABAP_TRUE AND
         QVSPRV~QUOTATION_VERSION_ID = @U_QUOVER_ID
   INTO CORRESPONDING FIELDS OF TABLE @GT_QVSPRV.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Quotation Product Variant' DISPLAY LIKE 'E'.
+
+  ELSE.
     SELECT GT~*,
            PRODCT~PRODUCT_NAME
     FROM @GT_QVSPRV AS GT
     JOIN Y03S24999_PRODCT AS PRODCT
     ON GT~PRODUCT_ID = PRODCT~ID
     INTO CORRESPONDING FIELDS OF TABLE @GT_QVSPRV.
-ENDFORM.
 
-*&---------------------------------------------------------------------*
-*& Form GET_QUOMSG_ITEMS
-*&---------------------------------------------------------------------*
-*& text
-*&---------------------------------------------------------------------*
-*&      --> U_QUOVER_ID
-*&---------------------------------------------------------------------*
-FORM GET_QUOMSG_ITEMS USING U_QUOTATION_ID.
-  CLEAR: GT_QUOMSG.
-  SELECT QUOMSG~*
-  FROM Y03S24999_QUOMSG AS QUOMSG
-  JOIN Y03S24999_QUOTA AS QUOTA
-  ON QUOMSG~QUOTATION_ID = QUOTA~ID
-  WHERE QUOMSG~IS_DELETED <> @ABAP_TRUE
-    AND QUOMSG~QUOTATION_ID = @U_QUOTATION_ID
-  ORDER BY QUOMSG~CREATED_ON ASCENDING, QUOMSG~CREATED_AT ASCENDING
-  INTO CORRESPONDING FIELDS OF TABLE @GT_QUOMSG.
-  LOOP AT GT_QUOMSG INTO DATA(LS_ROW).
-    IF LS_ROW-IS_CUSTOMER_MESSAGE = ABAP_TRUE.
-      LS_ROW-USER_SENDING = 'Customer'.
-    ELSE.
-      LS_ROW-USER_SENDING = 'Staff'.
+    IF SY-SUBRC <> 0.
+      MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Product Name' DISPLAY LIKE 'E'.
     ENDIF.
-    MODIFY GT_QUOMSG FROM LS_ROW.
-  ENDLOOP.
-ENDFORM.
 
+  ENDIF.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form GET_QUOVER_SERVICE_ITEMS
 *&---------------------------------------------------------------------*
@@ -388,4 +371,43 @@ FORM GET_QUOVER_SERVICE_ITEMS USING U_QUOVER_ID.
   WHERE QS~IS_DELETED <> @ABAP_TRUE AND
         QS~QUOTATION_VERSION_ID = @U_QUOVER_ID
   INTO CORRESPONDING FIELDS OF TABLE @GT_QVSSER.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Quotation Service' DISPLAY LIKE 'E'.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_QUOMSG_ITEMS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_QUOVER_ID
+*&---------------------------------------------------------------------*
+FORM GET_QUOMSG_ITEMS USING U_QUOTATION_ID.
+  CLEAR: GT_QUOMSG.
+
+  SELECT QUOMSG~*
+  FROM Y03S24999_QUOMSG AS QUOMSG
+  JOIN Y03S24999_QUOTA AS QUOTA
+  ON QUOMSG~QUOTATION_ID = QUOTA~ID
+  WHERE QUOMSG~IS_DELETED <> @ABAP_TRUE
+    AND QUOMSG~QUOTATION_ID = @U_QUOTATION_ID
+  ORDER BY QUOMSG~CREATED_ON ASCENDING, QUOMSG~CREATED_AT ASCENDING
+  INTO CORRESPONDING FIELDS OF TABLE @GT_QUOMSG.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Quotation Message' DISPLAY LIKE 'E'.
+  ELSE.
+    LOOP AT GT_QUOMSG INTO DATA(LS_ROW).
+      IF LS_ROW-IS_CUSTOMER_MESSAGE = ABAP_TRUE.
+        LS_ROW-USER_SENDING = 'Customer'.
+      ELSE.
+        LS_ROW-USER_SENDING = 'Staff'.
+      ENDIF.
+
+      MODIFY GT_QUOMSG FROM LS_ROW.
+    ENDLOOP.
+  ENDIF.
+
 ENDFORM.

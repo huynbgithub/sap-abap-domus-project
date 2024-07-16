@@ -209,7 +209,7 @@ ENDFORM.
 *& -->  p1        text
 *& <--  p2        text
 *&---------------------------------------------------------------------*
-FORM PROCESS_PCK_DISPLAY_CHANGE..
+FORM PROCESS_PCK_DISPLAY_CHANGE.
   CASE GV_PACKAGE_SCREEN_MODE.
     WHEN GC_PACKAGE_MODE_DISPLAY.
       GV_PACKAGE_SCREEN_MODE = GC_PACKAGE_MODE_CHANGE.

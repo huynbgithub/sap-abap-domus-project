@@ -176,7 +176,7 @@
       <TYPE>N</TYPE>
       <NEXTSCREEN>0200</NEXTSCREEN>
       <LINES>035</LINES>
-      <COLUMNS>163</COLUMNS>
+      <COLUMNS>164</COLUMNS>
       <FIORIENLARGEOFF>X</FIORIENLARGEOFF>
      </HEADER>
      <CONTAINERS>
@@ -189,7 +189,7 @@
        <NAME>CUSTOM_CONTROL_0200</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
        <LINE>004</LINE>
-       <COLUMN>078</COLUMN>
+       <COLUMN>081</COLUMN>
        <LENGTH>033</LENGTH>
        <HEIGHT>006</HEIGHT>
       </RPY_DYCATT>
@@ -197,7 +197,7 @@
        <TYPE>TABLE_CTRL</TYPE>
        <NAME>QVSPRV_TABLE_CONTROL</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>011</LINE>
+       <LINE>012</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>074</LENGTH>
        <HEIGHT>008</HEIGHT>
@@ -213,8 +213,8 @@
        <TYPE>TABLE_CTRL</TYPE>
        <NAME>QVSSER_TABLE_CONTROL</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>011</LINE>
-       <COLUMN>078</COLUMN>
+       <LINE>012</LINE>
+       <COLUMN>081</COLUMN>
        <LENGTH>052</LENGTH>
        <HEIGHT>008</HEIGHT>
        <C_SCROLL_V>X</C_SCROLL_V>
@@ -229,7 +229,7 @@
        <TYPE>TABLE_CTRL</TYPE>
        <NAME>QUOMSG_TABLE_CONTROL</NAME>
        <ELEMENT_OF>SCREEN</ELEMENT_OF>
-       <LINE>022</LINE>
+       <LINE>024</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>074</LENGTH>
        <HEIGHT>009</HEIGHT>
@@ -283,7 +283,7 @@
        <NAME>%#AUTOTEXT010</NAME>
        <TEXT>Reference_Package:</TEXT>
        <LINE>002</LINE>
-       <COLUMN>078</COLUMN>
+       <COLUMN>081</COLUMN>
        <LENGTH>018</LENGTH>
        <VISLENGTH>018</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -332,7 +332,7 @@
        <ICON_QSPEC>X</ICON_QSPEC>
        <WITH_ICON>X</WITH_ICON>
        <LINE>003</LINE>
-       <COLUMN>056</COLUMN>
+       <COLUMN>066</COLUMN>
        <LENGTH>031</LENGTH>
        <VISLENGTH>010</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -348,7 +348,7 @@
        <TEXT>_____________________________________________</TEXT>
        <ROLLING>X</ROLLING>
        <LINE>003</LINE>
-       <COLUMN>078</COLUMN>
+       <COLUMN>081</COLUMN>
        <LENGTH>045</LENGTH>
        <VISLENGTH>045</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -424,13 +424,13 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>PUSH</TYPE>
        <NAME>CANCLE_QUOTATION</NAME>
-       <TEXT>Cancle_____</TEXT>
+       <TEXT>Cancel_____</TEXT>
        <ICON_NAME>ICON_CANCEL</ICON_NAME>
        <ICON_QINFO>Cancel_Quotation</ICON_QINFO>
        <ICON_QSPEC>X</ICON_QSPEC>
        <WITH_ICON>X</WITH_ICON>
        <LINE>004</LINE>
-       <COLUMN>056</COLUMN>
+       <COLUMN>066</COLUMN>
        <LENGTH>034</LENGTH>
        <VISLENGTH>010</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -703,7 +703,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT016</NAME>
        <TEXT>Products:</TEXT>
-       <LINE>010</LINE>
+       <LINE>011</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>009</LENGTH>
        <VISLENGTH>009</VISLENGTH>
@@ -718,8 +718,8 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT017</NAME>
        <TEXT>Services:</TEXT>
-       <LINE>010</LINE>
-       <COLUMN>078</COLUMN>
+       <LINE>011</LINE>
+       <COLUMN>081</COLUMN>
        <LENGTH>009</LENGTH>
        <VISLENGTH>009</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -733,7 +733,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT019</NAME>
        <TEXT>Total_price_(Product):</TEXT>
-       <LINE>019</LINE>
+       <LINE>020</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>022</LENGTH>
        <VISLENGTH>022</VISLENGTH>
@@ -747,7 +747,7 @@
        <TYPE>TEMPLATE</TYPE>
        <NAME>GV_QVSPRV_TOTAL_PRICE</NAME>
        <TEXT>______________________________</TEXT>
-       <LINE>019</LINE>
+       <LINE>020</LINE>
        <COLUMN>042</COLUMN>
        <LENGTH>030</LENGTH>
        <VISLENGTH>030</VISLENGTH>
@@ -764,7 +764,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT020</NAME>
        <TEXT>VND</TEXT>
-       <LINE>019</LINE>
+       <LINE>020</LINE>
        <COLUMN>073</COLUMN>
        <LENGTH>003</LENGTH>
        <VISLENGTH>003</VISLENGTH>
@@ -778,8 +778,8 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT021</NAME>
        <TEXT>(Service):</TEXT>
-       <LINE>019</LINE>
-       <COLUMN>078</COLUMN>
+       <LINE>020</LINE>
+       <COLUMN>081</COLUMN>
        <LENGTH>010</LENGTH>
        <VISLENGTH>010</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -792,8 +792,8 @@
        <TYPE>TEMPLATE</TYPE>
        <NAME>GV_QVSSER_TOTAL_PRICE</NAME>
        <TEXT>______________________________</TEXT>
-       <LINE>019</LINE>
-       <COLUMN>096</COLUMN>
+       <LINE>020</LINE>
+       <COLUMN>099</COLUMN>
        <LENGTH>030</LENGTH>
        <VISLENGTH>030</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -809,8 +809,8 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT022</NAME>
        <TEXT>VND</TEXT>
-       <LINE>019</LINE>
-       <COLUMN>127</COLUMN>
+       <LINE>020</LINE>
+       <COLUMN>130</COLUMN>
        <LENGTH>003</LENGTH>
        <VISLENGTH>003</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -823,7 +823,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT023</NAME>
        <TEXT>TOTAL_PRICE_(QUOTATION):</TEXT>
-       <LINE>020</LINE>
+       <LINE>021</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>024</LENGTH>
        <VISLENGTH>024</VISLENGTH>
@@ -837,8 +837,8 @@
        <TYPE>TEMPLATE</TYPE>
        <NAME>GV_QUOVER_TOTAL_PRICE</NAME>
        <TEXT>______________________________</TEXT>
-       <LINE>020</LINE>
-       <COLUMN>096</COLUMN>
+       <LINE>021</LINE>
+       <COLUMN>099</COLUMN>
        <LENGTH>030</LENGTH>
        <VISLENGTH>030</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -855,8 +855,8 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT024</NAME>
        <TEXT>VND</TEXT>
-       <LINE>020</LINE>
-       <COLUMN>127</COLUMN>
+       <LINE>021</LINE>
+       <COLUMN>130</COLUMN>
        <LENGTH>003</LENGTH>
        <VISLENGTH>003</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -869,7 +869,7 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT018</NAME>
        <TEXT>Negotiation_Messages:</TEXT>
-       <LINE>021</LINE>
+       <LINE>023</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>021</LENGTH>
        <VISLENGTH>021</VISLENGTH>
@@ -884,8 +884,8 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT025</NAME>
        <TEXT>Type_your_negotiation_message_here:</TEXT>
-       <LINE>027</LINE>
-       <COLUMN>078</COLUMN>
+       <LINE>030</LINE>
+       <COLUMN>079</COLUMN>
        <LENGTH>035</LENGTH>
        <VISLENGTH>035</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -899,12 +899,13 @@
        <NAME>GV_QUOMSG_CONTENT</NAME>
        <TEXT>______________________________________________</TEXT>
        <ROLLING>X</ROLLING>
-       <LINE>028</LINE>
-       <COLUMN>078</COLUMN>
+       <LINE>031</LINE>
+       <COLUMN>079</COLUMN>
        <LENGTH>046</LENGTH>
        <VISLENGTH>046</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
+       <UP_LOWER>X</UP_LOWER>
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
       </RPY_DYFATC>
@@ -914,8 +915,8 @@
        <TYPE>PUSH</TYPE>
        <NAME>SEND_MESSAGE</NAME>
        <TEXT>Send_</TEXT>
-       <LINE>028</LINE>
-       <COLUMN>125</COLUMN>
+       <LINE>031</LINE>
+       <COLUMN>126</COLUMN>
        <LENGTH>005</LENGTH>
        <VISLENGTH>005</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -1315,7 +1316,7 @@
       <TYPE>N</TYPE>
       <NEXTSCREEN>1000</NEXTSCREEN>
       <LINES>027</LINES>
-      <COLUMNS>123</COLUMNS>
+      <COLUMNS>124</COLUMNS>
       <FIORIENLARGEOFF>X</FIORIENLARGEOFF>
      </HEADER>
      <CONTAINERS>
@@ -1331,8 +1332,8 @@
        <TYPE>TEXT</TYPE>
        <NAME>%#AUTOTEXT001</NAME>
        <TEXT>Username:</TEXT>
-       <LINE>001</LINE>
-       <COLUMN>001</COLUMN>
+       <LINE>002</LINE>
+       <COLUMN>005</COLUMN>
        <LENGTH>009</LENGTH>
        <VISLENGTH>008</VISLENGTH>
        <HEIGHT>001</HEIGHT>
@@ -1345,11 +1346,11 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>GV_USERNAME</NAME>
-       <TEXT>___________________</TEXT>
-       <LINE>001</LINE>
-       <COLUMN>010</COLUMN>
-       <LENGTH>019</LENGTH>
-       <VISLENGTH>019</VISLENGTH>
+       <TEXT>______________________</TEXT>
+       <LINE>002</LINE>
+       <COLUMN>014</COLUMN>
+       <LENGTH>022</LENGTH>
+       <VISLENGTH>022</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
        <INPUT_FLD>X</INPUT_FLD>
@@ -1361,8 +1362,8 @@
        <TYPE>PUSH</TYPE>
        <NAME>%#AUTOTEXT002</NAME>
        <TEXT>Confirm</TEXT>
-       <LINE>001</LINE>
-       <COLUMN>030</COLUMN>
+       <LINE>002</LINE>
+       <COLUMN>039</COLUMN>
        <LENGTH>007</LENGTH>
        <VISLENGTH>007</VISLENGTH>
        <HEIGHT>001</HEIGHT>

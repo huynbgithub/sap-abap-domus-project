@@ -8,6 +8,7 @@
 *----------------------------------------------------------------------*
 MODULE USER_COMMAND_0110 INPUT.
   IF ZTAB_001-ACTIVETAB = C_ZTAB_001-TAB1 AND G_ZTAB_001-SUBSCREEN = '0110'.
-
+    PERFORM HANDLE_UCOMM_0110
+    USING GV_OKCODE.
   ENDIF.
 ENDMODULE.

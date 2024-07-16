@@ -3,7 +3,7 @@
     typeName: 'Contract Detail',
     typeNamePlural: 'Contracts',
     title: {
-        label: 'Genaral',
+        label: 'General',
         value: 'ContractCode'
     },
     description: {
@@ -11,15 +11,35 @@
         value: 'Status'
     }
 }
-
 annotate view ZC_03_S24_999_CNTRCT_AD with
 {
   @UI.facet: [{
-    id: 'General',
-    type: #IDENTIFICATION_REFERENCE,
-    label: 'General Information',
-    position: 10
+      id: 'General',
+      type: #IDENTIFICATION_REFERENCE,
+      label: 'General Information',
+      position: 10
+  }, {
+      id: 'ProductTab',
+      type: #COLLECTION,
+      label: 'Product Information',
+      position: 20
+  }, {
+      id: 'fieldGroupProduct',
+      type: #FIELDGROUP_REFERENCE,
+      parentId: 'ProductTab',
+      targetQualifier: 'fieldGroupProduct'
+  }, {
+      id: 'ServiceTab',
+      type: #COLLECTION,
+      label: 'Service Information',
+      position: 30
+  }, {
+      id: 'fieldGroupService',
+      type: #FIELDGROUP_REFERENCE,
+      parentId: 'ServiceTab',
+      targetQualifier: 'fieldGroupService'
   }]
+
   @UI.hidden: true
   Id;
 
@@ -47,12 +67,9 @@ annotate view ZC_03_S24_999_CNTRCT_AD with
   @UI.selectionField: [{ position: 50 }]
   @UI.identification: [{ position: 50 }]
   Status;
-  
 
   @UI.identification: [{ position: 40 }]
   QuotationVersionName;
-
-
 
   @UI.identification: [{ position: 70 }]
   CreatedBy;
@@ -81,4 +98,14 @@ annotate view ZC_03_S24_999_CNTRCT_AD with
   @UI.identification: [{ position: 150 }]
   SignedAt;
 
+  @UI.fieldGroup: [{ 
+        qualifier: 'fieldGroupService',
+        position: 10
+    }]
+    ServiceName;
+@UI.fieldGroup: [{ 
+        qualifier: 'fieldGroupService',
+        position: 20
+    }]
+    ServiceDescription;
 }

@@ -119,6 +119,7 @@ ENDCLASS.
 *---------------------------------------------------------------------*
 * DATA Declaration
 *---------------------------------------------------------------------*
+DATA: GV_OKCODE      TYPE SYST-UCOMM.
 DATA: GV_OKCODE_0120 TYPE SYST-UCOMM.
 DATA: GV_OKCODE_0130 TYPE SYST-UCOMM.
 DATA: GV_OKCODE_0140 TYPE SYST-UCOMM.

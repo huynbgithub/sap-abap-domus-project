@@ -28,6 +28,16 @@ CLASS C_EVENT_RECEIVER_QUOTA DEFINITION.
       FOR EVENT PICTURE_DBLCLICK OF CL_GUI_PICTURE
       IMPORTING MOUSE_POS_X MOUSE_POS_Y SENDER.
 ENDCLASS.
+
+* CLASS C_EVENT_RECEIVER_CTR
+* DEFINITION
+CLASS C_EVENT_RECEIVER_CTR DEFINITION.
+  " The class is used to test the events raised by the cl_gui_pictureclass
+  PUBLIC SECTION.
+    METHODS EVENT_HANDLER_PICTURE_DBLCLICK
+      FOR EVENT PICTURE_DBLCLICK OF CL_GUI_PICTURE
+      IMPORTING MOUSE_POS_X MOUSE_POS_Y SENDER.
+ENDCLASS.
 *---------------------------------------------------------------------*
 * DATA Declaration
 *---------------------------------------------------------------------*

@@ -34,6 +34,31 @@ MODULE CALCULATE_TOTAL_PRICE_0129 OUTPUT.
   GV_PACKAGE_TOTAL_PRICE = GV_PCKPRV_TOTAL_PRICE + GV_PCKSER_TOTAL_PRICE.
 ENDMODULE.
 *&---------------------------------------------------------------------*
+*& Module MODIFY_PCKDES_SCREEN OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE MODIFY_PCKDES_SCREEN OUTPUT.
+  CASE GV_PACKAGE_SCREEN_MODE.
+* Display Mode
+    WHEN GC_PACKAGE_MODE_DISPLAY.
+      IF PCKDES_EDITOR IS NOT INITIAL.
+        PCKDES_EDITOR->SET_READONLY_MODE( ).
+      ENDIF.
+* Change Mode
+    WHEN GC_PACKAGE_MODE_CHANGE.
+      IF PCKDES_EDITOR IS NOT INITIAL.
+        PCKDES_EDITOR->SET_READONLY_MODE( 0 ).
+      ENDIF.
+* Create Mode
+    WHEN GC_PACKAGE_MODE_CREATE.
+      IF PCKDES_EDITOR IS NOT INITIAL.
+        PCKDES_EDITOR->SET_READONLY_MODE( 0 ).
+      ENDIF.
+    WHEN OTHERS.
+  ENDCASE.
+ENDMODULE.
+*&---------------------------------------------------------------------*
 *& Module MODIFY_PACKAGE_SCREEN OUTPUT
 *&---------------------------------------------------------------------*
 *&
@@ -77,9 +102,6 @@ MODULE MODIFY_PACKAGE_SCREEN OUTPUT.
           SCREEN-INPUT = '1'.
         ENDIF.
 
-        IF PCKDES_EDITOR IS NOT INITIAL.
-          PCKDES_EDITOR->SET_READONLY_MODE( ).
-        ENDIF.
 * Change Mode
       WHEN GC_PACKAGE_MODE_CHANGE.
         SCREEN-INPUT = '1'.
@@ -108,9 +130,6 @@ MODULE MODIFY_PACKAGE_SCREEN OUTPUT.
           SCREEN-REQUIRED = '2'.
         ENDIF.
 
-        IF PCKDES_EDITOR IS NOT INITIAL.
-          PCKDES_EDITOR->SET_READONLY_MODE( 0 ).
-        ENDIF.
 * Create Mode
       WHEN GC_PACKAGE_MODE_CREATE.
 
@@ -144,10 +163,6 @@ MODULE MODIFY_PACKAGE_SCREEN OUTPUT.
 
         IF SCREEN-NAME = 'GS_PACKAGE_DETAIL-NAME' OR SCREEN-NAME = 'GS_PACKAGE_DETAIL-DESCRIPTION'.
           SCREEN-REQUIRED = '2'.
-        ENDIF.
-
-        IF PCKDES_EDITOR IS NOT INITIAL.
-          PCKDES_EDITOR->SET_READONLY_MODE( 0 ).
         ENDIF.
 
       WHEN OTHERS.

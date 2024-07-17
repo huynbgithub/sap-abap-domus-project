@@ -53,14 +53,14 @@ annotate view ZC_03_S24_999_DOMUS_QUOTA with
   @EndUserText.label: 'Quotation ID'
   Id;
 
-  @EndUserText.label: 'ExpiredOn'
+  @EndUserText.label: 'Expired On'
   @UI.lineItem: [{ position: 60 }]
   @UI.selectionField: [{ position: 60 }]
   @UI.identification: [{ position: 60 }]
   ExpiredOn;
 
 
-  @EndUserText.label: 'ExpiredAt'
+  @EndUserText.label: 'Expired At'
   @UI.lineItem: [{ position: 70 }]
   @UI.selectionField: [{ position: 70 }]
   @UI.identification: [{ position: 70 }]

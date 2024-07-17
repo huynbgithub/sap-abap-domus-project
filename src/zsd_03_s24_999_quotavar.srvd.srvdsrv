@@ -1,0 +1,6 @@
+@EndUserText.label: 'Service for ZC_03_S24_999_QUOTAVAR'
+define service ZSD_03_S24_999_QUOTAVAR {
+  expose ZC_03_S24_999_QUOTAVAR as Quotation;
+  expose ZC_03_S24_999_QVSERCHILD as Services;
+  expose ZC_03_S24_999_QVSPRVCHILD as Products;
+}

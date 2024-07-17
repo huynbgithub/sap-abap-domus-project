@@ -5,8 +5,8 @@ association [1..1] to y03s24999_servce as _Service
     on $projection.ServiceId = _Service.id
 {
     key id as ServiceVariantId,
-    service_id as ServiceId,
-    quotation_version_id as QuotationVersionId,
+    key service_id as ServiceId,
+    key quotation_version_id as QuotationVersionId,
     _Service.name as ServiceName,
     _Service.description as ServiceDescription
 }

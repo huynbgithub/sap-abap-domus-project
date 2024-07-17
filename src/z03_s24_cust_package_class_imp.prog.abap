@@ -19,6 +19,22 @@ CLASS CL_PACKAGE_ALV_HANDLER IMPLEMENTATION.
 ENDCLASS.
 
 *---------------------------------------------------------------------*
+* CL_PRODUCT_ALV_HANDLER IMPLEMENTATION
+*---------------------------------------------------------------------*
+CLASS CL_PRODUCT_ALV_HANDLER IMPLEMENTATION.
+
+  METHOD HOTSPOT_CLICK.
+    READ TABLE IT_PRODUCT_0120 INTO DATA(LS_PRODCT_0120)
+      INDEX E_ROW_ID-INDEX.
+
+    PERFORM PROCESS_PREPARE_0130_DATA USING LS_PRODCT_0120-ID.
+    CALL SCREEN 0130 STARTING AT 15 06 ENDING AT 45 12.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+*---------------------------------------------------------------------*
 * CL_PACKAGE_PROVRT_ALV_HANDLER IMPLEMENTATION
 *---------------------------------------------------------------------*
 CLASS CL_PACKAGE_PROVRT_ALV_HANDLER IMPLEMENTATION.

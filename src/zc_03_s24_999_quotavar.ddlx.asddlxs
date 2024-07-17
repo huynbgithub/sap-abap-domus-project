@@ -1,0 +1,65 @@
+@Metadata.layer: #PARTNER
+@UI.headerInfo: { 
+    typeName: 'Quotation Version Detail', // Title of Detail Screen
+    typeNamePlural: 'Quotation Versions',  // Title of the List Table
+    typeImageUrl: 'sap-icon://document-text',
+    title: {
+        value: 'QuotationId'
+    },
+    description: {
+        value: 'Version'
+    }
+}
+annotate view ZC_03_S24_999_QUOTAVAR
+    with 
+{
+    @UI.facet: [{ 
+        id: 'tab1',
+        type: #IDENTIFICATION_REFERENCE,
+        label: 'General'
+    }, {
+        id: 'tab2',
+        type: #FIELDGROUP_REFERENCE,
+        targetQualifier: 'productFG',
+        label: 'Product Variants'
+    }, {
+        id: 'tab3',
+        type: #FIELDGROUP_REFERENCE,
+        targetQualifier: 'serviceFG',
+        label: 'Service Variants'
+    }]
+
+    @UI.lineItem: [{
+        position: 10,
+        importance: #HIGH
+    }]
+    @UI.identification: [{ position: 10 }]
+    @UI.selectionField: [{ position: 10 }]
+    @EndUserText.label: 'Quotation ID'
+    QuotationId;
+
+    @UI.lineItem: [{
+        position: 20
+    }]
+    @UI.identification: [{ position: 20 }]
+    @UI.selectionField: [{ position: 20 }]
+    @EndUserText.label: 'Version'
+    Version;
+
+    @UI.hidden: true
+    Id;
+
+    /* Product Variants Field Group */
+    @UI.fieldGroup: [{
+        qualifier: 'productFG',
+        position: 10
+    }]
+    _ProductVariants;
+
+    /* Service Variants Field Group */
+    @UI.fieldGroup: [{
+        qualifier: 'serviceFG',
+        position: 20
+    }]
+    _ServiceVariants;
+}

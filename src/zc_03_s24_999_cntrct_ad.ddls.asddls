@@ -4,10 +4,10 @@
 define root view entity ZC_03_S24_999_CNTRCT_AD
   as projection on ZI_03_S24_999_CNTRCT_AD
 {
-  key Id,
+  key ID,
+      QuotationVersionId,
       Customer,
       Staff,
-      QuotationVersionId,
       QuotationVersionName,
       Status,
       @Semantics.imageUrl: true
@@ -21,11 +21,5 @@ define root view entity ZC_03_S24_999_CNTRCT_AD
       Description,
       ContractCode,
       SignedOn,
-      SignedAt,
-      ProductName,
-      Quantity,
-      ServiceName,
-      ServiceDescription
-
-
+      SignedAt
 }

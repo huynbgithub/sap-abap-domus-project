@@ -10,3 +10,12 @@ MODULE USER_COMMAND_0160 INPUT.
   PERFORM HANDLE_UCOMM_0160
     USING GV_OKCODE.
 ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  EXIT_COMMAND_0160_EVENT  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE EXIT_COMMAND_0160_EVENT INPUT.
+  PERFORM HANDLE_EXIT_COMMAND
+    USING GV_OKCODE.
+ENDMODULE.

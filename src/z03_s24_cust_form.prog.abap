@@ -1,6 +1,20 @@
 *&---------------------------------------------------------------------*
 *& Include          Z03_S24_CUST_FORM
 *&---------------------------------------------------------------------*
+
+*&---------------------------------------------------------------------*
+*& Form SET_QCODE_INITIAL_VALUES.
+*&---------------------------------------------------------------------*
+FORM SET_QCODE_INITIAL_VALUES.
+  IF P_QCODE[] IS INITIAL.
+    P_QCODE-SIGN   = 'I'.
+    P_QCODE-OPTION = 'BT'.
+    P_QCODE-LOW    = 'Q000000000'.
+    P_QCODE-HIGH   = 'Q999999999'.
+    APPEND P_QCODE.
+  ENDIF.
+ENDFORM.
+
 *&---------------------------------------------------------------------*
 *& Form CREATE_UUID_C36_STATIC
 *&---------------------------------------------------------------------*
@@ -163,7 +177,7 @@ FORM WARNING_CANCLE_QUOTATION .
   DATA: LD_CHOICE TYPE CHAR01.
     CALL FUNCTION 'POPUP_TO_CONFIRM'
       EXPORTING
-        TEXT_QUESTION         = 'Do you want to CANCLE quotation?'
+        TEXT_QUESTION         = 'Do you want to CANCEL quotation?'
         TEXT_BUTTON_1         = 'Yes'(001)
         TEXT_BUTTON_2         = 'No'(002)
         DISPLAY_CANCEL_BUTTON = ''

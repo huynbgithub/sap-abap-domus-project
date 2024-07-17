@@ -1,4 +1,4 @@
-managed; //implementation in class ZBP_I03_S24_999_DOMUS_QUOTA unique;
+managed;// implementation in class ZBP_I03_S24_999_QUOTA unique;
 with draft;
 
 define behavior for ZI03_S24_999_DOMUS_QUOTA alias DomusQuota

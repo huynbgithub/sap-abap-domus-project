@@ -15,7 +15,7 @@
      <Node Name="EDM_P_HEADER" SimpleFormat="true">
       <Item Index="000001" SimpleFormat="true">
        <NAME Final="5 ">CONF_TIMESTAMP</NAME>
-       <VALUE>20240714032728</VALUE>
+       <VALUE>20240716201535</VALUE>
       </Item>
      </Node>
      <Node Name="GADGET_USAGE" SimpleFormat="true">
@@ -50,6 +50,74 @@
         <Item Index="000001" SimpleFormat="true">
          <NAME Final="5 ">CONF_TIMESTAMP</NAME>
          <VALUE>20240714032728</VALUE>
+        </Item>
+       </Node>
+      </Item>
+      <Item Index="000003" SimpleFormat="true">
+       <USAGE_ID Final="5 ">48MC0MJCBPU5GDDLNK84CVEYL</USAGE_ID>
+       <GADGET_ID>X-SAP-UI2-CHIP:/UI2/ACTION</GADGET_ID>
+       <TITLE Transl="true"/>
+       <CONFIGURATION/>
+       <LAYOUT_DATA/>
+       <REMOTE_CATALOG_ID/>
+       <REF_PAGE_ID>X-SAP-UI2-CATALOGPAGE:Z03S24_G03_DEMO_CATALOG_01</REF_PAGE_ID>
+       <REF_USAGE_ID>48MC0MJCBPU5GDDL9TQ0MB925</REF_USAGE_ID>
+       <IS_READ_ONLY/>
+       <Node Name="EDM_GU_HEADER" SimpleFormat="true">
+        <Item Index="000001" SimpleFormat="true">
+         <NAME Final="5 ">CONF_TIMESTAMP</NAME>
+         <VALUE>20240716201455</VALUE>
+        </Item>
+       </Node>
+      </Item>
+      <Item Index="000004" SimpleFormat="true">
+       <USAGE_ID Final="5 ">48MC0MJCBPU5GDDLO2A3PVW5K</USAGE_ID>
+       <GADGET_ID>X-SAP-UI2-CHIP:/UI2/STATIC_APPLAUNCHER</GADGET_ID>
+       <TITLE Transl="true"/>
+       <CONFIGURATION/>
+       <LAYOUT_DATA/>
+       <REMOTE_CATALOG_ID/>
+       <REF_PAGE_ID>X-SAP-UI2-CATALOGPAGE:Z03S24_G03_DEMO_CATALOG_01</REF_PAGE_ID>
+       <REF_USAGE_ID>48MC0MJCBPU5GDDLJ5O06OOQP</REF_USAGE_ID>
+       <IS_READ_ONLY/>
+       <Node Name="EDM_GU_HEADER" SimpleFormat="true">
+        <Item Index="000001" SimpleFormat="true">
+         <NAME Final="5 ">CONF_TIMESTAMP</NAME>
+         <VALUE>20240716201513</VALUE>
+        </Item>
+       </Node>
+      </Item>
+      <Item Index="000005" SimpleFormat="true">
+       <USAGE_ID Final="5 ">48MC0MJCBPU5GDDLOG4BIRJIK</USAGE_ID>
+       <GADGET_ID>X-SAP-UI2-CHIP:/UI2/ACTION</GADGET_ID>
+       <TITLE Transl="true"/>
+       <CONFIGURATION/>
+       <LAYOUT_DATA/>
+       <REMOTE_CATALOG_ID/>
+       <REF_PAGE_ID>X-SAP-UI2-CATALOGPAGE:Z03S24_G03_DEMO_CATALOG_01</REF_PAGE_ID>
+       <REF_USAGE_ID>48MC0MJCBPU5GDDL5WECLQ9ML</REF_USAGE_ID>
+       <IS_READ_ONLY/>
+       <Node Name="EDM_GU_HEADER" SimpleFormat="true">
+        <Item Index="000001" SimpleFormat="true">
+         <NAME Final="5 ">CONF_TIMESTAMP</NAME>
+         <VALUE>20240716201525</VALUE>
+        </Item>
+       </Node>
+      </Item>
+      <Item Index="000006" SimpleFormat="true">
+       <USAGE_ID Final="5 ">48MC0MJCBPU5GDDLOPRCTRWCT</USAGE_ID>
+       <GADGET_ID>X-SAP-UI2-CHIP:/UI2/STATIC_APPLAUNCHER</GADGET_ID>
+       <TITLE Transl="true"/>
+       <CONFIGURATION/>
+       <LAYOUT_DATA/>
+       <REMOTE_CATALOG_ID/>
+       <REF_PAGE_ID>X-SAP-UI2-CATALOGPAGE:Z03S24_G03_DEMO_CATALOG_01</REF_PAGE_ID>
+       <REF_USAGE_ID>48MC0MJCBPU5GDDL81E5WDD9Y</REF_USAGE_ID>
+       <IS_READ_ONLY/>
+       <Node Name="EDM_GU_HEADER" SimpleFormat="true">
+        <Item Index="000001" SimpleFormat="true">
+         <NAME Final="5 ">CONF_TIMESTAMP</NAME>
+         <VALUE>20240716201535</VALUE>
         </Item>
        </Node>
       </Item>

@@ -1,12 +1,13 @@
 *&---------------------------------------------------------------------*
 *& Include          Z03_S24_CONT_AUTH_PAI100
 *&---------------------------------------------------------------------*
-*&---------------------------------------------------------------------*
-*& Module STATUS_0100 OUTPUT
-*&---------------------------------------------------------------------*
-*&
-*&---------------------------------------------------------------------*
-MODULE STATUS_0100 OUTPUT.
- SET PF-STATUS 'ZSTATUS_0100'.
- SET TITLEBAR 'ZTITLE_100'.
+
+MODULE USER_COMMAND_0100 INPUT.
+  PERFORM HANDLE_UCOMM_0100
+  USING GV_OKCODE.
+ENDMODULE.
+
+MODULE EXIT_COMMAND_100_EVENT INPUT.
+  PERFORM HANDLE_EXIT_COMMAND
+  USING SY-UCOMM.
 ENDMODULE.

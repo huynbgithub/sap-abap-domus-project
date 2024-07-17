@@ -261,7 +261,7 @@ FORM DISPLAY_PACKAGE_ALV_TABLE
 
 ENDFORM.
 *&---------------------------------------------------------------------*
-*& Form PREPARE_PACKAGE_DETAIL
+*& Form PREPARE_PACKAGE_DETAIL_DISPLAY_0160
 *&---------------------------------------------------------------------*
 FORM PREPARE_PACKAGE_DETAIL  USING    U_PACKAGE_ID.
 
@@ -374,7 +374,8 @@ FORM GET_PACKAGE_PRODUCT_ITEMS USING U_PACKAGE_ID.
   SELECT ' ' AS SEL,
          PCKPRV~*,
          PROVRT~VARIANT_CODE AS VARIANT_CODE,
-         PROVRT~PRODUCT_ID
+         PROVRT~PRODUCT_ID,
+         PROVRT~DISPLAY_PRICE AS DISPLAY_PRICE
   FROM Y03S24999_PCKPRV AS PCKPRV
   JOIN Y03S24999_PROVRT AS PROVRT
   ON PCKPRV~PRODUCT_VARIANT_ID = PROVRT~ID
@@ -405,7 +406,8 @@ ENDFORM.
 FORM GET_PACKAGE_SERVICE_ITEMS USING U_PACKAGE_ID.
   SELECT ' ' AS SEL,
          PS~*,
-         S~NAME AS SERVICE_NAME
+         S~NAME AS SERVICE_NAME,
+         S~DISPLAY_PRICE AS DISPLAY_PRICE
   FROM Y03S24999_PCKSER AS PS
   JOIN Y03S24999_SERVCE AS S
   ON PS~SERVICE_ID = S~ID
@@ -665,7 +667,7 @@ FORM HANDLE_ENTER_ON_SCREEN_0150 .
 * Loop to append each selected Services into Package Service List
       LOOP AT LT_INDEX_ROWS INTO LS_INDEX_ROW.
 
-        READ TABLE GT_PCKSER INDEX 1 INTO GS_PCKSER.
+        READ TABLE GT_PCKSER_AFTER_MOD INDEX 1 INTO GS_PCKSER.
         CLEAR: GS_PCKSER.
 
         GS_PCKSER-PACKAGE_ID = GV_PACKAGE_ID.
@@ -676,7 +678,7 @@ FORM HANDLE_ENTER_ON_SCREEN_0150 .
 
         PERFORM CREATE_UUID_C36_STATIC CHANGING GS_PCKSER-ID.
 
-        APPEND GS_PCKSER TO GT_PCKSER.
+        APPEND GS_PCKSER TO GT_PCKSER_AFTER_MOD .
       ENDLOOP.
 
     ELSE.
@@ -799,6 +801,11 @@ FORM DISPLAY_PRODUCT_0120_ALV_TABLE
 
   IF SY-SUBRC <> 0.
     MESSAGE E005(Z03S24999_DOMUS_MSGS).
+  ENDIF.
+
+  IF O_PRODUCT_0120_HANDLER IS INITIAL.
+     O_PRODUCT_0120_HANDLER = NEW CL_PRODUCT_ALV_HANDLER( ).
+     SET HANDLER O_PRODUCT_0120_HANDLER->HOTSPOT_CLICK FOR O_PRODUCT_0120_ALV_TABLE.
   ENDIF.
 
 ENDFORM.
@@ -1021,10 +1028,10 @@ FORM HANDLE_ENTER_ON_SCREEN_0130.
         DATA: LV_IS_REPEATED TYPE ABAP_BOOL.
         READ TABLE IT_PROVRT_0130 INDEX LS_INDEX_ROW INTO DATA(LS_PROVRT_0130).
 
-        LOOP AT GT_PCKPRV INTO DATA(LS_TEMP).
+        LOOP AT GT_PCKPRV_AFTER_MOD INTO DATA(LS_TEMP).
           IF LS_TEMP-PRODUCT_VARIANT_ID = LS_PROVRT_0130-ID.
             LS_TEMP-QUANTITY += 1.
-            MODIFY TABLE GT_PCKPRV FROM LS_TEMP.
+            MODIFY TABLE GT_PCKPRV_AFTER_MOD FROM LS_TEMP.
 
             LV_IS_REPEATED = ABAP_TRUE.
             EXIT.
@@ -1032,7 +1039,7 @@ FORM HANDLE_ENTER_ON_SCREEN_0130.
         ENDLOOP.
 
         IF LV_IS_REPEATED <> ABAP_TRUE.
-          READ TABLE GT_PCKPRV INDEX 1 INTO GS_PCKPRV.
+          READ TABLE GT_PCKPRV_AFTER_MOD INDEX 1 INTO GS_PCKPRV.
           CLEAR: GS_PCKPRV.
 
           GS_PCKPRV-PACKAGE_ID = GV_PACKAGE_ID.
@@ -1043,7 +1050,7 @@ FORM HANDLE_ENTER_ON_SCREEN_0130.
 
           PERFORM CREATE_UUID_C36_STATIC CHANGING GS_PCKPRV-ID.
 
-          APPEND GS_PCKPRV TO GT_PCKPRV.
+          APPEND GS_PCKPRV TO GT_PCKPRV_AFTER_MOD.
 
         ENDIF.
 
@@ -1206,6 +1213,536 @@ ENDFORM.
 *&---------------------------------------------------------------------*
 FORM HANDLE_UCOMM_0160 USING U_OKCODE.
   CASE U_OKCODE.
+     WHEN 'BACK_TO_PAGCKAGE_LIS'.
+      PERFORM PROCESS_BACK_TO_PACKAGE_LIST.
+      CLEAR: U_OKCODE.
+
+    WHEN 'REQUEST_QUOTATION'.
+      PERFORM WARNING_CREATE_NORMAL_QUO.
+      "PERFORM CREATE_QUOTATION USING 'DEFAULT'.
+      CLEAR: U_OKCODE.
+
+    WHEN 'CUSTOMIZE_PACKAGE'.
+      PERFORM CUSTOMIZE_PACKAGE.
+      CLEAR: U_OKCODE.
+
     WHEN OTHERS.
   ENDCASE.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form PROCESS_BACK_TO_PACKAGE_LIST
+*&---------------------------------------------------------------------*
+FORM PROCESS_BACK_TO_PACKAGE_LIST .
+  LEAVE TO SCREEN 0.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form CUSTOMIZE_PACKAGE
+*&---------------------------------------------------------------------*
+FORM CUSTOMIZE_PACKAGE.
+  GT_PCKSER_AFTER_MOD = GT_PCKSER.
+  GT_PCKPRV_AFTER_MOD = GT_PCKPRV.
+  CALL SCREEN 0170 STARTING AT 15 06.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form HANDLE_COMMAND_0170
+*&---------------------------------------------------------------------*
+FORM HANDLE_COMMAND_0170  USING U_OKCODE.
+ CASE U_OKCODE.
+   WHEN 'INSERT_PCKPRV'.
+      PERFORM PROCESS_INSERT_PCKPRV.
+      CLEAR: U_OKCODE.
+
+    WHEN 'DELETE_PCKPRV'.
+      PERFORM DELETE_SELECTED_PCKPRVS.
+      CLEAR: U_OKCODE.
+
+    WHEN 'INSERT_PCKSER'.
+      PERFORM PROCESS_INSERT_PCKSER.
+      CLEAR: U_OKCODE.
+
+    WHEN 'DELETE_PCKSER'.
+      PERFORM DELETE_SELECTED_PCKSERS.
+      CLEAR: U_OKCODE.
+
+     WHEN 'CANCEL_CUSTOMIZATION'.
+      PERFORM WARNING_CANCEL_CUSTOMIZE.
+      CLEAR: U_OKCODE.
+      "LEAVE TO SCREEN 0.
+
+    WHEN 'REQUEST_QUOTATION'.
+      "PERFORM CREATE_QUOTATION USING 'CUSTOMIZE'.
+      PERFORM WARNING_CREATE_CUSTOM_QUO.
+      CLEAR: U_OKCODE.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_INSERT_PCKPRV
+*&---------------------------------------------------------------------*
+FORM PROCESS_INSERT_PCKPRV .
+ DATA: LV_SUCCESS TYPE ABAP_BOOL.
+* Get data from PRODUCT_0127 table
+  PERFORM GET_PRODUCT_0120_DATA CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+  CALL SCREEN 0120 STARTING AT 10 08 ENDING AT 70 20.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form GET_PRODUCT_0120_DATA
+*&---------------------------------------------------------------------*
+FORM GET_PRODUCT_0120_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
+  CLEAR: IT_PRODUCT_0120[], CH_V_SUCCESS.
+
+  SELECT P~*
+    FROM Y03S24999_PRODCT AS P
+    LEFT JOIN @GT_PCKPRV AS GP
+    ON P~ID = GP~PRODUCT_ID
+    WHERE P~IS_DELETED <> @ABAP_TRUE
+    AND GP~PRODUCT_ID IS NULL
+    ORDER BY P~UPDATED_ON DESCENDING, P~UPDATED_ON DESCENDING, P~PRODUCT_CODE
+    INTO CORRESPONDING FIELDS OF TABLE @IT_PRODUCT_0120.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_PRODUCT_0120[].
+
+    IF O_PRODUCT_0120_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_PRODUCT_0120_CONTAINER->FREE.
+      CLEAR O_PRODUCT_0120_CONTAINER.
+    ENDIF.
+    IF O_PRODUCT_0120_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_PRODUCT_0120_ALV_TABLE.
+    ENDIF.
+
+    MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'All products were selected!' DISPLAY LIKE 'E'.
+    CH_V_SUCCESS = ABAP_FALSE.
+  ELSE.
+    CH_V_SUCCESS = ABAP_TRUE.
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form PROCESS_INSERT_PCKSER
+*&---------------------------------------------------------------------*
+FORM PROCESS_INSERT_PCKSER .
+ DATA: LV_SUCCESS TYPE ABAP_BOOL.
+* Get data from PRODUCT_0150 table
+  PERFORM GET_SERVICE_0150_DATA CHANGING LV_SUCCESS.
+  IF LV_SUCCESS = ABAP_FALSE.
+    RETURN.
+  ENDIF.
+  CALL SCREEN 0150 STARTING AT 10 08 ENDING AT 70 20.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form GET_SERVICE_0150_DATA
+*&---------------------------------------------------------------------*
+FORM GET_SERVICE_0150_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
+  CLEAR: IT_SERVICE_0150[], CH_V_SUCCESS.
+
+  SELECT S~*
+    FROM Y03S24999_SERVCE AS S
+    LEFT JOIN @GT_PCKSER AS GS
+    ON S~ID = GS~SERVICE_ID
+    WHERE S~IS_DELETED <> @ABAP_TRUE
+    AND GS~SERVICE_ID IS NULL
+    ORDER BY S~CREATED_ON DESCENDING, S~CREATED_AT DESCENDING
+    INTO CORRESPONDING FIELDS OF TABLE @IT_SERVICE_0150.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_SERVICE_0150[].
+
+    IF O_SERVICE_0150_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_SERVICE_0150_CONTAINER->FREE.
+      CLEAR O_SERVICE_0150_CONTAINER.
+    ENDIF.
+    IF O_SERVICE_0150_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_SERVICE_0150_ALV_TABLE.
+    ENDIF.
+
+    MESSAGE S000(Z03S24999_DOMUS_MSGS) WITH 'All services were selected!' DISPLAY LIKE 'E'.
+    CH_V_SUCCESS = ABAP_FALSE.
+  ELSE.
+    CH_V_SUCCESS = ABAP_TRUE.
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form DELETE_SELECTED_PCKPRVS
+*&---------------------------------------------------------------------*
+FORM DELETE_SELECTED_PCKPRVS.
+  DATA: LD_SEL_PCKPRVS LIKE GT_PCKPRV.
+  LOOP AT GT_PCKPRV INTO DATA(LS_PI).
+    IF LS_PI-SEL = 'X'.
+      APPEND LS_PI TO LD_SEL_PCKPRVS.
+    ENDIF.
+  ENDLOOP.
+
+  IF LINES( LD_SEL_PCKPRVS ) = 0.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'a Product Variant for deletion' DISPLAY LIKE 'E'.
+    LEAVE LIST-PROCESSING.
+  ELSEIF LINES( LD_SEL_PCKPRVS ) > 1.
+    PERFORM WARNING_MULTI_SELECTED_PCKPRV TABLES LD_SEL_PCKPRVS.
+
+  ELSEIF LINES( LD_SEL_PCKPRVS ) = 1.
+    PERFORM HANDLE_PCKPRV_FINAL_DELETION TABLES LD_SEL_PCKPRVS.
+
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form WARNING_MULTI_SELECTED_PCKPRV
+*&---------------------------------------------------------------------*
+FORM WARNING_MULTI_SELECTED_PCKPRV TABLES U_ITAB LIKE GT_PCKPRV.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Do you want to delete MULTIPLE products?'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    PERFORM HANDLE_PCKPRV_FINAL_DELETION TABLES U_ITAB.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form HANDLE_PCKPRV_FINAL_DELETION
+*&---------------------------------------------------------------------*
+FORM HANDLE_PCKPRV_FINAL_DELETION TABLES U_ITAB LIKE GT_PCKPRV.
+  LOOP AT U_ITAB INTO DATA(S_ROW).
+
+    DELETE TABLE GT_PCKPRV FROM S_ROW.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'One deleting Product in Package has caused an error!'.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form DELETE_SELECTED_PCKSERS
+*&---------------------------------------------------------------------*
+FORM DELETE_SELECTED_PCKSERS .
+
+DATA: LD_SEL_PCKSERS LIKE GT_PCKSER.
+  LOOP AT GT_PCKSER INTO DATA(LS_PI).
+    IF LS_PI-SEL = 'X'.
+      APPEND LS_PI TO LD_SEL_PCKSERS.
+    ENDIF.
+  ENDLOOP.
+
+  IF LINES( LD_SEL_PCKSERS ) = 0.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'a Service for deletion' DISPLAY LIKE 'E'.
+    LEAVE LIST-PROCESSING.
+  ELSEIF LINES( LD_SEL_PCKSERS ) > 1.
+    PERFORM WARNING_MULTI_SELECTED_PCKSER TABLES LD_SEL_PCKSERS.
+
+  ELSEIF LINES( LD_SEL_PCKSERS ) = 1.
+    PERFORM HANDLE_PCKSER_FINAL_DELETION TABLES LD_SEL_PCKSERS.
+
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form WARNING_MULTI_SELECTED_PCKSER
+*&---------------------------------------------------------------------*
+FORM WARNING_MULTI_SELECTED_PCKSER TABLES U_ITAB LIKE GT_PCKSER.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Do you want to delete MULTIPLE services?'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    PERFORM HANDLE_PCKSER_FINAL_DELETION TABLES U_ITAB.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form HANDLE_PCKSER_FINAL_DELETION
+*&---------------------------------------------------------------------*
+FORM HANDLE_PCKSER_FINAL_DELETION TABLES U_ITAB LIKE GT_PCKSER.
+  LOOP AT U_ITAB INTO DATA(S_ROW).
+
+    DELETE TABLE GT_PCKSER FROM S_ROW.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E000(Z03S24999_DOMUS_MSGS) WITH 'One deleting Service in Package has caused an error!'.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form CREATE_QUOTATION
+*&---------------------------------------------------------------------*
+FORM CREATE_QUOTATION USING U_TYPE TYPE STRING.
+
+  DATA: LV_QUOTATION TYPE Y03S24999_QUOTA.
+
+  PERFORM CREATE_UUID_C36_STATIC CHANGING LV_QUOTATION-ID.
+
+  "Autoincrement the counter buffer for Quotation Code
+  PERFORM AUTO_GENERATE_QUOTATION_CODE CHANGING LV_QUOTATION-QUOTATION_CODE.
+
+  "Append the Q to the beginning of the quotation code
+  CONCATENATE 'Q' LV_QUOTATION-QUOTATION_CODE INTO LV_QUOTATION-QUOTATION_CODE.
+
+  LV_QUOTATION-PACKAGE_ID = GS_PACKAGE_DETAIL-ID.
+  LV_QUOTATION-CUSTOMER = SY-UNAME.
+  LV_QUOTATION-STATUS = 'Requested'.
+  LV_QUOTATION-EXPIRED_ON = SY-DATUM + 30. "30 days later than date of creation
+  LV_QUOTATION-EXPIRED_AT = SY-UZEIT.
+  LV_QUOTATION-CREATED_BY = SY-UNAME.
+  LV_QUOTATION-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+  LV_QUOTATION-CREATED_ON = SY-DATUM.
+
+  "INSERTION
+  INSERT Y03S24999_QUOTA FROM LV_QUOTATION.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E015(Z03S24999_DOMUS_MSGS) WITH 'Quotation'.
+  ELSE.
+    "Create the first (index = 1) Quotation Version for the newly created Quotation
+    DATA: LV_QUOVER TYPE Y03S24999_QUOVER.
+
+    PERFORM CREATE_UUID_C36_STATIC CHANGING LV_QUOVER-ID.
+
+    LV_QUOVER-QUOTATION_ID = LV_QUOTATION-ID.
+    LV_QUOVER-VERSION_ORDER = 1. "The Fisrt Quotation Version
+    LV_QUOVER-CREATED_BY = SY-UNAME.
+    LV_QUOVER-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+    LV_QUOVER-CREATED_ON = SY-DATUM.
+
+    INSERT Y03S24999_QUOVER FROM LV_QUOVER.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE S018(Z03S24999_DOMUS_MSGS) WITH 'Quotation Version' DISPLAY LIKE 'E'.
+    ELSE.
+
+      MESSAGE I023(Z03S24999_DOMUS_MSGS) WITH 'Quotation' LV_QUOTATION-QUOTATION_CODE.
+      "Create Product Variant and Service for Quotation Service.
+      PERFORM CREATE_QUOVER_OBJECTS USING U_TYPE LV_QUOVER-ID.
+    ENDIF.
+
+*
+*    MESSAGE I023(Z03S24999_DOMUS_MSGS) WITH 'Quotation' LV_QUOTATION-QUOTATION_CODE.
+*    MESSAGE S023(Z03S24999_DOMUS_MSGS) WITH 'Quotation' LV_QUOTATION-QUOTATION_CODE.
+
+    LEAVE TO SCREEN 0.
+  ENDIF.
+
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& CREATE_QUOVER_OBJECTS
+*&---------------------------------------------------------------------*
+FORM CREATE_QUOVER_OBJECTS USING U_TYPE TYPE STRING
+                                 U_QUOVER_ID TYPE Y03S24999_QUOVER-ID.
+  DATA: LS_PCKPRV TYPE TY_PCKPRV,
+        LS_PCKSER TYPE TY_PCKSER,
+        LV_QVPRV TYPE Y03S24999_QVSPRV,
+        LV_QVSSER TYPE Y03S24999_QVSSER.
+
+  CASE U_TYPE.
+    WHEN 'DEFAULT'.
+      LOOP AT GT_PCKPRV INTO LS_PCKPRV.
+
+        PERFORM CREATE_UUID_C36_STATIC CHANGING LV_QVPRV-ID.
+
+        LV_QVPRV-PRODUCT_VARIANT_ID = LS_PCKPRV-PRODUCT_VARIANT_ID.
+        LV_QVPRV-QUOTATION_VERSION_ID = U_QUOVER_ID.
+        LV_QVPRV-QUANTITY = LS_PCKPRV-QUANTITY.
+        LV_QVPRV-PRICE = LS_PCKPRV-DISPLAY_PRICE.
+        LV_QVPRV-CREATED_BY = SY-UNAME.
+        LV_QVPRV-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+        LV_QVPRV-CREATED_ON = SY-DATUM.
+
+        "INSERTION
+        INSERT Y03S24999_QVSPRV FROM LV_QVPRV.
+
+        IF SY-SUBRC <> 0.
+          MESSAGE S018(Z03S24999_DOMUS_MSGS) WITH 'Quotation Version Product Variant' DISPLAY LIKE 'E'.
+        ENDIF.
+
+      ENDLOOP.
+
+      LOOP AT GT_PCKSER INTO LS_PCKSER.
+
+        PERFORM CREATE_UUID_C36_STATIC CHANGING LV_QVSSER-ID.
+
+        LV_QVSSER-SERVICE_ID = LS_PCKSER-SERVICE_ID.
+        LV_QVSSER-QUOTATION_VERSION_ID = U_QUOVER_ID.
+        LV_QVSSER-PRICE = LS_PCKSER-DISPLAY_PRICE.
+        LV_QVSSER-CREATED_BY = SY-UNAME.
+        LV_QVSSER-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+        LV_QVSSER-CREATED_ON = SY-DATUM.
+
+        "INSERTION
+        INSERT Y03S24999_QVSSER FROM LV_QVSSER.
+
+        IF SY-SUBRC <> 0.
+          MESSAGE S018(Z03S24999_DOMUS_MSGS) WITH 'Quotation Version Service' DISPLAY LIKE 'E'.
+        ENDIF.
+
+      ENDLOOP.
+
+    WHEN 'CUSTOMIZE'.
+      LOOP AT GT_PCKPRV_AFTER_MOD INTO LS_PCKPRV.
+
+        PERFORM CREATE_UUID_C36_STATIC CHANGING LV_QVPRV-ID.
+
+        LV_QVPRV-PRODUCT_VARIANT_ID = LS_PCKPRV-PRODUCT_VARIANT_ID.
+        LV_QVPRV-QUOTATION_VERSION_ID = U_QUOVER_ID.
+        LV_QVPRV-QUANTITY = LS_PCKPRV-QUANTITY.
+        LV_QVPRV-PRICE = LS_PCKPRV-DISPLAY_PRICE.
+        LV_QVPRV-CREATED_BY = SY-UNAME.
+        LV_QVPRV-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+        LV_QVPRV-CREATED_ON = SY-DATUM.
+
+        "INSERTION
+        INSERT Y03S24999_QVSPRV FROM LV_QVPRV.
+
+        IF SY-SUBRC <> 0.
+          MESSAGE S018(Z03S24999_DOMUS_MSGS) WITH 'Quotation Version Product Variant' DISPLAY LIKE 'E'.
+        ENDIF.
+      ENDLOOP.
+
+      LOOP AT GT_PCKSER_AFTER_MOD INTO LS_PCKSER.
+
+        PERFORM CREATE_UUID_C36_STATIC CHANGING LV_QVSSER-ID.
+
+        LV_QVSSER-SERVICE_ID = LS_PCKSER-SERVICE_ID.
+        LV_QVSSER-QUOTATION_VERSION_ID = U_QUOVER_ID.
+        LV_QVSSER-PRICE = LS_PCKSER-DISPLAY_PRICE.
+        LV_QVSSER-CREATED_BY = SY-UNAME.
+        LV_QVSSER-CREATED_AT = SY-UZEIT + ( 3600 * 5 ).
+        LV_QVSSER-CREATED_ON = SY-DATUM.
+
+        "INSERTION
+        INSERT Y03S24999_QVSSER FROM LV_QVSSER.
+
+        IF SY-SUBRC <> 0.
+          MESSAGE S018(Z03S24999_DOMUS_MSGS) WITH 'Quotation Version Service' DISPLAY LIKE 'E'.
+        ENDIF.
+
+      ENDLOOP.
+  ENDCASE.
+
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form WARNING_CANCEL_CUSTOMIZE
+*&---------------------------------------------------------------------*
+FORM WARNING_CANCEL_CUSTOMIZE.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Your customization will be lost!'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    LEAVE TO SCREEN 0.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form WARNING_CREATE_NORMAL_QUO
+*&---------------------------------------------------------------------*
+FORM WARNING_CREATE_NORMAL_QUO.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Do you want to create a Quotation based on this Package?'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    PERFORM CREATE_QUOTATION USING 'DEFAULT'.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*& Form WARNING_CREATE_CUSTOM_QUO
+*&---------------------------------------------------------------------*
+FORM WARNING_CREATE_CUSTOM_QUO.
+  DATA: LD_CHOICE TYPE C.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      TEXT_QUESTION         = 'Do you want to create a Quotation of your own customization?'
+      TEXT_BUTTON_1         = 'Yes'(001)
+      TEXT_BUTTON_2         = 'No'(002)
+      DISPLAY_CANCEL_BUTTON = ''
+    IMPORTING
+      ANSWER                = LD_CHOICE.
+  IF LD_CHOICE = '1'.
+    PERFORM CREATE_QUOTATION USING 'CUSTOMIZE'.
+
+  ELSEIF LD_CHOICE = '2'.
+
+  ENDIF.
+ENDFORM.
+
+
+*###########QUOTATIONS
+*&---------------------------------------------------------------------*
+*& Form AUTO_GENERATE_QUOTATION__CODE
+*&---------------------------------------------------------------------*
+FORM AUTO_GENERATE_QUOTATION_CODE CHANGING U_CODE.
+  CALL FUNCTION 'NUMBER_GET_NEXT'
+    EXPORTING
+      NR_RANGE_NR             = '1'
+      OBJECT                  = 'Z03G03_QUO'
+*     QUANTITY                = '1'
+*     SUBOBJECT               = ' '
+*     TOYEAR                  = '0000'
+*     IGNORE_BUFFER           = ' '
+    IMPORTING
+      NUMBER                  = U_CODE
+*     QUANTITY                =
+*     RETURNCODE              =
+    EXCEPTIONS
+      INTERVAL_NOT_FOUND      = 1
+      NUMBER_RANGE_NOT_INTERN = 2
+      OBJECT_NOT_FOUND        = 3
+      QUANTITY_IS_0           = 4
+      QUANTITY_IS_NOT_1       = 5
+      INTERVAL_OVERFLOW       = 6
+      BUFFER_OVERFLOW         = 7
+      OTHERS                  = 8.
+  IF SY-SUBRC <> 0.
+    MESSAGE E021(Z03S24999_DOMUS_MSGS) WITH 'Quotation Code'.
+  ENDIF.
 ENDFORM.

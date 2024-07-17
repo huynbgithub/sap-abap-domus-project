@@ -39,9 +39,11 @@ annotate view ZC_03_S24_999_CNTRCT_AD with
       parentId: 'ServiceTab',
       targetQualifier: 'fieldGroupService'
   }]
+  @UI.hidden: true
+ Id;
 
   @UI.hidden: true
-  Id;
+  QuotationVersionId;
 
   @UI.lineItem: [{ position: 10}]
   @UI.selectionField: [{ position: 10 }]
@@ -98,14 +100,4 @@ annotate view ZC_03_S24_999_CNTRCT_AD with
   @UI.identification: [{ position: 150 }]
   SignedAt;
 
-  @UI.fieldGroup: [{ 
-        qualifier: 'fieldGroupService',
-        position: 10
-    }]
-    ServiceName;
-@UI.fieldGroup: [{ 
-        qualifier: 'fieldGroupService',
-        position: 20
-    }]
-    ServiceDescription;
 }

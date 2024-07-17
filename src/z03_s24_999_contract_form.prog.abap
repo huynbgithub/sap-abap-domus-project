@@ -39,12 +39,41 @@ FORM HANDLE_UCOMM_0140 USING U_OKCODE.
       CLEAR: U_OKCODE.
 
     WHEN 'VIEW_CONTRACT'.
-*      PERFORM PROCESS_VIEW_CONTRACT_DETAIL CHANGING GV_CONTRACT_ID.
+      PERFORM PROCESS_VIEW_CONTRACT_DETAIL CHANGING GV_CONTRACT_ID.
       CLEAR: U_OKCODE.
 
     WHEN OTHERS.
 
   ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0149
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0149 USING U_OKCODE.
+  CASE U_OKCODE.
+    WHEN 'BACK_TO_CNTRCT_LIST'.
+      PERFORM PROCESS_BACK_TO_CONTRACT_LIST.
+      CLEAR: U_OKCODE.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_BACK_TO_CONTRACT_LIST
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_BACK_TO_CONTRACT_LIST.
+    PERFORM RESET_CONTRACT_CONTAINER.
+    CONTRACT_SCREEN_MODE = '0140'.
+    PERFORM PROCESS_CONTRACT_LIST_0140.
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form PROCESS_CONTRACT_LIST_0140
@@ -81,7 +110,7 @@ FORM GET_CONTRACT_DATA CHANGING CH_V_SUCCESS TYPE ABAP_BOOL.
     FROM Y03S24999_CNTRCT
     WHERE CONTRACT_CODE IN @P_CCODE
       AND IS_DELETED <> @ABAP_TRUE
-    ORDER BY CREATED_ON DESCENDING, CREATED_AT DESCENDING, CONTRACT_CODE DESCENDING
+    ORDER BY CONTRACT_CODE DESCENDING
     INTO CORRESPONDING FIELDS OF TABLE @IT_CONTRACT.
 
   IF SY-SUBRC <> 0.
@@ -261,4 +290,301 @@ FORM CHANGE_CONTRACT_COLOR  USING    U_CSTATUS      TYPE Y03S24999_CNTRCT-STATUS
 
   ENDTRY.
 
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_VIEW_CONTRACT_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  CH_CONTRACT_ID
+*& <--  CH_CONTRACT_ID
+*&---------------------------------------------------------------------*
+FORM PROCESS_VIEW_CONTRACT_DETAIL CHANGING CH_CONTRACT_ID.
+  IF O_CONTRACT_ALV_TABLE IS NOT INITIAL.
+
+    DATA: LT_INDEX_ROWS TYPE LVC_T_ROW.
+    DATA: LS_INDEX_ROW  TYPE LVC_S_ROW.
+
+    CALL METHOD O_CONTRACT_ALV_TABLE->GET_SELECTED_ROWS
+      IMPORTING
+        ET_INDEX_ROWS = LT_INDEX_ROWS.
+
+    IF LINES( LT_INDEX_ROWS ) = 1.
+
+      READ TABLE LT_INDEX_ROWS INDEX 1 INTO LS_INDEX_ROW.
+      READ TABLE IT_CONTRACT INDEX LS_INDEX_ROW INTO DATA(LS_CONTRACT).
+
+      CH_CONTRACT_ID = LS_CONTRACT-ID.
+* Prepare CONTRACT Detail to display on Screen 0149
+      PERFORM PREPARE_CONTRACT_DETAIL USING CH_CONTRACT_ID.
+
+    ELSEIF LINES( LT_INDEX_ROWS ) = 0.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Contract' DISPLAY LIKE 'E'.
+    ELSEIF LINES( LT_INDEX_ROWS ) > 1.
+      MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'only one Contract' DISPLAY LIKE 'E'.
+    ENDIF.
+
+  ELSE.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Contract' DISPLAY LIKE 'E'.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_CONTRACT_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PREPARE_CONTRACT_DETAIL USING U_CONTRACT_ID.
+  DATA: LV_QUOVER_ID TYPE Y03S24999_QUOVER-ID.
+
+  CLEAR: GV_CONTRACT_TOTAL_PRICE.
+  CLEAR: GV_CTRPRV_TOTAL_PRICE.
+  CLEAR: GV_CTRSER_TOTAL_PRICE.
+
+  PERFORM RESET_CONTRACT_CONTAINER.
+
+  PERFORM GET_CONTRACT_BASIC_INFO USING U_CONTRACT_ID
+                                   CHANGING LV_QUOVER_ID.
+  PERFORM GET_CONTRACT_PRODUCT_ITEMS USING LV_QUOVER_ID.
+  PERFORM GET_CONTRACT_SERVICE_ITEMS USING LV_QUOVER_ID.
+
+* Change Screen from 0140 to 0149
+  CONTRACT_SCREEN_MODE = '0149'.
+
+  MESSAGE S009(Z03S24999_DOMUS_MSGS) WITH 'Contract'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_CONTRACT_BASIC_INFO
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_CONTRACT_ID
+*&---------------------------------------------------------------------*
+FORM GET_CONTRACT_BASIC_INFO USING U_CONTRACT_ID
+                             CHANGING CH_QUOVER_ID.
+  SELECT SINGLE *
+    FROM Y03S24999_CNTRCT
+    INTO CORRESPONDING FIELDS OF GS_CONTRACT_DETAIL
+    WHERE ID = U_CONTRACT_ID AND IS_DELETED <> ABAP_TRUE.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E004(Z03S24999_DOMUS_MSGS) WITH 'Contract'.
+  ELSE.
+    CH_QUOVER_ID = GS_CONTRACT_DETAIL-QUOTATION_VERSION_ID.
+    GV_CTRIMG_URL = GS_CONTRACT_DETAIL-SIGNATURE.
+    PERFORM SHOW_CTR_SELECTED_IMAGE USING GV_CTRIMG_URL.
+
+    PERFORM SHOW_CONTRACT_DESCRIPTION USING GS_CONTRACT_DETAIL-DESCRIPTION.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_CTR_SELECTED_IMAGE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_CTR_SELECTED_IMAGE USING U_CTRIMG_URL TYPE CNDP_URL.
+  IF CTRIMG_CONTAINER IS INITIAL OR CTRIMG_CONTROL IS INITIAL.
+
+* Create controls
+    CREATE OBJECT CTRIMG_CONTAINER
+      EXPORTING
+        CONTAINER_NAME = 'CUSTOM_CONTROL_0149'.
+
+    CREATE OBJECT CTRIMG_CONTROL EXPORTING PARENT = CTRIMG_CONTAINER.
+
+* Register the events
+    CTRIMG_EVENT_TAB_LINE-EVENTID = CL_GUI_PICTURE=>EVENTID_PICTURE_DBLCLICK.
+    APPEND CTRIMG_EVENT_TAB_LINE TO CTRIMG_EVENT_TAB.
+    CTRIMG_EVENT_TAB_LINE-EVENTID = CL_GUI_PICTURE=>EVENTID_CONTEXT_MENU.
+    APPEND CTRIMG_EVENT_TAB_LINE TO CTRIMG_EVENT_TAB.
+    CTRIMG_EVENT_TAB_LINE-EVENTID = CL_GUI_PICTURE=>EVENTID_CONTEXT_MENU_SELECTED.
+    APPEND CTRIMG_EVENT_TAB_LINE TO CTRIMG_EVENT_TAB.
+
+    CALL METHOD CTRIMG_CONTROL->SET_REGISTERED_EVENTS
+      EXPORTING
+        EVENTS = CTRIMG_EVENT_TAB.
+
+* Create the event_receiver object and set the handlers for the events
+* of the picture controls
+    CREATE OBJECT CTRIMG_EVENT_RECEIVER.
+    SET HANDLER CTRIMG_EVENT_RECEIVER->EVENT_HANDLER_PICTURE_DBLCLICK
+                FOR CTRIMG_CONTROL.
+
+* Set the display mode to 'normal' (0)
+    CALL METHOD CTRIMG_CONTROL->SET_DISPLAY_MODE
+      EXPORTING
+        DISPLAY_MODE = CL_GUI_PICTURE=>DISPLAY_MODE_NORMAL.
+
+* Set 3D Border
+    CALL METHOD CTRIMG_CONTROL->SET_3D_BORDER
+      EXPORTING
+        BORDER = 1.
+
+    CALL METHOD CTRIMG_CONTROL->SET_DISPLAY_MODE
+      EXPORTING
+        DISPLAY_MODE = CL_GUI_PICTURE=>DISPLAY_MODE_STRETCH.
+
+  ENDIF.
+
+  CALL METHOD CTRIMG_CONTROL->LOAD_PICTURE_FROM_URL_ASYNC
+    EXPORTING
+      URL = U_CTRIMG_URL.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_CONTRACT_DESCRIPTION
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_CONTRACT_DESCRIPTION USING U_CTRDES TYPE Y03S24999_CNTRCT-DESCRIPTION.
+  IF CTRDES_CONTAINER01 IS INITIAL OR CTRDES_EDITOR01 IS INITIAL.
+
+    CREATE OBJECT: CTRDES_CONTAINER01 EXPORTING CONTAINER_NAME = 'CUSTOM_CONTROL_TEXT_0149',
+                   CTRDES_EDITOR01    EXPORTING PARENT = CTRDES_CONTAINER01
+                                              MAX_NUMBER_CHARS = 1333.
+  ENDIF.
+
+  CALL FUNCTION 'RKD_WORD_WRAP'
+    EXPORTING
+      TEXTLINE            = U_CTRDES
+      OUTPUTLEN           = 256
+    TABLES
+      OUT_LINES           = CTRDES_TEXT_TAB01
+    EXCEPTIONS
+      OUTPUTLEN_TOO_LARGE = 1
+      OTHERS              = 2.
+
+  IF SY-SUBRC = 0.
+    IF CTRDES_CONTAINER01 IS NOT INITIAL.
+      CTRDES_EDITOR01->SET_TEXT_AS_STREAM( EXPORTING TEXT = CTRDES_TEXT_TAB01 ).
+    ENDIF.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_CONTRACT_PRODUCT_VARIANT_ITEMS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_QUOVER_ID
+*&---------------------------------------------------------------------*
+FORM GET_CONTRACT_PRODUCT_ITEMS USING U_QUOVER_ID.
+
+  SELECT ' ' AS SEL,
+         QVSPRV~*,
+         PROVRT~VARIANT_CODE AS VARIANT_CODE,
+         ( QVSPRV~PRICE * QVSPRV~QUANTITY ) AS TOTAL_PRICE,
+         PROVRT~PRODUCT_ID
+  FROM Y03S24999_QVSPRV AS QVSPRV
+  JOIN Y03S24999_PROVRT AS PROVRT
+  ON QVSPRV~PRODUCT_VARIANT_ID = PROVRT~ID
+  WHERE QVSPRV~IS_DELETED <> @ABAP_TRUE AND
+        QVSPRV~QUOTATION_VERSION_ID = @U_QUOVER_ID
+  INTO CORRESPONDING FIELDS OF TABLE @GT_CTRPRV.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Contract Product Variant' DISPLAY LIKE 'E'.
+
+  ELSE.
+    SELECT GT~*,
+           PRODCT~PRODUCT_NAME
+    FROM @GT_CTRPRV AS GT
+    JOIN Y03S24999_PRODCT AS PRODCT
+    ON GT~PRODUCT_ID = PRODCT~ID
+    INTO CORRESPONDING FIELDS OF TABLE @GT_CTRPRV.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Product Name' DISPLAY LIKE 'E'.
+    ENDIF.
+
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_CONTRACT_SERVICE_ITEMS
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_QUOVER_ID
+*&---------------------------------------------------------------------*
+FORM GET_CONTRACT_SERVICE_ITEMS USING U_QUOVER_ID.
+  SELECT ' ' AS SEL,
+         QS~*,
+         S~NAME AS SERVICE_NAME
+  FROM Y03S24999_QVSSER AS QS
+  JOIN Y03S24999_SERVCE AS S
+  ON QS~SERVICE_ID = S~ID
+  WHERE QS~IS_DELETED <> @ABAP_TRUE AND
+        QS~QUOTATION_VERSION_ID = @U_QUOVER_ID
+  INTO CORRESPONDING FIELDS OF TABLE @GT_CTRSER.
+
+  IF SY-SUBRC <> 0.
+    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Contract Service' DISPLAY LIKE 'E'.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form RESET_CONTRACT_CONTAINER
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM RESET_CONTRACT_CONTAINER.
+  PERFORM RESET_CTRDES01_CONTAINER.
+  PERFORM RESET_CTRIMG_CONTAINER.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form RESET_CTRDES01_CONTAINER
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM RESET_CTRDES01_CONTAINER.
+  IF CTRDES_TEXT_TAB01 IS NOT INITIAL.
+    CLEAR CTRDES_TEXT_TAB01.
+  ENDIF.
+  IF CTRDES_EDITOR01 IS NOT INITIAL.
+    CALL METHOD CTRDES_EDITOR01->DELETE_TEXT.
+    CLEAR CTRDES_EDITOR01.
+  ENDIF.
+  IF CTRDES_CONTAINER01 IS NOT INITIAL.
+    CALL METHOD CTRDES_CONTAINER01->FREE.
+    CLEAR CTRDES_CONTAINER01.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form RESET_CTRIMG_CONTAINER
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM RESET_CTRIMG_CONTAINER.
+  IF GV_CTRIMG_URL IS NOT INITIAL.
+    CLEAR GV_CTRIMG_URL.
+  ENDIF.
+  IF CTRIMG_CONTROL IS NOT INITIAL.
+    CALL METHOD CTRIMG_CONTROL->CLEAR_PICTURE.
+    CLEAR CTRIMG_CONTROL.
+  ENDIF.
+  IF CTRIMG_CONTAINER IS NOT INITIAL.
+    CALL METHOD CTRIMG_CONTAINER->FREE.
+    CLEAR CTRIMG_CONTAINER.
+  ENDIF.
+  IF CTRIMG_EVENT_RECEIVER IS NOT INITIAL.
+    CLEAR CTRIMG_EVENT_RECEIVER.
+  ENDIF.
 ENDFORM.

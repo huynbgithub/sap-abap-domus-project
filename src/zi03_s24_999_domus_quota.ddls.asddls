@@ -2,7 +2,7 @@
 @EndUserText.label: 'Domus Quotation'
 @Metadata.allowExtensions: true
 define root view entity ZI03_S24_999_DOMUS_QUOTA
-  as select from y03s24999_quota
+  as select from y03s24999_quota 
   association [1..1] to y03s24999_packge as _Package on $projection.PackageId = _Package.id
   association [1..1] to y03s24999_user   as _User    on $projection.Staff = _User.username
 {
@@ -31,4 +31,4 @@ define root view entity ZI03_S24_999_DOMUS_QUOTA
 }
 where
   is_deleted <> 'X'
-  and status = 'Requested';
+  and status = 'Requested'  ;

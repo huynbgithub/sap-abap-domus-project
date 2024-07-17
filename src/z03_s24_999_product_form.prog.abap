@@ -46,11 +46,15 @@ FORM HANDLE_UCOMM_0119 USING U_OKCODE.
     WHEN 'DISPLAY<->CHANGE'.
       PERFORM PROCESS_PRO_DISPLAY_CHANGE.
       CLEAR: U_OKCODE.
-*
-*    WHEN 'SAVE'.
-*      PERFORM PROCESS_PRODUCT_SAVE_EVENT.
-*      CLEAR: U_OKCODE.
-*
+
+    WHEN 'SAVE'.
+      PERFORM PROCESS_PRODUCT_SAVE_EVENT.
+      CLEAR: U_OKCODE.
+
+    WHEN 'VIEW_PROVRT'.
+      PERFORM PROCESS_VIEW_PROVRT_0118.
+      CLEAR: U_OKCODE.
+
 *    WHEN 'SEARCH_PROCAT'.
 *      PERFORM PROCESS_PRODUCT_SAVE_EVENT.
 *      CLEAR: U_OKCODE.
@@ -65,6 +69,170 @@ FORM HANDLE_UCOMM_0119 USING U_OKCODE.
 
     WHEN OTHERS.
   ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_VIEW_PROVRT_0118
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_PROVRT_ID
+*&---------------------------------------------------------------------*
+FORM PROCESS_VIEW_PROVRT_0118.
+  DATA: LT_SEL_PROVRTS LIKE GT_PROVRT.
+
+  LOOP AT GT_PROVRT INTO DATA(LS_PI).
+    IF LS_PI-SEL = 'X'.
+      APPEND LS_PI TO LT_SEL_PROVRTS.
+    ENDIF.
+  ENDLOOP.
+
+  IF LINES( LT_SEL_PROVRTS ) = 0.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'one Product Variant' DISPLAY LIKE 'E'.
+    LEAVE LIST-PROCESSING.
+  ELSEIF LINES( LT_SEL_PROVRTS ) > 1.
+    MESSAGE S008(Z03S24999_DOMUS_MSGS) WITH 'only one Product Variant' DISPLAY LIKE 'E'.
+
+  ELSEIF LINES( LT_SEL_PROVRTS ) = 1.
+    READ TABLE LT_SEL_PROVRTS INDEX 1 INTO DATA(LS_PROVRT).
+    PERFORM PREPARE_PRODUCT_PROATV_0118 USING LS_PROVRT-ID.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PRODUCT_PROATV_0118
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_PROVRT_ID
+*&---------------------------------------------------------------------*
+FORM PREPARE_PRODUCT_PROATV_0118  USING  U_PROVRT_ID.
+  SELECT PROATV~VALUE, PROATR~ATTRIBUTE_NAME
+    FROM Y03S24999_PROATV AS PROATV
+    LEFT JOIN Y03S24999_PROATR AS PROATR
+    ON PROATR~ID = PROATV~PRODUCT_ATTRIBUTE_ID
+    WHERE PROATV~IS_DELETED <> @ABAP_TRUE
+    AND PROATV~PRODUCT_VARIANT_ID = @U_PROVRT_ID
+    INTO CORRESPONDING FIELDS OF TABLE @IT_PROATV_0118.
+
+  IF SY-SUBRC <> 0.
+    CLEAR IT_PROATV_0118[].
+
+    IF O_PROATV_0118_CONTAINER IS NOT INITIAL.
+      CALL METHOD O_PROATV_0118_CONTAINER->FREE.
+      CLEAR O_PROATV_0118_CONTAINER.
+    ENDIF.
+    IF O_PROATV_0118_ALV_TABLE IS NOT INITIAL.
+      CLEAR O_PROATV_0118_ALV_TABLE.
+    ENDIF.
+
+    MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Attribute of this product' DISPLAY LIKE 'E'.
+    RETURN.
+  ELSE.
+    CALL SCREEN 0118 STARTING AT 15 06 ENDING AT 45 12.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PROCESS_PRODUCT_SAVE_EVENT
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM PROCESS_PRODUCT_SAVE_EVENT.
+  CASE GV_PRODUCT_SCREEN_MODE.
+    WHEN GC_PRODUCT_MODE_DISPLAY.
+
+    WHEN GC_PRODUCT_MODE_CHANGE.
+      PERFORM CHANGE_PRODUCT_DETAIL.
+      PERFORM PREPARE_PRODUCT_DETAIL USING GV_PRODUCT_ID.
+
+      MESSAGE S010(Z03S24999_DOMUS_MSGS) WITH 'Product'.
+
+      GV_PRODUCT_SCREEN_MODE = GC_PRODUCT_MODE_DISPLAY.
+
+    WHEN GC_PRODUCT_MODE_CREATE.
+*      PERFORM CHANGE_PRODUCT_DETAIL.
+*      PERFORM PREPARE_PRODUCT_DETAIL USING GV_PRODUCT_ID.
+*
+*      MESSAGE S016(Z03S24999_DOMUS_MSGS) WITH 'Product'.
+*
+*      GV_PRODUCT_SCREEN_MODE = GC_PRODUCT_MODE_DISPLAY.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_PRODUCT_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHANGE_PRODUCT_DETAIL .
+  PERFORM CHANGE_PRODUCT_BASIC_DETAIL.
+  PERFORM CHANGE_PRODUCT_VARIANTS_DETAIL.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_PRODUCT_BASIC_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHANGE_PRODUCT_BASIC_DETAIL .
+  DATA: LS_PRODCT TYPE Y03S24999_PRODCT.
+  MOVE-CORRESPONDING GS_PRODUCT_DETAIL TO LS_PRODCT.
+
+  IF GV_PRODUCT_SCREEN_MODE = GC_PRODUCT_MODE_CHANGE.
+    LS_PRODCT-UPDATED_BY = SY-UNAME.
+    LS_PRODCT-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+    LS_PRODCT-UPDATED_ON = SY-DATUM.
+
+    UPDATE Y03S24999_PRODCT FROM LS_PRODCT.
+
+    IF SY-SUBRC <> 0.
+      MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Product basic information'.
+    ENDIF.
+
+  ELSEIF GV_PRODUCT_SCREEN_MODE = GC_PRODUCT_MODE_CREATE.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CHANGE_PRODUCT_VARIANTS_DETAIL
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CHANGE_PRODUCT_VARIANTS_DETAIL.
+  DATA: LT_PI TYPE STANDARD TABLE OF Y03S24999_PROVRT.
+  MOVE-CORRESPONDING GT_PROVRT TO LT_PI.
+
+  IF GV_PRODUCT_SCREEN_MODE = GC_PRODUCT_MODE_CHANGE.
+    LOOP AT LT_PI INTO DATA(LS_PI).
+      LS_PI-UPDATED_BY = SY-UNAME.
+      LS_PI-UPDATED_AT = SY-UZEIT + ( 3600 * 5 ).
+      LS_PI-UPDATED_ON = SY-DATUM.
+
+      MODIFY Y03S24999_PROVRT FROM LS_PI.
+
+      IF SY-SUBRC <> 0.
+        MESSAGE E011(Z03S24999_DOMUS_MSGS) WITH 'Product Variant details'.
+      ENDIF.
+    ENDLOOP.
+
+  ELSEIF GV_PRODUCT_SCREEN_MODE = GC_PRODUCT_MODE_CREATE.
+
+  ENDIF.
+
 ENDFORM.
 *&---------------------------------------------------------------------*
 *& Form PROCESS_PRO_DISPLAY_CHANGE.
@@ -108,7 +276,7 @@ FORM WARNING_PRODUCT_CHANGES_EXIST .
       IMPORTING
         ANSWER                = LD_CHOICE.
     IF LD_CHOICE = '1'.
-*      PERFORM CHANGE_PRODUCT_DETAIL.
+      PERFORM CHANGE_PRODUCT_DETAIL.
       PERFORM PREPARE_PRODUCT_DETAIL USING GV_PRODUCT_ID.
     ELSEIF LD_CHOICE = '2'.
       PERFORM PREPARE_PRODUCT_DETAIL USING GV_PRODUCT_ID.
@@ -531,4 +699,125 @@ FORM GET_PRODUCT_VARIANT_ITEMS USING U_PRODUCT_ID.
     MESSAGE S004(Z03S24999_DOMUS_MSGS) WITH 'Product Variant' DISPLAY LIKE 'E'.
   ENDIF.
 
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SHOW_PROATV_0118_ALV
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SHOW_PROATV_0118_ALV.
+  DATA: LT_FIELD_CAT TYPE LVC_T_FCAT,
+        LS_LAYOUT    TYPE LVC_S_LAYO.
+*        LS_VARIANT   TYPE DISVARIANT.
+
+* Define Table Structure / Define fields catalog
+  PERFORM PREPARE_PRO_0118_FIELD_CATALOG
+    CHANGING LT_FIELD_CAT.
+
+* Prepare Layout
+  PERFORM PREPARE_PROATV_0118_LAYOUT
+    CHANGING LS_LAYOUT.
+** Prepare Variant
+*  PERFORM PREPARE_VARIANT
+*    CHANGING LS_VARIANT.
+
+* Show ALV
+  PERFORM DISPLAY_PROATV_0118_ALV_TABLE
+    CHANGING LS_LAYOUT
+*            LS_VARIANT
+             LT_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form ADD_PROATV_0118_FCAT
+*&---------------------------------------------------------------------*
+FORM ADD_PROATV_0118_FCAT USING U_FIELDNAME
+                    U_SCRTEXT_M
+                    U_OUTPUTLEN
+                    U_KEY
+                    U_HOTSPOT
+                    U_EMPHASIZE
+              CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+  DATA: LS_FIELD_CAT TYPE LVC_S_FCAT.
+  LS_FIELD_CAT-FIELDNAME = U_FIELDNAME.
+  LS_FIELD_CAT-SCRTEXT_M = U_SCRTEXT_M.
+  LS_FIELD_CAT-OUTPUTLEN = U_OUTPUTLEN.
+  LS_FIELD_CAT-KEY = U_KEY.
+  LS_FIELD_CAT-HOTSPOT = U_HOTSPOT.
+  LS_FIELD_CAT-EMPHASIZE = U_EMPHASIZE.
+  APPEND LS_FIELD_CAT TO CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PROATV_0118_FIELD_CATALOG
+*&---------------------------------------------------------------------*
+FORM PREPARE_PRO_0118_FIELD_CATALOG
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+
+***** Full form:
+  PERFORM: ADD_PROATV_0118_FCAT USING 'ATTRIBUTE_NAME' 'Attribute' 12 ''  'X' 'C500'  CHANGING CH_T_FIELD_CAT,
+           ADD_PROATV_0118_FCAT USING 'VALUE'          'Value'     12 ''  ''  ''      CHANGING CH_T_FIELD_CAT.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form DISPLAY_PROATV_0118_ALV_TABLE
+*&---------------------------------------------------------------------*
+FORM DISPLAY_PROATV_0118_ALV_TABLE
+  USING    U_S_LAYOUT    TYPE LVC_S_LAYO
+  CHANGING CH_T_FIELD_CAT TYPE LVC_T_FCAT.
+*          IM_S_VARIANT   TYPE DISVARIANT
+
+  IF O_PROATV_0118_CONTAINER IS INITIAL.
+    O_PROATV_0118_CONTAINER = NEW CL_GUI_CUSTOM_CONTAINER( CONTAINER_NAME = 'CUSTOM_CONTROL_ALV_0118' ).
+  ENDIF.
+
+  IF O_PROATV_0118_ALV_TABLE IS INITIAL.
+    O_PROATV_0118_ALV_TABLE = NEW CL_GUI_ALV_GRID( I_PARENT = O_PROATV_0118_CONTAINER ).
+  ENDIF.
+
+  O_PROATV_0118_ALV_TABLE->SET_TABLE_FOR_FIRST_DISPLAY(
+    EXPORTING
+      IS_LAYOUT                     = U_S_LAYOUT      " Layout
+*      I_SAVE                        = 'A'
+*      IS_VARIANT                    = IM_S_VARIANT
+    CHANGING
+      IT_OUTTAB                     = IT_PROATV_0118     " Output Table
+      IT_FIELDCATALOG               = CH_T_FIELD_CAT   " Field Catalog
+    EXCEPTIONS
+      INVALID_PARAMETER_COMBINATION = 1                " Wrong Parameter
+      PROGRAM_ERROR                 = 2                " Program Errors
+      TOO_MANY_LINES                = 3                " Too many Rows in Ready for Input Grid
+      OTHERS                        = 4
+  ).
+
+  IF SY-SUBRC <> 0.
+    MESSAGE E005(Z03S24999_DOMUS_MSGS).
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form PREPARE_PROATV_0118_LAYOUT
+*&---------------------------------------------------------------------*
+FORM PREPARE_PROATV_0118_LAYOUT CHANGING CH_S_LAYOUT TYPE LVC_S_LAYO.
+
+*  CH_S_LAYOUT-CWIDTH_OPT = ABAP_TRUE.
+  CH_S_LAYOUT-ZEBRA = ABAP_TRUE.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form HANDLE_UCOMM_0118
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> U_OKCODE
+*&
+*&---------------------------------------------------------------------*
+FORM HANDLE_UCOMM_0118 USING U_OKCODE.
+  CASE U_OKCODE.
+    WHEN 'CANCLE_118'.
+      CLEAR: U_OKCODE.
+      LEAVE TO SCREEN 0.
+
+    WHEN OTHERS.
+  ENDCASE.
 ENDFORM.

@@ -11,3 +11,12 @@ MODULE ADJUST_TABLE_LINE_0160 OUTPUT.
   PCKSER_TABLE_CONTROL-LINES = LINES( GT_PCKSER ).
   PCKIMG_TABLE_CONTROL-LINES = LINES( GT_PCKIMG ).
 ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*& Module MODIFY_PCKDES_SCREEN OUTPUT
+*&---------------------------------------------------------------------*
+MODULE MODIFY_PCKDES_SCREEN OUTPUT.
+  IF PCKDES_EDITOR IS NOT INITIAL.
+    PCKDES_EDITOR->SET_READONLY_MODE( ).
+  ENDIF.
+ENDMODULE.

@@ -7,7 +7,7 @@
      <ID>Z03S24_G03_CUSTOMER_BG_01</ID>
      <TITLE Transl="true">1</TITLE>
      <CATALOG_ID>/UI2/FLPD_CATALOG</CATALOG_ID>
-     <LAYOUT>{&quot;order&quot;:[&quot;48MC0MJCBPU76NMM2D2Y93R8Y&quot;],&quot;linkOrder&quot;:[]}</LAYOUT>
+     <LAYOUT>{&quot;order&quot;:[&quot;48MC0MJCBPU76NMM2D2Y93R8Y&quot;,&quot;48MC0MJCBPU5GDDLPY64A7DFK&quot;,&quot;48MC0MJCBPU5GDDLPZTT4WEKG&quot;],&quot;linkOrder&quot;:[]}</LAYOUT>
      <ORIGINAL_LANGUAGE>en</ORIGINAL_LANGUAGE>
      <IS_CATALOG_PAGE/>
      <IS_PERS_LOCKED>X</IS_PERS_LOCKED>
@@ -15,7 +15,7 @@
      <Node Name="EDM_P_HEADER" SimpleFormat="true">
       <Item Index="000001" SimpleFormat="true">
        <NAME Final="5 ">CONF_TIMESTAMP</NAME>
-       <VALUE>20240714032927</VALUE>
+       <VALUE>20240716201619</VALUE>
       </Item>
      </Node>
      <Node Name="GADGET_USAGE" SimpleFormat="true">
@@ -33,6 +33,40 @@
         <Item Index="000001" SimpleFormat="true">
          <NAME Final="5 ">CONF_TIMESTAMP</NAME>
          <VALUE>20240714032926</VALUE>
+        </Item>
+       </Node>
+      </Item>
+      <Item Index="000002" SimpleFormat="true">
+       <USAGE_ID Final="5 ">48MC0MJCBPU5GDDLPY64A7DFK</USAGE_ID>
+       <GADGET_ID>X-SAP-UI2-PAGE:X-SAP-UI2-CATALOGPAGE:Z03S24_G03_CUSTOMER_BC_01:48MC0MJCBPU5GDDLO2A3PVW5K</GADGET_ID>
+       <TITLE Transl="true"/>
+       <CONFIGURATION/>
+       <LAYOUT_DATA/>
+       <REMOTE_CATALOG_ID/>
+       <REF_PAGE_ID/>
+       <REF_USAGE_ID/>
+       <IS_READ_ONLY/>
+       <Node Name="EDM_GU_HEADER" SimpleFormat="true">
+        <Item Index="000001" SimpleFormat="true">
+         <NAME Final="5 ">CONF_TIMESTAMP</NAME>
+         <VALUE>20240716201617</VALUE>
+        </Item>
+       </Node>
+      </Item>
+      <Item Index="000003" SimpleFormat="true">
+       <USAGE_ID Final="5 ">48MC0MJCBPU5GDDLPZTT4WEKG</USAGE_ID>
+       <GADGET_ID>X-SAP-UI2-PAGE:X-SAP-UI2-CATALOGPAGE:Z03S24_G03_CUSTOMER_BC_01:48MC0MJCBPU5GDDLOPRCTRWCT</GADGET_ID>
+       <TITLE Transl="true"/>
+       <CONFIGURATION/>
+       <LAYOUT_DATA/>
+       <REMOTE_CATALOG_ID/>
+       <REF_PAGE_ID/>
+       <REF_USAGE_ID/>
+       <IS_READ_ONLY/>
+       <Node Name="EDM_GU_HEADER" SimpleFormat="true">
+        <Item Index="000001" SimpleFormat="true">
+         <NAME Final="5 ">CONF_TIMESTAMP</NAME>
+         <VALUE>20240716201619</VALUE>
         </Item>
        </Node>
       </Item>

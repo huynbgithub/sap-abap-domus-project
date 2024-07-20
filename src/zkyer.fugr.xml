@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_FUGR" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <AREAT>Wrap Long Text</AREAT>
+   <INCLUDES>
+    <SOBJ_NAME>LZKYERTOP</SOBJ_NAME>
+    <SOBJ_NAME>SAPLZKYER</SOBJ_NAME>
+   </INCLUDES>
+   <FUNCTIONS>
+    <item>
+     <FUNCNAME>ZRKD_WORD_WRAP</FUNCNAME>
+     <SHORT_TEXT>Wrap Long Text</SHORT_TEXT>
+     <IMPORT>
+      <RSIMP>
+       <PARAMETER>TEXTLINE</PARAMETER>
+       <TYP>C</TYP>
+      </RSIMP>
+      <RSIMP>
+       <PARAMETER>DELIMITER</PARAMETER>
+       <DEFAULT>SPACE</DEFAULT>
+       <OPTIONAL>X</OPTIONAL>
+       <TYP>C</TYP>
+      </RSIMP>
+      <RSIMP>
+       <PARAMETER>OUTPUTLEN</PARAMETER>
+       <DEFAULT>35</DEFAULT>
+       <OPTIONAL>X</OPTIONAL>
+       <TYP>I</TYP>
+      </RSIMP>
+     </IMPORT>
+     <EXPORT>
+      <RSEXP>
+       <PARAMETER>OUT_LINE1</PARAMETER>
+       <TYP>C</TYP>
+      </RSEXP>
+      <RSEXP>
+       <PARAMETER>OUT_LINE2</PARAMETER>
+       <TYP>C</TYP>
+      </RSEXP>
+      <RSEXP>
+       <PARAMETER>OUT_LINE3</PARAMETER>
+       <TYP>C</TYP>
+      </RSEXP>
+     </EXPORT>
+     <TABLES>
+      <RSTBL>
+       <PARAMETER>OUT_LINES</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
+      </RSTBL>
+     </TABLES>
+     <EXCEPTION>
+      <RSEXC>
+       <EXCEPTION>OUTPUTLEN_TOO_LARGE</EXCEPTION>
+      </RSEXC>
+     </EXCEPTION>
+     <DOCUMENTATION>
+      <RSFDO>
+       <PARAMETER>TEXTLINE</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Source text line</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>DELIMITER</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Indicator, which is used as a separator</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>OUTPUTLEN</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Maximum output line width</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>OUT_LINE1</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Output line 1</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>OUT_LINE2</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Output line 2</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>OUT_LINE3</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Output line 3</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>OUT_LINES</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>All output lines as table</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>OUTPUTLEN_TOO_LARGE</PARAMETER>
+       <KIND>X</KIND>
+      </RSFDO>
+     </DOCUMENTATION>
+    </item>
+   </FUNCTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

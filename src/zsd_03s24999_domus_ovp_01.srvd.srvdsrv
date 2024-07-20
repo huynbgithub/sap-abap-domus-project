@@ -1,0 +1,4 @@
+@EndUserText.label: 'ZSD_03S24999_DOMUS_OVP_01'
+define service ZSD_03S24999_DOMUS_OVP_01 {
+  expose ZC_03S24999_DOMUS_OVP_01;
+}

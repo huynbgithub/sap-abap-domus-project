@@ -7,21 +7,7 @@
      <NAME>ZUI03_S24_999_QUOTAAPP_V4</NAME>
      <TYPE>SRVB/SVB</TYPE>
      <DESCRIPTION>ZUI03_S24_999_QUOTAAPP_V4</DESCRIPTION>
-     <LINKS>
-      <item>
-       <HREF>/sap/bc/adt/businessservices/odatav4/ZUI03_S24_999_QUOTAAPP_V4</HREF>
-       <REL>http://www.sap.com/categories/odatav4</REL>
-       <TYPE>application/vnd.sap.adt.businessservices.odatav4.v1+xml</TYPE>
-       <TITLE>ODATAV4</TITLE>
-      </item>
-      <item>
-       <HREF>/sap/bc/adt/businessservices/testclass</HREF>
-       <REL>http://www.sap.com/categories/testclass</REL>
-       <TYPE>application/vnd.sap.adt.businessservices.testclass.v1+xml</TYPE>
-       <TITLE>TESTCLASS</TITLE>
-      </item>
-     </LINKS>
-     <RESPONSIBLE>DEV-093</RESPONSIBLE>
+     <RESPONSIBLE>DEVELOPER</RESPONSIBLE>
      <MASTER_LANGUAGE>EN</MASTER_LANGUAGE>
     </METADATA>
     <CONTENT>
@@ -36,17 +22,23 @@
        <SERVICE_CONTENT>
         <item>
          <SERVICE_VERSION>0001</SERVICE_VERSION>
+         <RELEASE_STATE>NOT_RELEASED</RELEASE_STATE>
          <SRVD_REF>
           <URI>/sap/bc/adt/ddic/srvd/sources/zi03_s24_999s_quotaappadmin</URI>
           <TYPE>SRVD/SRV</TYPE>
           <NAME>ZI03_S24_999S_QUOTAAPPADMIN</NAME>
          </SRVD_REF>
+         <BIND_TYPE_DATA>
+          <CONTENT>
+           <ENCODING>base64</ENCODING>
+          </CONTENT>
+         </BIND_TYPE_DATA>
         </item>
        </SERVICE_CONTENT>
       </item>
      </SERVICES>
     </CONTENT>
-    <PUBLISHED>true</PUBLISHED>
+    <BINDING_CREATED>true</BINDING_CREATED>
    </SRVB>
   </asx:values>
  </asx:abap>

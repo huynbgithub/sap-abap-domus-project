@@ -1,4 +1,0 @@
-@EndUserText.label: 'Service for ZC_03_S24_999_CNTRCT_AD'
-define service ZSD_03_S24_999_CNTRCT_AD_APP {
-  expose ZC_03_S24_999_CNTRCT_AD as ContractAdmin;
-}
